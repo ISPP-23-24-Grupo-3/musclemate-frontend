@@ -1,9 +1,36 @@
-# React + Vite
+# MuscleMate-Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+## Requisitos previos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# musclemate-frontend
+Asegúrate de tener Node.js y npm instalados antes de comenzar.
+
+- [Node.js](https://nodejs.org/)
+
+## Instalación
+
+1. Clona este repositorio:
+
+   ```bash
+   git clone https://github.com/ISPP-23-24-Grupo-3/musclemate-frontend.git
+   ```
+
+2. Accede al directorio donde has clonado tu proyecto
+
+    ```bash
+    cd musclemate-frontend
+    ```
+
+3. Instalar los paquetes requeridos
+    ```bash
+    npm install
+    ```
+
+4. Una vez instalado todos los requisitos necesarios, inicializamos el proyecto en modo desarrollo:
+    ```bash
+    npm run dev
+    ```
+
+Para acceder a la aplicación, visita http://localhost:5174/
+
+
