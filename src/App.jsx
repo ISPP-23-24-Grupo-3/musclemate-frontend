@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
-import UserLogin from './views/UserLogin'; // Importa el componente de inicio de sesión de usuario
-import GymLogin from './views/GymLogin'; // Importa el componente de inicio de sesión de gimnasio
+import UserLogin from './views/userLogin'; // Importa el componente de inicio de sesión de usuario
+import GymLogin from './views/gymLogin'; // Importa el componente de inicio de sesión de gimnasio
 
 function App() {
   const [showUserLogin, setShowUserLogin] = useState(false);
