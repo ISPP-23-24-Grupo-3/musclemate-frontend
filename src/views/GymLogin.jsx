@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import './Login.css'; // Importa el archivo de estilos CSS
+import './Login.css'; // Importa los estilos CSS
 
-const Login = () => {
+const GymLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -15,12 +15,12 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Lógica para manejar el inicio de sesión...
+    // Lógica para manejar el inicio de sesión de gimnasio...
   };
 
   return (
     <div className="login-container">
-      <h2>Iniciar Sesión</h2>
+      <h2>Iniciar Sesión como Gimnasio</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Usuario:</label>
@@ -36,4 +36,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default GymLogin;
