@@ -27,7 +27,7 @@ const UserLogin = () => {
             type="text"
             value={username}
             onChange={handleUsernameChange}
-            className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white"
+            className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white text-black pl-28" // Ajustar el padding izquierdo para dejar espacio para la etiqueta
           />
         </div>
         <div className="mb-10 relative">
@@ -36,7 +36,7 @@ const UserLogin = () => {
             type="password"
             value={password}
             onChange={handlePasswordChange}
-            className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white"
+            className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white text-black pl-28" // Ajustar el padding izquierdo para dejar espacio para la etiqueta
           />
         </div>
         <button
