@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import loginVideo from '../assets/other_assets/video_login.mp4'; // Importa el video de login
+import { HiUser, HiLockClosed } from 'react-icons/hi'; // Importa los iconos de usuario y candado
 
 const UserLogin = () => {
   const [username, setUsername] = useState('');
@@ -32,24 +33,26 @@ const UserLogin = () => {
   return (
     <div className="flex justify-between items-center">
       <div className="max-w-300px p-10 border border-lime-500 rounded">
-        <h2 className="mb-6 text-lime-500 font-bold text-4xl">Iniciar Sesión</h2>
+        <h2 className="mb-6 text-lime-500 font-bold text-4xl">¡Bienvenido!</h2>
         <form onSubmit={handleSubmit} className="relative">
-          <div className="mb-6 relative">
-            <label className="absolute left-0 w-24 bg-lime-500 h-full flex justify-center items-center text-white rounded-l-lg">Usuario:</label>
+          <div className="mb-6 relative flex items-center">
+            <HiUser className="absolute left-0 w-8 h-8 text-lime-500 ml-4" />
             <input
               type="text"
               value={username}
               onChange={handleUsernameChange}
-              className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white text-black pl-28"
+              placeholder="Usuario"
+              className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white text-black pl-16"
             />
           </div>
-          <div className="mb-6 relative">
-            <label className="absolute left-0 w-24 bg-lime-500 h-full flex justify-center items-center text-white rounded-l-lg">Contraseña:</label>
+          <div className="mb-6 relative flex items-center">
+            <HiLockClosed className="absolute left-0 w-8 h-8 text-lime-500 ml-4" />
             <input
               type="password"
               value={password}
               onChange={handlePasswordChange}
-              className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white text-black pl-28"
+              placeholder="Contraseña"
+              className="w-full px-6 py-3 border border-lime-500 rounded-r-lg bg-white text-black pl-16"
             />
           </div>
           <button
