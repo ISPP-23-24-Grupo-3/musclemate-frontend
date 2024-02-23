@@ -1,3 +1,6 @@
+
+import tailwindcssRadix from 'tailwindcss-radix';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -6,12 +9,11 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        lime: {
-          DEFAULT: '#22E435', // Define el nuevo tono de verde
-        },
-      },
     },
   },
-  plugins: [],
+  plugins: [
+    tailwindcssRadix({
+      variantPrefix: "data",
+    }),
+  ],
 };

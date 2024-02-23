@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
-import Login from './views/Login'; // Asegúrate de importar correctamente tu componente de inicio de sesión
-import './index.css';
+import Login from './views/Login';
+import './index.css'
+import '@radix-ui/themes/styles.css';
 
 const router = createBrowserRouter([
   {
