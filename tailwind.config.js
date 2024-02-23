@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        radixgreen: '#30A46C',
+      },
     },
   },
   plugins: [

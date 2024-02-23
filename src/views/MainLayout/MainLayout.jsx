@@ -1,7 +1,7 @@
 
 import PropTypes from 'prop-types';
 import Header from '../../components/Header/Header';
-import { Theme, Container, Flex } from '@radix-ui/themes';
+import { Theme, Container } from '@radix-ui/themes';
 import Footer from '../../components/Footer/Footer';
 
 const MainLayout = ({ children }) => {
@@ -10,9 +10,7 @@ const MainLayout = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <Header/> 
     <Container>
-        <Flex justify="center">
             {children}
-        </Flex>
       </Container>
       <Footer/>
     </div>
