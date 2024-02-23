@@ -36,7 +36,7 @@ const UserLogin = () => {
 
   return (
     <MainLayout>
-      <div className="mt-8 flex flex-col md:flex-row justify-between items-center">
+      <div className="mt-16 flex flex-col md:flex-row justify-between items-center"> {/* Ajusta el margen superior */}
         <div className="max-w-300px p-10 border border-radixgreen rounded md:mr-8">
           <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">¡Bienvenido!</h2>
           <form onSubmit={handleSubmit} className="relative">
@@ -63,7 +63,7 @@ const UserLogin = () => {
             <Button type="submit" size="3" variant="solid" color="green" className="w-full">Iniciar Sesión</Button>
           </form>
         </div>
-        <div className="w-full md:w-1/2 mt-8 md:mt-0">
+        <div className="w-full md:w-1/2 mt-8 md:mt-0"> {/* Ajusta el margen superior */}
           <video ref={videoRef} src={loginVideo} autoPlay loop muted onLoadedData={handleVideoLoaded} className="h-auto">
             Tu navegador no admite la reproducción de videos.
           </video>
