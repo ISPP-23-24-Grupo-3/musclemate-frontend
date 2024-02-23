@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import './index.css'
+import '@radix-ui/themes/styles.css';
+
 
 const router = createBrowserRouter([
   {
