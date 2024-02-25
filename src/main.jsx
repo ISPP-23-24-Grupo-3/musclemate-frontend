@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./views/LoginPage/Login";
+import { Routines } from "./views/Routines/Routines";
+
 import "./index.css";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
@@ -22,6 +24,10 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+      {
+        path: "/routines",
+        element: <Routines />,
+      },
     ],
   },
 ]);
@@ -31,5 +37,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

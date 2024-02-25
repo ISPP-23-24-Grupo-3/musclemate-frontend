@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import MainLayout from "../MainLayout/MainLayout";
 import { Box, Button, Flex, ScrollArea, Text } from "@radix-ui/themes";
 import { FaPencil } from "react-icons/fa6";
 import { CgGym } from "react-icons/cg";
-import { Outlet, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 
@@ -38,8 +37,7 @@ export const Routines = () => {
   const addRoutine = () => navigate("new");
 
   return (
-    <MainLayout>
-      <Outlet />
+    <>
       <Button
         type="submit"
         size="4"
@@ -56,7 +54,7 @@ export const Routines = () => {
       ) : (
         <ListRoutines routines={routines} />
       )}
-    </MainLayout>
+    </>
   );
 };
 
