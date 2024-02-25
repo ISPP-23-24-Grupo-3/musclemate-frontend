@@ -1,14 +1,11 @@
-import { Link } from 'react-router-dom';
-import './App.css'
-import Users from './views/UserListing/Users'
+import { Link } from "react-router-dom";
+import "./App.css";
 import MainLayout from './views/MainLayout/MainLayout'
-import { Button, Flex } from '@radix-ui/themes';
-
+import { Button, Flex } from "@radix-ui/themes";
 
 function App() {
 
   return (
-    <>
     <MainLayout>
       <Flex justify="center" align="center">
         <div className="mt-6 flex items-center">
@@ -16,23 +13,15 @@ function App() {
           <h1 className="text-2xl font-bold">MuscleMate</h1>
         </div>
       </Flex>
-      <Flex direction="column" justify="center" align="center" >
-            <Link to="/login">
-              <Button size="4" variant="classic" color="green">Iniciar Sesión</Button>
-            </Link>
-            <Link to="/users">
-              <Button size="4" variant="classic" color="green">Users</Button>
-            </Link>
+      <Flex direction="column" justify="center" align="center">
+        <Link to="/login">
+          <Button size="4" variant="classic" color="green">
+            Iniciar Sesión
+          </Button>
+        </Link>
       </Flex>
     </MainLayout>
-    </>
   );
-}
-
-const header = {
-  backgroundColor: '#f4f4f4',
-  padding: '10px',
-  marginBottom: '20px'
 }
 
 export default App;
