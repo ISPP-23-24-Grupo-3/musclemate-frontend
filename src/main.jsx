@@ -1,14 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import MachineList from "./views/MachineList.jsx";
-import "./index.css";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from './App';
+import Login from './views/LoginPage/Login';
+import './index.css'
+import '@radix-ui/themes/styles.css';
+import { Theme } from '@radix-ui/themes';
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <App />,
+    path: '/',
+    element: <App />
+  },
+  {
+    path: '/login',
+    element: <Login />
   },
   {
     path: "/my-machines",
@@ -16,8 +22,10 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <Theme accentColor='green'>
     <RouterProvider router={router} />
-  </React.StrictMode>,
+    </Theme>
+  </React.StrictMode>
 );
