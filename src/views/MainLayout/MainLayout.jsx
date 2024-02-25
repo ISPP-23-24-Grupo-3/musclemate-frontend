@@ -1,19 +1,19 @@
+import PropTypes from "prop-types";
+import Header from "../../components/Header/Header";
+import { Theme, Container } from "@radix-ui/themes";
+import Footer from "../../components/Footer/Footer";
+import { Outlet } from "react-router";
 
-import PropTypes from 'prop-types';
-import Header from '../../components/Header/Header';
-import { Theme, Container } from '@radix-ui/themes';
-import Footer from '../../components/Footer/Footer';
-
-const MainLayout = ({ children }) => {
+const MainLayout = () => {
   return (
     <Theme>
-    <div className="flex flex-col min-h-screen">
-      <Header/> 
-    <Container>
-            {children}
-      </Container>
-      <Footer/>
-    </div>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <Container>
+          <Outlet />
+        </Container>
+        <Footer />
+      </div>
     </Theme>
   );
 };
