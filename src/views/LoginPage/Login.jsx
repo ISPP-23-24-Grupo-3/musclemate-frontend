@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import loginVideo from "../../assets/other_assets/video_login.mp4"; // Importa el video de inicio de sesión
 import { HiUser, HiLockClosed } from "react-icons/hi"; // Importa los iconos de usuario y candado
-import MainLayout from "../MainLayout/MainLayout";
 import { Button } from "@radix-ui/themes";
 
 const UserLogin = () => {
