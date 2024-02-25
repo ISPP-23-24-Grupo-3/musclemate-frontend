@@ -7,6 +7,7 @@ import Users from './views/UserListing/Users';
 import './index.css'
 import '@radix-ui/themes/styles.css';
 import { Theme } from '@radix-ui/themes';
+import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
 
 const router = createBrowserRouter([
@@ -23,19 +24,17 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+      {
+        path: "/my-machines",
+        element: <MachineList />,
+      },
+      {
+        path: '/users',
+        element: <Users />
+      },
     ],
   },
-<<<<<<< HEAD
-  {
-    path: '/login',
-    element: <Login />
-  },
-  {
-    path: '/users',
-    element: <Users />
-  },
-=======
->>>>>>> develop
+
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
