@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import "./App.css";
-import MainLayout from './views/MainLayout/MainLayout'
 import { Button, Flex } from "@radix-ui/themes";
 
 function App() {
-
   return (
-    <MainLayout>
+    <>
       <Flex justify="center" align="center">
         <div className="mt-6 flex items-center">
           <img src="/pwa-64x64.png" alt="Logo" className="mr-4" />
@@ -20,7 +18,7 @@ function App() {
           </Button>
         </Link>
       </Flex>
-    </MainLayout>
+    </>
   );
 }
 
