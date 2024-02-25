@@ -23,6 +23,10 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+      {
+        path: "/my-machines",
+        element: <MachineList />,
+      },
     ],
   },
 ]);
