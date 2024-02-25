@@ -5,6 +5,7 @@ import Login from "./views/LoginPage/Login";
 import "./index.css";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
+import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
 import App from "./App";
 
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/my-machines",
+        element: <MachineList />,
       },
     ],
   },
