@@ -1,7 +1,10 @@
 import * as Separator from "@radix-ui/react-separator";
 import Rating from "../../components/Rating";
-import * as Popover from "@radix-ui/react-popover";
-import MainLayout from "../MainLayout/MainLayout";
+// import * as Popover from "@radix-ui/react-popover";
+import { IoMdAddCircleOutline, IoMdSearch } from "react-icons/io";
+import { HiOutlineFilter } from "react-icons/hi";
+import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
+import { useState } from "react";
 
 // TODO: Add picture support
 const MACHINES = [
@@ -59,7 +62,7 @@ const MACHINES = [
   },
   {
     id: 1,
-    name: "Bench Press 2",
+    name: "Weights",
     description:
       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
     // picture: ""
@@ -110,17 +113,30 @@ const MACHINES = [
 ];
 
 export default function MachineList() {
+  const [search, set_search] = useState("");
+
   return (
     <>
-      <span className="text-xl">My Machines</span>
+      <Heading className="">Mis Máquinas</Heading>
       <div className="flex flex-col space-y-3">
         <div className="flex gap-3">
-          <input className="rounded border border-radixgreen/50 w-1/2"></input>
+          <TextField.Root className="flex-1">
+            <TextField.Slot>
+              <IoMdSearch />
+            </TextField.Slot>
+            <TextField.Input
+              placeholder="Buscar máquina"
+              onChange={(e) => set_search(e.target.value)}
+            ></TextField.Input>
+          </TextField.Root>
           <Popover.Root>
-            <Popover.Trigger className="p-2 flex-1 bg-radixgreen rounded">
-              Sort
+            <Popover.Trigger className="flex-1 rounded">
+              <Button size="2" variant="surface" className="size-full m-0 ">
+                <HiOutlineFilter />
+                Ordenar
+              </Button>
             </Popover.Trigger>
-            <Popover.Content class="p-2 shadow-md shadow-black/30 backdrop-blur bg-neutral-400/10 rounded-lg">
+            <Popover.Content>
               <span className="text-lg font-bold">Sort By</span>
               <div className="flex"></div>
               <Separator.Root className="border-b my-3" />
@@ -130,22 +146,14 @@ export default function MachineList() {
           </Popover.Root>
         </div>
 
-        <button className="flex items-center gap-2 font-bold px-3 hover:border-radixgreen">
-          <svg
-            className="fill-current size-5 inline-block"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M11 8C11 7.44772 11.4477 7 12 7C12.5523 7 13 7.44772 13 8V11H16C16.5523 11 17 11.4477 17 12C17 12.5523 16.5523 13 16 13H13V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V13H8C7.44771 13 7 12.5523 7 12C7 11.4477 7.44772 11 8 11H11V8Z" />
-            <path
-              d="M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM3.00683 12C3.00683 16.9668 7.03321 20.9932 12 20.9932C16.9668 20.9932 20.9932 16.9668 20.9932 12C20.9932 7.03321 16.9668 3.00683 12 3.00683C7.03321 3.00683 3.00683 7.03321 3.00683 12Z"
-              fillRule="evenodd"
-            />
-          </svg>
+        <Button size="3">
+          <IoMdAddCircleOutline className="size-6" />
           Add a machine
-        </button>
+        </Button>
 
-        {MACHINES.map((machine) => {
+        {MACHINES.filter((m) =>
+          m.name.toLowerCase().includes(search.toLowerCase()),
+        ).map((machine) => {
           const ratings = machine.reviews.map((review) => review.rating);
           const avg_rating =
             ratings.reduce((previous, current) => {
@@ -155,9 +163,11 @@ export default function MachineList() {
           const reviews = machine.reviews.length;
 
           return (
-            <button
+            <Button
               key={machine.id}
-              className="flex bg-black/0 rounded-lg border-none shadow shadow-radixgreen/30 p-3 justify-between hover:bg-primary/5 hover:shadow-primary/50 hover:border-none transition-all"
+              variant="soft"
+              size="3"
+              className="flex !justify-between !h-fit !p-2 !px-4"
             >
               <div className="flex flex-col">
                 <p className="font-semibold">{machine.name}</p>
@@ -190,7 +200,7 @@ export default function MachineList() {
                   {issues} issues
                 </span>
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>
