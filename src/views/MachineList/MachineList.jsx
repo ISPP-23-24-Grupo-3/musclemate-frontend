@@ -1,12 +1,13 @@
 import * as Separator from "@radix-ui/react-separator";
 import Rating from "../../components/Rating";
-// import * as Popover from "@radix-ui/react-popover";
-import { IoMdAddCircleOutline, IoMdSearch } from "react-icons/io";
+import { IoMdAddCircleOutline, IoMdSearch, IoIosClose } from "react-icons/io";
+import * as Toggle from "@radix-ui/react-toggle";
 import { HiOutlineFilter } from "react-icons/hi";
 import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
 import { useState } from "react";
 
 // TODO: Add picture support
+const MUSCLES = ["hombros", "brazos", "espalda"];
 const MACHINES = [
   {
     id: 0,
@@ -14,7 +15,7 @@ const MACHINES = [
     description:
       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
     // picture: ""
-    muscles: ["shoulders", "arms"],
+    muscles: ["hombros", "brazos", "espalda"],
     reviews: [
       {
         id: 0,
@@ -66,7 +67,7 @@ const MACHINES = [
     description:
       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
     // picture: ""
-    muscles: ["shoulders", "arms"],
+    muscles: ["hombros", "brazos"],
     reviews: [
       {
         id: 3,
@@ -113,11 +114,22 @@ const MACHINES = [
 ];
 
 export default function MachineList() {
+  const [filters, set_filters] = useState([]);
   const [search, set_search] = useState("");
+  const filtered_machine_list = MACHINES.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase()),
+  ).filter((m) =>
+    filters.length != 0 ? filters.some((f) => m.muscles.includes(f)) : true,
+  );
+  const addFilter = (filter) => set_filters([filter, ...filters]);
+  const removeFilter = (filter) =>
+    set_filters(filters.filter((f) => f != filter));
 
   return (
     <>
-      <Heading className="">Mis Máquinas</Heading>
+      <Heading size="8" className="text-radixgreen !mt-8 !mb-3">
+        Mis Máquinas
+      </Heading>
       <div className="flex flex-col space-y-3">
         <div className="flex gap-3">
           <TextField.Root className="flex-1">
@@ -130,18 +142,46 @@ export default function MachineList() {
             ></TextField.Input>
           </TextField.Root>
           <Popover.Root>
-            <Popover.Trigger className="flex-1 rounded">
-              <Button size="2" variant="surface" className="size-full m-0 ">
-                <HiOutlineFilter />
-                Ordenar
-              </Button>
-            </Popover.Trigger>
+            <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
+              <Popover.Trigger>
+                <Button radius="none" size="2" variant="soft" className="m-0">
+                  <HiOutlineFilter />
+                </Button>
+              </Popover.Trigger>
+              <div className="flex-1 flex gap-2">
+                {filters.map((f) => (
+                  <Button
+                    key={f}
+                    radius="full"
+                    size="1"
+                    className="!pl-1 !gap-1"
+                    onClick={(_) => removeFilter(f)}
+                  >
+                    <IoIosClose className="size-4" />
+                    {f}
+                  </Button>
+                ))}
+              </div>
+            </div>
             <Popover.Content>
               <span className="text-lg font-bold">Ordenar por</span>
               <div className="flex"></div>
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
               <span className="text-lg font-bold">Filtrar por</span>
+              <div className="flex gap-3">
+                {MUSCLES.map((m) => (
+                  <Toggle.Root
+                    className="transition-colors data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
+                    key={m}
+                    onPressedChange={(p) =>
+                      p ? addFilter(m) : removeFilter(m)
+                    }
+                  >
+                    {m}
+                  </Toggle.Root>
+                ))}
+              </div>
             </Popover.Content>
           </Popover.Root>
         </div>
@@ -151,9 +191,7 @@ export default function MachineList() {
           Añadir máquina
         </Button>
 
-        {MACHINES.filter((m) =>
-          m.name.toLowerCase().includes(search.toLowerCase()),
-        ).map((machine) => {
+        {filtered_machine_list.map((machine) => {
           const ratings = machine.reviews.map((review) => review.rating);
           const avg_rating =
             ratings.reduce((previous, current) => {
