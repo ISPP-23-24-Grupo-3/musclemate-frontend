@@ -135,6 +135,21 @@ export default function MachineList() {
     name: (a, b) => a.name.localeCompare(b.name),
     issues: (a, b) => a.reviews.length - b.reviews.length,
     reviews: (a, b) => a.issues.length - b.issues.length,
+    rating: (a, b) => {
+      const a_rating =
+        a.reviews
+          .map((r) => r.rating)
+          .reduce((previous, current) => {
+            return previous + current;
+          }, 0) / a.reviews.length;
+      const b_rating =
+        b.reviews
+          .map((r) => r.rating)
+          .reduce((previous, current) => {
+            return previous + current;
+          }, 0) / b.reviews.length;
+      return a_rating - b_rating;
+    },
   };
 
   const addFilter = (filter) => set_filters([filter, ...filters]);
@@ -225,6 +240,12 @@ export default function MachineList() {
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
                 >
                   Nº incidencias
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="rating"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Valoración
                 </ToggleGroup.Item>
               </ToggleGroup.Root>
               <Separator.Root className="border-b my-3" />
