@@ -199,7 +199,7 @@ export default function MachineList() {
                     radius="full"
                     size="1"
                     className="!pl-1 !gap-1 animate-fadein"
-                    onClick={(_) => removeFilter(f)}
+                    onClick={() => removeFilter(f)}
                   >
                     <IoIosClose className="size-4" />
                     {f}
@@ -220,7 +220,7 @@ export default function MachineList() {
               <ToggleGroup.Root
                 type="single"
                 defaultValue="name"
-                onValueChange={(v) => set_sorting(v)}
+                onValueChange={(v) => v && set_sorting(v)}
                 className="gap-2 flex"
               >
                 <ToggleGroup.Item
