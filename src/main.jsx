@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./views/LoginPage/Login";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
+import RegisterClient from "./views/RegisterPage/RegisterClient";
 import "./index.css";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <RegisterUser />,
+      },
+      {
+        path: "/register-client",
+        element: <RegisterClient />,
       },
       {
         path: "/my-machines",

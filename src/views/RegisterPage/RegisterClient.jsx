@@ -2,19 +2,17 @@ import React from "react";
 import { HiUser, HiLockClosed, HiOutlineMail } from "react-icons/hi";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import { Link } from "react-router-dom";
 
 
 
-
-const UserRegister = () => {
+const ClientRegister = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = (userInfo) => console.log(userInfo);
 
   const messages = {
     req: "Este campo es obligatorio",
-    name: "El nombre de usuario tiene que ser mayor a 8 caracteres",
+    name: "El nombre del gimnasio tiene que ser mayor a 8 caracteres",
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres"
   };
@@ -32,7 +30,7 @@ const UserRegister = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="relative flex items-center">
             <HiUser className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="userName">Nombre de usuario</label>
+            <label htmlFor="userName">Nombre de la empresa</label>
             <input
               {...register("userName", {
                 required: messages.req,
@@ -96,17 +94,11 @@ const UserRegister = () => {
           >
             Registrarse
           </Button>
-          <p className="mt-4">
-          ¿Deseas registrarte como cliente?
-              <Link to="/register-client" className="ml-2 text-radixgreen">
-               Regístrate aquí
-              </Link>
-          </p>
         </form>
       </div>
       <div className="ml-8">
         <p className="text-gray-600 text-lg">
-          Bienvenido a nuestra plataforma de registro. Complete el formulario a la izquierda para crear su cuenta.
+          Bienvenido a nuestra plataforma de registro para clientes. Complete el formulario a la izquierda para crear su cuenta.
         </p>
         <img src="src\assets\images\gym_reg.jpg" alt="Descripción de la imagen" className="mt-4 w-64 h-auto" />
       </div>
@@ -114,4 +106,4 @@ const UserRegister = () => {
   );
 };
 
-export default UserRegister;
+export default ClientRegister;
