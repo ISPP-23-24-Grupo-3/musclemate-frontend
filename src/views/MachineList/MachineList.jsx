@@ -153,11 +153,14 @@ export default function MachineList() {
 
   return (
     <>
-      <Heading size="8" className="text-radixgreen !mt-8 !mb-3">
+      <Heading
+        size="8"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+      >
         Mis Máquinas
       </Heading>
       <div className="flex flex-col space-y-3">
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-col md:flex-row">
           <TextField.Root className="flex-1">
             <TextField.Slot>
               <IoMdSearch />
@@ -190,7 +193,7 @@ export default function MachineList() {
               </div>
             </div>
             <Popover.Content>
-              <div className="flex justify-between">
+              <div className="flex justify-between mb-2">
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
                   onPressedChange={(p) => set_sorting_reverse(p)}
@@ -230,7 +233,7 @@ export default function MachineList() {
               <div className="flex gap-3">
                 {MUSCLES.map((m) => (
                   <Toggle.Root
-                    className="transition-colors bg-radixgreen/10 text-radixgreen data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
+                    className="capitalize transition-colors bg-radixgreen/10 text-radixgreen data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
                     key={m}
                     onPressedChange={(p) =>
                       p ? addFilter(m) : removeFilter(m)
