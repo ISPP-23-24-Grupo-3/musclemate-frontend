@@ -1,9 +1,21 @@
 import * as Separator from "@radix-ui/react-separator";
 import Rating from "../../components/Rating";
-import { IoMdAddCircleOutline, IoMdSearch, IoIosClose } from "react-icons/io";
+import {
+  IoMdAddCircleOutline,
+  IoMdSearch,
+  IoIosClose,
+  IoIosArrowRoundUp,
+} from "react-icons/io";
 import * as Toggle from "@radix-ui/react-toggle";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { HiOutlineFilter } from "react-icons/hi";
-import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
+import {
+  Button,
+  Popover,
+  TextField,
+  Heading,
+  IconButton,
+} from "@radix-ui/themes";
 import { useState } from "react";
 
 // TODO: Add picture support
@@ -115,15 +127,29 @@ const MACHINES = [
 
 export default function MachineList() {
   const [filters, set_filters] = useState([]);
+  const [sorting, set_sorting] = useState("name");
+  const [sorting_reverse, set_sorting_reverse] = useState(false);
   const [search, set_search] = useState("");
-  const filtered_machine_list = MACHINES.filter((m) =>
-    m.name.toLowerCase().includes(search.toLowerCase()),
-  ).filter((m) =>
-    filters.length != 0 ? filters.some((f) => m.muscles.includes(f)) : true,
-  );
+
+  const SORTING_FUNCTIONS = {
+    name: (a, b) => a.name.localeCompare(b.name),
+    issues: (a, b) => a.reviews.length - b.reviews.length,
+    reviews: (a, b) => a.issues.length - b.issues.length,
+  };
+
   const addFilter = (filter) => set_filters([filter, ...filters]);
   const removeFilter = (filter) =>
     set_filters(filters.filter((f) => f != filter));
+
+  const filtered_machine_list = MACHINES.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase()),
+  )
+    .filter((m) =>
+      filters.length != 0 ? filters.some((f) => m.muscles.includes(f)) : true,
+    )
+    .sort(
+      (a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1),
+    );
 
   return (
     <>
@@ -154,7 +180,7 @@ export default function MachineList() {
                     key={f}
                     radius="full"
                     size="1"
-                    className="!pl-1 !gap-1"
+                    className="!pl-1 !gap-1 animate-fadein"
                     onClick={(_) => removeFilter(f)}
                   >
                     <IoIosClose className="size-4" />
@@ -164,15 +190,47 @@ export default function MachineList() {
               </div>
             </div>
             <Popover.Content>
-              <span className="text-lg font-bold">Ordenar por</span>
-              <div className="flex"></div>
+              <div className="flex justify-between">
+                <span className="text-lg font-bold">Ordenar por</span>
+                <Toggle.Root
+                  onPressedChange={(p) => set_sorting_reverse(p)}
+                  className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
+                >
+                  <IoIosArrowRoundUp className="size-7" />
+                </Toggle.Root>
+              </div>
+              <ToggleGroup.Root
+                type="single"
+                defaultValue="name"
+                onValueChange={(v) => set_sorting(v)}
+                className="gap-2 flex"
+              >
+                <ToggleGroup.Item
+                  value="name"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Nombre
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="reviews"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Nº reseñas
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="issues"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Nº incidencias
+                </ToggleGroup.Item>
+              </ToggleGroup.Root>
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
               <span className="text-lg font-bold">Filtrar por</span>
               <div className="flex gap-3">
                 {MUSCLES.map((m) => (
                   <Toggle.Root
-                    className="transition-colors data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
+                    className="transition-colors bg-radixgreen/10 text-radixgreen data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
                     key={m}
                     onPressedChange={(p) =>
                       p ? addFilter(m) : removeFilter(m)
