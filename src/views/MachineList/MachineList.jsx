@@ -1,12 +1,25 @@
 import * as Separator from "@radix-ui/react-separator";
 import Rating from "../../components/Rating";
-// import * as Popover from "@radix-ui/react-popover";
-import { IoMdAddCircleOutline, IoMdSearch } from "react-icons/io";
+import {
+  IoMdAddCircleOutline,
+  IoMdSearch,
+  IoIosClose,
+  IoIosArrowRoundUp,
+} from "react-icons/io";
+import * as Toggle from "@radix-ui/react-toggle";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { HiOutlineFilter } from "react-icons/hi";
-import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
+import {
+  Button,
+  Popover,
+  TextField,
+  Heading,
+  IconButton,
+} from "@radix-ui/themes";
 import { useState } from "react";
 
 // TODO: Add picture support
+const MUSCLES = ["hombros", "brazos", "espalda"];
 const MACHINES = [
   {
     id: 0,
@@ -14,7 +27,7 @@ const MACHINES = [
     description:
       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
     // picture: ""
-    muscles: ["shoulders", "arms"],
+    muscles: ["hombros", "brazos", "espalda"],
     reviews: [
       {
         id: 0,
@@ -66,7 +79,7 @@ const MACHINES = [
     description:
       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
     // picture: ""
-    muscles: ["shoulders", "arms"],
+    muscles: ["hombros", "brazos"],
     reviews: [
       {
         id: 3,
@@ -113,13 +126,56 @@ const MACHINES = [
 ];
 
 export default function MachineList() {
+  const [filters, set_filters] = useState([]);
+  const [sorting, set_sorting] = useState("name");
+  const [sorting_reverse, set_sorting_reverse] = useState(false);
   const [search, set_search] = useState("");
+
+  const SORTING_FUNCTIONS = {
+    name: (a, b) => a.name.localeCompare(b.name),
+    issues: (a, b) => a.reviews.length - b.reviews.length,
+    reviews: (a, b) => a.issues.length - b.issues.length,
+    rating: (a, b) => {
+      const a_rating =
+        a.reviews
+          .map((r) => r.rating)
+          .reduce((previous, current) => {
+            return previous + current;
+          }, 0) / a.reviews.length;
+      const b_rating =
+        b.reviews
+          .map((r) => r.rating)
+          .reduce((previous, current) => {
+            return previous + current;
+          }, 0) / b.reviews.length;
+      return a_rating - b_rating;
+    },
+  };
+
+  const addFilter = (filter) => set_filters([filter, ...filters]);
+  const removeFilter = (filter) =>
+    set_filters(filters.filter((f) => f != filter));
+
+  const filtered_machine_list = MACHINES.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase()),
+  )
+    .filter((m) =>
+      filters.length != 0 ? filters.some((f) => m.muscles.includes(f)) : true,
+    )
+    .sort(
+      (a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1),
+    );
 
   return (
     <>
-      <Heading className="">Mis Máquinas</Heading>
+      <Heading
+        size="8"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+      >
+        Mis Máquinas
+      </Heading>
       <div className="flex flex-col space-y-3">
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-col md:flex-row">
           <TextField.Root className="flex-1">
             <TextField.Slot>
               <IoMdSearch />
@@ -130,18 +186,84 @@ export default function MachineList() {
             ></TextField.Input>
           </TextField.Root>
           <Popover.Root>
-            <Popover.Trigger className="flex-1 rounded">
-              <Button size="2" variant="surface" className="size-full m-0 ">
-                <HiOutlineFilter />
-                Ordenar
-              </Button>
-            </Popover.Trigger>
+            <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
+              <Popover.Trigger>
+                <Button radius="none" size="2" variant="soft" className="m-0">
+                  <HiOutlineFilter />
+                </Button>
+              </Popover.Trigger>
+              <div className="flex-1 flex gap-2">
+                {filters.map((f) => (
+                  <Button
+                    key={f}
+                    radius="full"
+                    size="1"
+                    className="!pl-1 !gap-1 animate-fadein"
+                    onClick={() => removeFilter(f)}
+                  >
+                    <IoIosClose className="size-4" />
+                    {f}
+                  </Button>
+                ))}
+              </div>
+            </div>
             <Popover.Content>
-              <span className="text-lg font-bold">Ordenar por</span>
-              <div className="flex"></div>
+              <div className="flex justify-between mb-2">
+                <span className="text-lg font-bold">Ordenar por</span>
+                <Toggle.Root
+                  onPressedChange={(p) => set_sorting_reverse(p)}
+                  className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
+                >
+                  <IoIosArrowRoundUp className="size-7" />
+                </Toggle.Root>
+              </div>
+              <ToggleGroup.Root
+                type="single"
+                defaultValue="name"
+                onValueChange={(v) => v && set_sorting(v)}
+                className="gap-2 flex"
+              >
+                <ToggleGroup.Item
+                  value="name"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Nombre
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="reviews"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Nº reseñas
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="issues"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Nº incidencias
+                </ToggleGroup.Item>
+                <ToggleGroup.Item
+                  value="rating"
+                  className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                >
+                  Valoración
+                </ToggleGroup.Item>
+              </ToggleGroup.Root>
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
               <span className="text-lg font-bold">Filtrar por</span>
+              <div className="flex gap-3">
+                {MUSCLES.map((m) => (
+                  <Toggle.Root
+                    className="capitalize transition-colors bg-radixgreen/10 text-radixgreen data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
+                    key={m}
+                    onPressedChange={(p) =>
+                      p ? addFilter(m) : removeFilter(m)
+                    }
+                  >
+                    {m}
+                  </Toggle.Root>
+                ))}
+              </div>
             </Popover.Content>
           </Popover.Root>
         </div>
@@ -151,9 +273,7 @@ export default function MachineList() {
           Añadir máquina
         </Button>
 
-        {MACHINES.filter((m) =>
-          m.name.toLowerCase().includes(search.toLowerCase()),
-        ).map((machine) => {
+        {filtered_machine_list.map((machine) => {
           const ratings = machine.reviews.map((review) => review.rating);
           const avg_rating =
             ratings.reduce((previous, current) => {
