@@ -9,29 +9,42 @@ import '@radix-ui/themes/styles.css';
 import { Theme } from '@radix-ui/themes';
 import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
+import { AuthProvider } from './utils/context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      // Place your routes here
       {
         path: "/",
         element: <App />,
       },
       {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/my-machines",
-        element: <MachineList />,
-      },
-      {
-        path: '/users',
-        element: <Users />
-      },
+        path: "/",
+        element: <AuthProvider />,
+        children: [
+          {
+            path: "/login",
+            element: <Login />,
+          },
+          {
+            path: "/",
+            element: <ProtectedRoute />,
+            children: [
+              {
+                path: "/my-machines",
+                element: <MachineList />,
+              },
+              {
+                path: '/users',
+                element: <Users />
+              },
+            ],
+          }
+        ]
+      }
     ],
   },
 
@@ -40,7 +53,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Theme accentColor="green">
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
     </Theme>
   </React.StrictMode>,
 );
