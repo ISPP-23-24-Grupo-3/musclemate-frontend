@@ -2,10 +2,10 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useContext } from 'react'
 import AuthContext from '../utils/context/AuthContext'
 
-const ProtectedRoute = () => {
+const OwnerRoute = () => {
     let {user} = useContext(AuthContext)
-     console.log(user)
-    if (!user){
+
+    if (user.rol !== 'owner'){
         return <Navigate to="/login" />
     }
     
@@ -14,4 +14,4 @@ const ProtectedRoute = () => {
     )
 }
 
-export default ProtectedRoute;
+export default OwnerRoute;

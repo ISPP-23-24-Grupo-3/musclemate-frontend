@@ -10,7 +10,8 @@ import { Theme } from '@radix-ui/themes';
 import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
 import { AuthProvider } from './utils/context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import OwnerRoute from './components/OwnerRoute';
+import UserRoute from './components/UserRoute';
 
 const router = createBrowserRouter([
   {
@@ -31,18 +32,25 @@ const router = createBrowserRouter([
           },
           {
             path: "/",
-            element: <ProtectedRoute />,
+            element: <OwnerRoute />,
             children: [
               {
                 path: "/my-machines",
                 element: <MachineList />,
               },
+            ],
+          },
+          {
+            path: "/",
+            element: <UserRoute />,
+            children: [
               {
-                path: '/users',
-                element: <Users />
+                path: "/users",
+                element: <Users />,
               },
             ],
           }
+
         ]
       }
     ],
