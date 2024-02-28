@@ -50,16 +50,17 @@ const router = createBrowserRouter([
                 path: "/register-client",
                 element: <RegisterClient />,
               },
+              {
+                path: "/users",
+                element: <Users />,
+              },
             ],
           },
           {
             path: "/",
             element: <UserRoute />,
             children: [
-              {
-                path: "/users",
-                element: <Users />,
-              },
+              
             ],
           },
         ],
