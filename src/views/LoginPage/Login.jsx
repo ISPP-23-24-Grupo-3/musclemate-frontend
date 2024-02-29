@@ -1,27 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
 import loginVideo from "../../assets/other_assets/video_login.mp4"; // Importa el video de inicio de sesión
 import { HiUser, HiLockClosed } from "react-icons/hi"; // Importa los iconos de usuario y candado
 import { Button } from "@radix-ui/themes";
+import AuthContext from "../../utils/context/AuthContext";
+
 
 const UserLogin = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+
+  let {loginUser} = useContext(AuthContext)
   const videoRef = useRef(null);
-
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value);
-    console.log(username);
-  };
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-    console.log(password);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Lógica para manejar el inicio de sesión de usuario...
-  };
 
   useEffect(() => {
     // Reproducir el video al montar el componente
@@ -39,13 +26,12 @@ const UserLogin = () => {
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           ¡Bienvenido!
         </h2>
-        <form onSubmit={handleSubmit} className="relative">
+        <form onSubmit={loginUser} className="relative">
           <div className="mb-6 relative flex items-center">
             <HiUser className="absolute left-0 w-8 h-8 text-radixgreen ml-4" />
             <input
               type="text"
-              value={username}
-              onChange={handleUsernameChange}
+              name="username"
               placeholder="Usuario"
               className="w-full px-6 py-3 border border-radixgreen rounded-lg bg-white text-black pl-16"
             />
@@ -54,8 +40,7 @@ const UserLogin = () => {
             <HiLockClosed className="absolute left-0 w-8 h-8 text-radixgreen ml-4" />
             <input
               type="password"
-              value={password}
-              onChange={handlePasswordChange}
+              name="password"
               placeholder="Contraseña"
               className="w-full px-6 py-3 border border-radixgreen rounded-lg bg-white text-black pl-16"
             />
