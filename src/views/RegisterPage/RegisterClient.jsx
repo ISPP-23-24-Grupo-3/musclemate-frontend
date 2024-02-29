@@ -1,5 +1,6 @@
 import React from "react";
-import { HiUser, HiLockClosed, HiOutlineMail } from "react-icons/hi";
+import { HiUser, HiOutlineMail,HiPhone } from "react-icons/hi";
+import { HiHome} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 
@@ -25,16 +26,15 @@ const ClientRegister = () => {
     <div className="flex justify-center items-center min-h-screen">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
-          ¡Regístrese hoy mismo!
+          Registro de nuevo propietario
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="relative flex items-center">
             <HiUser className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="userName">Nombre de la empresa</label>
+            <label htmlFor="userName">Nombre</label>
             <input
               {...register("userName", {
                 required: messages.req,
-                minLength: { value: 8, message: messages.name }
               })}
               name="userName"
               type="text"
@@ -46,6 +46,21 @@ const ClientRegister = () => {
           {errors.userName && (
             <p className="text-red-500">{errors.userName.message}</p>
           )}
+
+          <div className="relative flex items-center">
+            <HiUser className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="lastname">Apellidos</label>
+            <input
+              {...register("userName", {
+                required: messages.req
+              })}
+              name="userName"
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.userName ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+            />
+          </div>
 
           <div className="relative flex items-center">
             <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
@@ -67,22 +82,40 @@ const ClientRegister = () => {
           )}
 
           <div className="relative flex items-center">
-            <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="password">Contraseña</label>
+            <HiPhone className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="phone">Número de telefono</label>
             <input
-              {...register("password", {
+              {...register("phone", {
                 required: messages.req,
-                minLength: { value: 10, message: messages.password }
+                pattern: { value: patterns.phoneNumber, message: messages.phone}
               })}
-              name="password"
-              type="password"
+              name="phone"
+              type="number"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.password ? 'border-red-500' : 'border-radixgreen'
+                errors.phone ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
             />
           </div>
-          {errors.password && (
-            <p className="text-red-500">{errors.password.message}</p>
+          {errors.phone && (
+          <p className="text-red-500">{errors.phone.message}</p>
+          )}
+
+          <div className="relative flex items-center">
+            <HiHome className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="address">Dirección</label>
+            <input
+              {...register("address", {
+                required: messages.req
+              })}
+              name="address"
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.address ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+            />
+          </div>
+          {errors.address && (
+          <p className="text-red-500">{errors.address.message}</p>
           )}
 
           <Button
@@ -95,12 +128,6 @@ const ClientRegister = () => {
             Registrarse
           </Button>
         </form>
-      </div>
-      <div className="ml-8">
-        <p className="text-gray-600 text-lg">
-          Bienvenido a nuestra plataforma de registro para clientes. Complete el formulario a la izquierda para crear su cuenta.
-        </p>
-        <img src="src\assets\images\gym_reg.jpg" alt="Descripción de la imagen" className="mt-4 w-64 h-auto" />
       </div>
     </div>
   );
