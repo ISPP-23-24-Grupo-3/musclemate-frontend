@@ -22,7 +22,7 @@ services:
     links:
       - db
     volumes:
-      - ./musclemate-backend/src/:/app/src
+      - ./musclemate-backend/:/app/
       - ./musclemate-backend/local_settings.docker.py:/app/local_settings.py
   frontend:
     build: ./musclemate-frontend
