@@ -13,6 +13,8 @@ import Users from './views/UserListing/Users';
 import '@radix-ui/themes/styles.css';
 import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
+import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+
 
 const router = createBrowserRouter([
   {
@@ -43,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: <Users />
+      },
+      {
+        path: "/equipment-details/:serialNumber",
+        element: <EquipmentDetails />,
       },
     ],
   },
