@@ -33,6 +33,8 @@ const router = createBrowserRouter([
       {
         path: "/routines",
         element: <Routines />,
+        },
+      {
         path: "/register",
         element: <RegisterUser />,
       },
@@ -58,5 +60,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
