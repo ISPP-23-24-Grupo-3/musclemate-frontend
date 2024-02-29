@@ -146,6 +146,7 @@ const EditableWorkout = ({ workout }) => {
 
   const onSubmit = (data) => {
     console.log("Submitted");
+    console.log(data);
   };
 
   const {
@@ -161,7 +162,11 @@ const EditableWorkout = ({ workout }) => {
           <Flex justify="between">
             <Flex direction="column" className="w-1/5">
               <Text weight="bold">Ejercicio</Text>
-              <TextField.Input value={workout.name}></TextField.Input>
+              <TextField.Input
+                value={workout.name}
+                name="name"
+                {...register("name")}
+              ></TextField.Input>
             </Flex>
             <div className="flex place-content-around w-3/5">
               <Flex direction="column items-center" className="flex-1">
@@ -169,23 +174,35 @@ const EditableWorkout = ({ workout }) => {
                 <TextField.Input
                   className="!w-20"
                   value={workout.sets}
+                  name="sets"
+                  {...register("sets")}
                 ></TextField.Input>
               </Flex>
               <Flex direction="column items-center" className="flex-1">
                 <Text weight="bold">Repeticiones</Text>
-                <TextField.Input value={workout.reps}></TextField.Input>
+                <TextField.Input
+                  value={workout.reps}
+                  name="reps"
+                  {...register("reps")}
+                ></TextField.Input>
               </Flex>
               <Flex direction="column items-center" className="flex-1">
                 <Text weight="bold">Peso</Text>
                 <TextField.Input
                   className="!w-20"
                   value={workout.weight}
+                  name="weight"
+                  {...register("weight")}
                 ></TextField.Input>
               </Flex>
             </div>
             <Flex direction="column" className="w-1/5 items-end">
               <Text weight="bold">Máquina</Text>
-              <TextField.Input value={workout.machine}></TextField.Input>
+              <TextField.Input
+                value={workout.machine}
+                name="machine"
+                {...register("machine")}
+              ></TextField.Input>
             </Flex>
           </Flex>
           <Button className="!mt-3">Finish editing</Button>
