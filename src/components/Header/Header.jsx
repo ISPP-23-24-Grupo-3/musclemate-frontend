@@ -16,9 +16,12 @@ const Header = () => {
                         Entrar
                     </Button>
                 </Link>
-                <Button size="2" variant="surface" color="green">
+                <Link to="/register">
+                    <Button size="2" variant="surface" color="green">
                     Registrarse
-                </Button>
+                    </Button>
+                </Link>
+                
             </div>
         </header>
     );
