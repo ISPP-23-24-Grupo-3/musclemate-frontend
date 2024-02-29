@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Flex, ScrollArea, Text } from "@radix-ui/themes";
+import { Box, Button, Flex, ScrollArea, Section, Text } from "@radix-ui/themes";
 import { FaPencil } from "react-icons/fa6";
 import { CgGym } from "react-icons/cg";
 import { useNavigate } from "react-router";
@@ -37,7 +37,7 @@ export const Routines = () => {
   const addRoutine = () => navigate("new");
 
   return (
-    <>
+    <Section>
       <Button
         type="submit"
         size="4"
@@ -54,7 +54,7 @@ export const Routines = () => {
       ) : (
         <ListRoutines routines={routines} />
       )}
-    </>
+    </Section>
   );
 };
 
@@ -70,7 +70,7 @@ const ListRoutines = ({ routines }) => {
     );
   }
   return (
-    <ScrollArea scrollbars="vertical" size="2" mx="2" style={{ height: 400 }}>
+    <ScrollArea scrollbars="vertical" size="2" mx="2" style={{ height: 500 }}>
       <Flex gap="5" direction="column">
         {routines.map((routine) => (
           <Box key={routine.id}>

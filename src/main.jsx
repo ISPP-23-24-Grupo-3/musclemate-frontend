@@ -9,6 +9,7 @@ import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import MainLayout from "./views/MainLayout/MainLayout";
 import App from "./App";
+import { EditRoutine } from "./views/Routines/EditRoutine";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
         path: "/routines",
         element: <Routines />,
       },
+      { path: "/routines/:id/edit", element: <EditRoutine /> },
     ],
   },
 ]);
