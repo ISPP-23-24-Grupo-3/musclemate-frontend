@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import "./App.css";
-import MainLayout from "./views/MainLayout/MainLayout";
 import { Button, Flex } from "@radix-ui/themes";
 
 function App() {
