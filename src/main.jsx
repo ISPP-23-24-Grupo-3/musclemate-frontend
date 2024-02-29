@@ -63,6 +63,7 @@ const router = createBrowserRouter([
             element: <UserRoute />,
             children: [
               { path: "/routines/:id/edit", element: <EditRoutine /> },
+              { path: "/routines/new", element: <EditRoutine /> },
               { path: "/routines/", element: <Routines /> },
             ],
           },

@@ -6,12 +6,13 @@ import {
   Flex,
   Heading,
   Text,
-  IconButton,
   TextField,
+  IconButton,
 } from "@radix-ui/themes";
 import { useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
+import { useForm } from "react-hook-form";
 
 import PropTypes from "prop-types";
 
@@ -69,6 +70,7 @@ export const EditRoutine = () => {
       </div>
       <Heading as="h2">Ejercicios</Heading>
       <Flex direction="column" gap="3" className="mt-4">
+        <EditableWorkout workout={{}} />
         <WorkoutList workouts={routine.workouts} />
       </Flex>
     </>
@@ -137,4 +139,58 @@ WorkoutList.propTypes = {
       weigth: PropTypes.number,
     }),
   ),
+};
+
+const EditableWorkout = ({ workout }) => {
+  const editing = !workout.id;
+
+  const onSubmit = (data) => {
+    console.log("Submitted");
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  return (
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card>
+          <Flex justify="between">
+            <Flex direction="column" className="w-1/5">
+              <Text weight="bold">Ejercicio</Text>
+              <TextField.Input value={workout.name}></TextField.Input>
+            </Flex>
+            <div className="flex place-content-around w-3/5">
+              <Flex direction="column items-center" className="flex-1">
+                <Text weight="bold">Sets</Text>
+                <TextField.Input
+                  className="!w-20"
+                  value={workout.sets}
+                ></TextField.Input>
+              </Flex>
+              <Flex direction="column items-center" className="flex-1">
+                <Text weight="bold">Repeticiones</Text>
+                <TextField.Input value={workout.reps}></TextField.Input>
+              </Flex>
+              <Flex direction="column items-center" className="flex-1">
+                <Text weight="bold">Peso</Text>
+                <TextField.Input
+                  className="!w-20"
+                  value={workout.weight}
+                ></TextField.Input>
+              </Flex>
+            </div>
+            <Flex direction="column" className="w-1/5 items-end">
+              <Text weight="bold">Máquina</Text>
+              <TextField.Input value={workout.machine}></TextField.Input>
+            </Flex>
+          </Flex>
+          <Button className="!mt-3">Finish editing</Button>
+        </Card>
+      </form>
+    </>
+  );
 };
