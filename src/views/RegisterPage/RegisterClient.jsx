@@ -25,46 +25,49 @@ const ClientRegister = () => {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
+        <div className="w-full">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Registro de nuevo propietario
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="relative flex items-center">
+          <div className="relative flex items-center mb-4">
             <HiUser className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="userName">Nombre</label>
+            <label htmlFor="userName" className="mr-3">Nombre</label>
             <input
               {...register("userName", {
                 required: messages.req,
               })}
               name="userName"
               type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
+              className={`w-full pl-4 pr-100000 px-4 py-3 border rounded-lg ${
                 errors.userName ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "3rem" }}
             />
           </div>
           {errors.userName && (
             <p className="text-red-500">{errors.userName.message}</p>
           )}
 
-          <div className="relative flex items-center">
+          <div className="relative flex items-center mb-4">
             <HiUser className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="lastname">Apellidos</label>
+            <label htmlFor="lastname" className="mr-3">Apellidos</label>
             <input
-              {...register("userName", {
+              {...register("lastName", {
                 required: messages.req
               })}
-              name="userName"
+              name="lastName"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.userName ? 'border-red-500' : 'border-radixgreen'
+                errors.lastName ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "2.5rem" }}
             />
           </div>
 
-          <div className="relative flex items-center">
+          <div className="relative flex items-center mb-4">
             <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="mail">Correo electrónico</label>
+            <label htmlFor="mail" className="mr-3">Correo electrónico</label>
             <input
               {...register("mail", {
                 required: messages.req,
@@ -72,18 +75,19 @@ const ClientRegister = () => {
               })}
               name="mail"
               type="email"
-              className={`w-full px-4 py-3 border rounded-lg ${
+              className={`w-full pl-90 px-4 py-3 border rounded-lg ${
                 errors.mail ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "1rem" }}
             />
           </div>
           {errors.mail && (
             <p className="text-red-500">{errors.mail.message}</p>
           )}
 
-          <div className="relative flex items-center">
+          <div className="relative flex items-center mb-4">
             <HiPhone className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="phone">Número de telefono</label>
+            <label htmlFor="phone" className="mr-3">Número de telefono</label>
             <input
               {...register("phone", {
                 required: messages.req,
@@ -94,15 +98,16 @@ const ClientRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.phone ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "0.5rem" }}
             />
           </div>
           {errors.phone && (
           <p className="text-red-500">{errors.phone.message}</p>
           )}
 
-          <div className="relative flex items-center">
+          <div className="relative flex items-center mb-4">
             <HiHome className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="address">Dirección</label>
+            <label htmlFor="address" className="mr-3">Dirección</label>
             <input
               {...register("address", {
                 required: messages.req
@@ -112,6 +117,7 @@ const ClientRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.address ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "2.3rem" }}
             />
           </div>
           {errors.address && (
@@ -127,8 +133,16 @@ const ClientRegister = () => {
           >
             Registrarse
           </Button>
+
+       
         </form>
+        </div>
+         
       </div>
+      
+      <div className="ml-8">
+          <img src="src\assets\images\gym_reg.jpg" alt="Descripción de la imagen" className="mt-4 w-auto h-auto max-w-full max-h-full" style={{ maxWidth: "3000px", maxHeight: "3000px" }}/>
+        </div>
     </div>
   );
 };

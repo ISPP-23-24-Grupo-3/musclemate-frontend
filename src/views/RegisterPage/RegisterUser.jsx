@@ -47,6 +47,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.userName ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "2.5rem" }}
             />
           </div>
           {errors.userName && (
@@ -65,6 +66,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.userName ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "2rem" }}
             />
           </div>
           
@@ -82,6 +84,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.mail ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "0.5rem" }}
             />
           </div>
           {errors.mail && (
@@ -111,6 +114,7 @@ const UserRegister = () => {
                 className={`w-full px-4 py-3 border rounded-lg ${
                   errors.gender ? 'border-red-500' : 'border-radixgreen'
                 } bg-white text-black`}
+                style={{ marginLeft: "3rem" }}
               >
                 <option value="">Seleccionar...</option>
                 <option value="masculino">Masculino</option>
@@ -136,6 +140,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.phone ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "0rem" }}
             />
           </div>
           {errors.phone && (
@@ -154,6 +159,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.address ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "2.10rem" }}
             />
           </div>
           {errors.address && (
@@ -172,6 +178,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.city ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "3.10rem" }}
             />
           </div>
           {errors.city && (
