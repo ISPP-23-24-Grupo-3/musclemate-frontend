@@ -15,41 +15,58 @@ import "@radix-ui/themes/styles.css";
 import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
 import { EditRoutine } from "./views/Routines/EditRoutine";
+import { AuthProvider } from "./utils/context/AuthContext";
+import OwnerRoute from "./components/OwnerRoute";
+import UserRoute from "./components/UserRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      // Place your routes here
       {
         path: "/",
         element: <App />,
       },
       {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/routines",
-        element: <Routines />,
-      },
-      { path: "/routines/:id/edit", element: <EditRoutine /> },
-      {
         path: "/register",
         element: <RegisterUser />,
       },
       {
-        path: "/register-client",
-        element: <RegisterClient />,
-      },
-      {
-        path: "/my-machines",
-        element: <MachineList />,
-      },
-      {
-        path: "/users",
-        element: <Users />,
+        path: "/",
+        element: <AuthProvider />,
+        children: [
+          {
+            path: "/login",
+            element: <Login />,
+          },
+          {
+            path: "/",
+            element: <OwnerRoute />,
+            children: [
+              {
+                path: "/my-machines",
+                element: <MachineList />,
+              },
+              {
+                path: "/register-client",
+                element: <RegisterClient />,
+              },
+              {
+                path: "/users",
+                element: <Users />,
+              },
+            ],
+          },
+          {
+            path: "/",
+            element: <UserRoute />,
+            children: [
+              { path: "/routines/:id/edit", element: <EditRoutine /> },
+              { path: "/routines/", element: <Routines /> },
+            ],
+          },
+        ],
       },
     ],
   },
@@ -60,5 +77,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
