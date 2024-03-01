@@ -4,7 +4,30 @@ import { useParams } from "react-router-dom";
 const EquipmentDetails = () => {
   const { id } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
+  const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
+
+  // Traducción de los grupos musculares
+  const translateMuscularGroup = (group) => {
+    switch (group) {
+      case "arms":
+        return "Brazos";
+      case "legs":
+        return "Piernas";
+      case "core":
+        return "Core";
+      case "chest":
+        return "Pecho";
+      case "back":
+        return "Espalda";
+      case "shoulders":
+        return "Hombros";
+      case "other":
+        return "Otros";
+      default:
+        return group;
+    }
+  };
 
   useEffect(() => {
     const fetchMachineDetails = async () => {
@@ -13,6 +36,17 @@ const EquipmentDetails = () => {
         if (response.ok) {
           const data = await response.json();
           setMachineDetails(data);
+          // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
+          if (data.gym) {
+            const gymId = data.gym;
+            const gymResponse = await fetch(`/api/gyms/${gymId}/`);
+            if (gymResponse.ok) {
+              const gymData = await gymResponse.json();
+              setGymName(gymData.name);
+            } else {
+              setGymName("Nombre de gimnasio no disponible");
+            }
+          }
         } else {
           setError("No se encontró la máquina con la ID proporcionada.");
         }
@@ -48,10 +82,10 @@ const EquipmentDetails = () => {
           <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
         </div>
         <div className="mb-6">
-          <strong className="text-radixgreen">Gimnasio:</strong> {machineDetails.gym}
+          <strong className="text-radixgreen">Gimnasio:</strong> {gymName || 'No disponible'}
         </div>
         <div className="mb-6">
-          <strong className="text-radixgreen">Grupo Muscular:</strong> {machineDetails.muscular_group}
+          <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
         <div className="mb-6">
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
