@@ -47,9 +47,9 @@ const router = createBrowserRouter([
         element: <Users />
       },
       {
-        path: "/equipment-details/:serialNumber",
+        path: "/equipment-details/:id",
         element: <EquipmentDetails />,
-      },
+      }
     ],
   },
 

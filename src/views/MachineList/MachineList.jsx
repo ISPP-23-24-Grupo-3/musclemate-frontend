@@ -17,6 +17,7 @@ import {
   IconButton,
 } from "@radix-ui/themes";
 import { useState } from "react";
+import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
 
 // TODO: Add picture support
 const MUSCLES = ["hombros", "brazos", "espalda"];
@@ -283,16 +284,11 @@ export default function MachineList() {
           const reviews = machine.reviews.length;
 
           return (
-            <Button
-              key={machine.id}
-              variant="soft"
-              size="3"
-              className="flex !justify-between !h-fit !p-2 !px-4"
-            >
-              <div className="flex flex-col">
+            <Button key={machine.id} variant="soft" size="3" className="flex !justify-between !h-fit !p-2 !px-4">
+              <Link to={`/equipment-details/${machine.id}`} className="flex flex-col">
                 <p className="font-semibold">{machine.name}</p>
                 <Rating rating={avg_rating} />
-              </div>
+              </Link>
               <div className="flex flex-col items-start gap-1">
                 <span>
                   <svg
