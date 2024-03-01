@@ -23,7 +23,9 @@ services:
       - db
     volumes:
       - ./musclemate-backend/:/app/
-      - ./musclemate-backend/local_settings.docker.py:/app/local_settings.py
+      - type: bind
+        source: ./musclemate-backend/local_settings.docker.py
+        target: /app/.local_settings.py
   frontend:
     build: ./musclemate-frontend
     container_name: musclemate-front
@@ -36,7 +38,15 @@ services:
       - backend
     volumes:
       - ./musclemate-frontend/src/:/app/src
-      - ./musclemate-frontend/.env.docker:/app/.env
+      - type: bind
+        source: ./musclemate-frontend/.env.docker
+        target: /app/.env
+      - type: bind
+        source: ./musclemate-frontend/package.json
+        target: /app/package.json
+      - type: bind
+        source: ./musclemate-frontend/package-lock.json
+        target: /app/package-lock.json
 
 volumes:
   postgres_data:
