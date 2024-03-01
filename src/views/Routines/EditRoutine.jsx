@@ -8,7 +8,7 @@ import {
   TextField,
   Section,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
 import { useForm } from "react-hook-form";
@@ -192,7 +192,7 @@ const EditableWorkout = ({ workout }) => {
                   type="number"
                   min="0"
                   color={errors.reps && "red"}
-                  className={`!w-20 ${errors.sets && "!border-red-500"}`}
+                  className={`!w-20 ${errors.reps && "!border-red-500"}`}
                   {...register("reps", {
                     valueAsNumber: "true",
                     required: true,
@@ -202,14 +202,16 @@ const EditableWorkout = ({ workout }) => {
               <Flex direction="column items-center" className="flex-1">
                 <Text weight="bold">Peso</Text>
                 <TextField.Input
-                  className="!w-20"
                   value={workout.weight}
                   name="weight"
                   type="number"
                   min="0"
-                  color={errors.name && "red"}
-                  className={`${errors.weight && "!border-red-500"}`}
-                  {...register("weight")}
+                  color={errors.weight && "red"}
+                  className={`!w-20 ${errors.weight && "!border-red-500"}`}
+                  {...register("weight", {
+                    valueAsNumber: true,
+                    required: false,
+                  })}
                 ></TextField.Input>
               </Flex>
             </div>
