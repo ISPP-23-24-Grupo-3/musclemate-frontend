@@ -16,6 +16,8 @@ import MainLayout from "./views/MainLayout/MainLayout";
 import { AuthProvider } from './utils/context/AuthContext';
 import OwnerRoute from './components/OwnerRoute';
 import UserRoute from './components/UserRoute';
+import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
+import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,14 @@ const router = createBrowserRouter([
               {
                 path: "/users",
                 element: <Users />,
+              },
+              {
+                path: "/owner-home",
+                element: <OwnerHomePage />,
+              },
+              {
+                path: "/equipment-details/:id",
+                element: <EquipmentDetails />,
               },
             ],
           },
