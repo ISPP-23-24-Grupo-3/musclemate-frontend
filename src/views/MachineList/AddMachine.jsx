@@ -32,7 +32,7 @@ const GymMachineForm = () => {
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.name ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
-              placeholder="Nombre"
+              
             />
           </div>
           {errors.name && (
@@ -48,7 +48,7 @@ const GymMachineForm = () => {
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.brand ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
-              placeholder="Marca"
+              style={{ marginLeft: "7.5rem" }}
             />
           </div>
           {errors.brand && (
@@ -64,7 +64,7 @@ const GymMachineForm = () => {
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.reference ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
-              placeholder="Número de referencia"
+              style={{ marginLeft: "0.4rem" }}
             />
           </div>
           {errors.reference && (
@@ -79,7 +79,6 @@ const GymMachineForm = () => {
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.description ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
-              placeholder="Descripción"
               rows="4"
             />
           </div>
@@ -96,7 +95,7 @@ const GymMachineForm = () => {
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.muscularGroup ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
-              placeholder="Grupo muscular"
+              style={{ marginLeft: "3rem" }}
             />
           </div>
           {errors.muscularGroup && (

@@ -27,10 +27,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <App />,
       },
-      {
-        path: "/register",
-        element: <RegisterUser />,
-      },
+      
       {
         path: "/",
         element: <AuthProvider />,
@@ -40,25 +37,30 @@ const router = createBrowserRouter([
             element: <Login />,
           },
           {
+            path: "/register-client",
+            element: <RegisterClient/>,
+          },
+          {
             path: "/",
             element: <OwnerRoute />,
             children: [
+              {
+                path: "/register-user",
+                element: <RegisterUser />,
+              },
               {
                 path: "/my-machines",
                 element: <MachineList />,
               },
               {
-                path: "/register-client",
-                element: <RegisterClient />,
+                path: "/add-machine",
+                element: <GymMachineForm/>,
               },
               {
                 path: "/users",
                 element: <Users />,
               },
-              {
-                path: "/add-machine",
-                element: <GymMachineForm/>,
-              }
+              
             ],
           },
           {
