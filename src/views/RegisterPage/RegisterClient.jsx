@@ -9,7 +9,29 @@ import { Button } from "@radix-ui/themes";
 const ClientRegister = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (userInfo) => console.log(userInfo);
+
+  const postUser = async () => {
+    const response = await fetch("/api/users/create/", {
+      method: "POST",
+      headers : {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "username":"owner1",
+         "password": "pbkdf2_sha256$720000$WSQKOFW6AKLFtPIMa6E3aU$QQt4xn2PQjMAW8X31Jf3UXhxp8IkYA82lTbcQaL/K58=",
+         "rol": "owner"
+      })
+      
+    })
+    return response.json()
+  }
+
+  const onSubmit =  (register) => {
+    postUser().then(res => console.log(res))
+    
+  }
+
+
 
   const messages = {
     req: "Este campo es obligatorio",
