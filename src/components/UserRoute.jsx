@@ -5,12 +5,11 @@ import AuthContext from "../utils/context/AuthContext";
 const UserRoute = () => {
   let { user } = useContext(AuthContext);
 
-    if (!user || user.rol !== 'client'){
-        return <Navigate to="/login" />
-    }
-    
-    return(
-        <Outlet />
-    )
-}
+  if (!user || user.rol !== "client") {
+    return <Navigate to="/login" />;
+  }
 
+  return <Outlet />;
+};
+
+export default UserRoute;

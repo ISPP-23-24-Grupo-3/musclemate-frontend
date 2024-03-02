@@ -39,9 +39,12 @@ export const EditRoutine = () => {
     name: "Routine 1",
     workouts,
   });
+  const [hide_form, set_hide_form] = useState(true);
 
   const updateRoutine = (event) =>
     setRoutine({ ...routine, name: event.target.value });
+  const updateWorkouts = (workouts) =>
+    setRoutine({ ...routine, workouts: workouts });
 
   return (
     <>
@@ -59,7 +62,11 @@ export const EditRoutine = () => {
         <div className="my-4 bg-radixgreen/40 p-4 rounded-lg">
           <Heading className="!mb-2">Añadir ejercicio</Heading>
           <div className="place-content-around gap-20 flex">
-            <Button className="flex-1" variant="surface">
+            <Button
+              className="flex-1"
+              variant="surface"
+              onClick={() => set_hide_form(false)}
+            >
               Manualmente
             </Button>
             <Button className="flex-1" variant="surface">
@@ -70,7 +77,12 @@ export const EditRoutine = () => {
         </div>
         <Heading as="h2">Ejercicios</Heading>
         <Flex direction="column" gap="3" className="mt-4">
-          <EditableWorkout workout={{}} />
+          <EditableWorkout
+            workouts={routine.workouts}
+            editWorkout={updateWorkouts}
+            hideForm={hide_form}
+            setHideForm={set_hide_form}
+          />
           <WorkoutList workouts={routine.workouts} />
         </Flex>
       </Section>
@@ -142,29 +154,28 @@ WorkoutList.propTypes = {
   ),
 };
 
-const EditableWorkout = ({ workout }) => {
-  const editing = !workout.id;
-
+const EditableWorkout = ({ workouts, editWorkout, hideForm, setHideForm }) => {
   const onSubmit = (data) => {
-    console.log("Submitted");
-    console.log(data);
+    editWorkout([data, ...workouts]);
+    setHideForm(true);
+    reset();
   };
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className={hideForm && "hidden"}>
         <Card>
           <Flex justify="between">
             <Flex direction="column" className="w-1/5">
               <Text weight="bold">Ejercicio</Text>
               <TextField.Input
-                value={workout.name}
                 name="name"
                 {...register("name", { required: true })}
                 color={errors.name && "red"}
@@ -175,7 +186,6 @@ const EditableWorkout = ({ workout }) => {
               <Flex direction="column items-center" className="flex-1">
                 <Text weight="bold">Sets</Text>
                 <TextField.Input
-                  value={workout.sets}
                   type="number"
                   min="0"
                   name="sets"
@@ -187,7 +197,6 @@ const EditableWorkout = ({ workout }) => {
               <Flex direction="column items-center" className="flex-1">
                 <Text weight="bold">Repeticiones</Text>
                 <TextField.Input
-                  value={workout.reps}
                   name="reps"
                   type="number"
                   min="0"
@@ -202,7 +211,6 @@ const EditableWorkout = ({ workout }) => {
               <Flex direction="column items-center" className="flex-1">
                 <Text weight="bold">Peso</Text>
                 <TextField.Input
-                  value={workout.weight}
                   name="weight"
                   type="number"
                   min="0"
@@ -218,7 +226,6 @@ const EditableWorkout = ({ workout }) => {
             <Flex direction="column" className="w-1/5 items-end">
               <Text weight="bold">Máquina</Text>
               <TextField.Input
-                value={workout.machine}
                 name="machine"
                 color={errors.machine && "red"}
                 className={`${errors.name && "!border-red-500"}`}
