@@ -33,8 +33,8 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path: "/register-user",
-        element: <RegisterUser />,
+        path: "/register-client",
+        element: <RegisterClient />,
       },
       {
         path: "/",
@@ -53,8 +53,8 @@ const router = createBrowserRouter([
                 element: <MachineList />,
               },
               {
-                path: "/register-client",
-                element: <RegisterClient />,
+                path: "/register-user",
+                element: <RegisterUser />,
               },
               {
                 path: "/users",
