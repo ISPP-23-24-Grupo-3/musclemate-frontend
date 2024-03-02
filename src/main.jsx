@@ -1,4 +1,4 @@
-
+// Importa los módulos necesarios
 import React from "react";
 import ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -16,6 +16,7 @@ import MainLayout from "./views/MainLayout/MainLayout";
 import { AuthProvider } from './utils/context/AuthContext';
 import OwnerRoute from './components/OwnerRoute';
 import UserRoute from './components/UserRoute';
+import TicketList from './views/TicketList/TicketList'; // Importa el componente de la lista de tickets
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
             path: "/login",
             element: <Login />,
           },
+          
           {
             path: "/",
             element: <OwnerRoute />,
@@ -47,6 +49,10 @@ const router = createBrowserRouter([
                 element: <MachineList />,
               },
               {
+                path: "/machines/:serialNumber/tickets", // Ruta para los tickets de una máquina
+                element: <TicketList />,
+              },
+              {
                 path: "/register-client",
                 element: <RegisterClient />,
               },
@@ -54,13 +60,14 @@ const router = createBrowserRouter([
                 path: "/users",
                 element: <Users />,
               },
+              
             ],
           },
           {
             path: "/",
             element: <UserRoute />,
             children: [
-              
+              // Aquí podrías agregar rutas específicas para usuarios si es necesario
             ],
           },
         ],

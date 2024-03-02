@@ -3,15 +3,13 @@ import { useContext } from 'react'
 import AuthContext from '../utils/context/AuthContext'
 
 const OwnerRoute = () => {
-    let {user} = useContext(AuthContext)
+    const { user } = useContext(AuthContext)
 
-    if (user.rol !== 'owner'){
+    if (!user || user.rol !== 'owner') {
         return <Navigate to="/login" />
     }
     
-    return(
-        <Outlet />
-    )
+    return <Outlet />
 }
 
 export default OwnerRoute;
