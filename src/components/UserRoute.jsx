@@ -5,7 +5,7 @@ import AuthContext from '../utils/context/AuthContext'
 const UserRoute = () => {
     let {user} = useContext(AuthContext)
 
-    if (user.rol !== 'user'){
+    if (!user || user.rol !== 'client'){
         return <Navigate to="/login" />
     }
     
