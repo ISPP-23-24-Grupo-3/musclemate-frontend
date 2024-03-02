@@ -1,5 +1,6 @@
 import {
   Button,
+  IconButton,
   Card,
   Dialog,
   Flex,
@@ -12,6 +13,7 @@ import { useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
 import { useForm } from "react-hook-form";
+import { LuPencil } from "react-icons/lu";
 
 import PropTypes from "prop-types";
 
@@ -40,19 +42,39 @@ export const EditRoutine = () => {
     workouts,
   });
   const [hide_form, set_hide_form] = useState(true);
+  const [editing_name, set_editing_name] = useState(false);
 
-  const updateRoutine = (event) =>
-    setRoutine({ ...routine, name: event.target.value });
+  const updateName = (name) => setRoutine({ ...routine, name: name });
   const updateWorkouts = (workouts) =>
     setRoutine({ ...routine, workouts: workouts });
+
+  const { register, handleSubmit, reset, setValue } = useForm();
 
   return (
     <>
       <Section className="!pt-1">
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Heading>{routine.name}</Heading>
-            <EditDialog updateRoutine={updateRoutine} />
+            <Heading className={editing_name && "hidden"}>
+              {routine.name}
+            </Heading>
+            <form
+              className={`${!editing_name && "hidden"} flex gap-5`}
+              onSubmit={handleSubmit((r) => {
+                updateName(r.name);
+                set_editing_name(false);
+              })}
+            >
+              <TextField.Input {...register("name")} />
+              <Button>Aceptar</Button>
+            </form>
+            <IconButton
+              className={editing_name && "!hidden"}
+              radius="full"
+              onClick={() => set_editing_name(true)}
+            >
+              <LuPencil />
+            </IconButton>
           </div>
           <Button size="3">
             <CgGym className="size-7" />
