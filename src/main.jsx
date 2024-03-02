@@ -1,21 +1,24 @@
-
 import React from "react";
 import ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./views/LoginPage/Login";
+import { Routines } from "./views/Routines/Routines";
+
 import RegisterUser from "./views/RegisterPage/RegisterUser";
 import RegisterClient from "./views/RegisterPage/RegisterClient";
+import GymMachineForm from "./views/MachineList/AddMachine";
 import "./index.css";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
-import App from './App';
-import Users from './views/UserListing/Users';
-import '@radix-ui/themes/styles.css';
+import App from "./App";
+import Users from "./views/UserListing/Users";
+import "@radix-ui/themes/styles.css";
 import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
-import { AuthProvider } from './utils/context/AuthContext';
-import OwnerRoute from './components/OwnerRoute';
-import UserRoute from './components/UserRoute';
+import { EditRoutine } from "./views/Routines/EditRoutine";
+import { AuthProvider } from "./utils/context/AuthContext";
+import OwnerRoute from "./components/OwnerRoute";
+import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
 
@@ -33,8 +36,8 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path: "/register-user",
-        element: <RegisterUser />,
+        path: "/register-client",
+        element: <RegisterClient />,
       },
       {
         path: "/",
@@ -45,16 +48,24 @@ const router = createBrowserRouter([
             element: <Login />,
           },
           {
+            path: "/register-client",
+            element: <RegisterClient/>,
+          },
+          {
             path: "/",
             element: <OwnerRoute />,
             children: [
+              {
+                path: "/register-user",
+                element: <RegisterUser />,
+              },
               {
                 path: "/my-machines",
                 element: <MachineList />,
               },
               {
-                path: "/register-client",
-                element: <RegisterClient />,
+                path: "/add-machine",
+                element: <GymMachineForm/>,
               },
               {
                 path: "/users",
@@ -74,7 +85,9 @@ const router = createBrowserRouter([
             path: "/",
             element: <UserRoute />,
             children: [
-              
+              { path: "/routines/:id/edit", element: <EditRoutine /> },
+              { path: "/routines/new", element: <EditRoutine /> },
+              { path: "/routines/", element: <Routines /> },
             ],
           },
         ],
@@ -86,7 +99,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Theme accentColor="green">
-        <RouterProvider router={router} />
+      <RouterProvider router={router} />
     </Theme>
   </React.StrictMode>,
 );

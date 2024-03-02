@@ -1,5 +1,4 @@
-
-import Header from "../../components/Header/Header"
+import Header from "../../components/Header/Header";
 import { Theme, Container } from "@radix-ui/themes";
 import Footer from "../../components/Footer/Footer";
 import { Outlet } from "react-router";
