@@ -1,5 +1,6 @@
 import React from "react";
-import { HiUser, HiLockClosed, HiOutlineMail } from "react-icons/hi";
+import { HiUser, HiLockClosed, HiOutlineMail,HiPhone, } from "react-icons/hi";
+import { HiBuildingOffice2,HiHome,HiMiniCake,HiMiniIdentification   } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
@@ -16,38 +17,59 @@ const UserRegister = () => {
     req: "Este campo es obligatorio",
     name: "El nombre de usuario tiene que ser mayor a 8 caracteres",
     mail: "Debes introducir una dirección correcta",
-    password: "La contraseña tiene que ser mayor a 10 caracteres"
+    password: "La contraseña tiene que ser mayor a 10 caracteres",
+    phone: "Tiene que ser un numero de 9 cifras"
+
   };
 
   const patterns = {
-    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+    phoneNumber: /^\d{9}$/
   };
+
 
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
-          ¡Regístrese hoy mismo!
+          Registro de nuevo usuario
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="relative flex items-center">
             <HiUser className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="userName">Nombre de usuario</label>
+            <label htmlFor="userName">Nombre</label>
             <input
               {...register("userName", {
-                required: messages.req,
-                minLength: { value: 8, message: messages.name }
+                required: messages.req
               })}
               name="userName"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.userName ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "2.5rem" }}
             />
           </div>
           {errors.userName && (
             <p className="text-red-500">{errors.userName.message}</p>
           )}
+
+          <div className="relative flex items-center">
+            <HiUser className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="lastname">Apellidos</label>
+            <input
+              {...register("userName", {
+                required: messages.req
+              })}
+              name="userName"
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.userName ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+              style={{ marginLeft: "2rem" }}
+            />
+          </div>
+          
 
           <div className="relative flex items-center">
             <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
@@ -62,6 +84,7 @@ const UserRegister = () => {
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.mail ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
+              style={{ marginLeft: "0.5rem" }}
             />
           </div>
           {errors.mail && (
@@ -69,22 +92,97 @@ const UserRegister = () => {
           )}
 
           <div className="relative flex items-center">
-            <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="password">Contraseña</label>
+            <HiMiniCake className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="birthdate">Fecha de nacimiento</label>
             <input
-              {...register("password", {
-                required: messages.req,
-                minLength: { value: 10, message: messages.password }
+              {...register("birthdate", {
+                required: messages.req
               })}
-              name="password"
-              type="password"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.password ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              name="birthdate"
+              type="date"
+              className="w-full px-4 py-3 border rounded-lg g-white text-black"
             />
           </div>
-          {errors.password && (
-            <p className="text-red-500">{errors.password.message}</p>
+
+
+          <div className="relative flex items-center">
+              <HiMiniIdentification className="w-6 h-6 text-radixgreen mr-3" />
+              <label htmlFor="gender">Género</label>
+              <select
+                {...register("gender")}
+                name="gender"
+                className={`w-full px-4 py-3 border rounded-lg ${
+                  errors.gender ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
+                style={{ marginLeft: "3rem" }}
+              >
+                <option value="">Seleccionar...</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+                <option value="otro">No binario</option>
+                <option value="otro">Género fluido</option>
+              </select>
+          </div>
+          {errors.gender && (
+          <p className="text-red-500">{errors.gender.message}</p>
+          )}
+
+          <div className="relative flex items-center">
+            <HiPhone className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="phone">Número de telefono</label>
+            <input
+              {...register("phone", {
+                required: messages.req,
+                pattern: { value: patterns.phoneNumber, message: messages.phone}
+              })}
+              name="phone"
+              type="number"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.phone ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+              style={{ marginLeft: "0rem" }}
+            />
+          </div>
+          {errors.phone && (
+          <p className="text-red-500">{errors.phone.message}</p>
+          )}
+
+          <div className="relative flex items-center">
+            <HiHome className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="address">Dirección</label>
+            <input
+              {...register("address", {
+                required: messages.req
+              })}
+              name="address"
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.address ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+              style={{ marginLeft: "2.10rem" }}
+            />
+          </div>
+          {errors.address && (
+          <p className="text-red-500">{errors.address.message}</p>
+          )}
+
+          <div className="relative flex items-center">
+            <HiBuildingOffice2 className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="city">Ciudad</label>
+            <input
+              {...register("city", {
+                required: messages.req
+              })}
+              name="city"
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.city ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+              style={{ marginLeft: "3.10rem" }}
+            />
+          </div>
+          {errors.city && (
+          <p className="text-red-500">{errors.city.message}</p>
           )}
 
           <Button
@@ -96,19 +194,7 @@ const UserRegister = () => {
           >
             Registrarse
           </Button>
-          <p className="mt-4">
-          ¿Deseas registrarte como cliente?
-              <Link to="/register-client" className="ml-2 text-radixgreen">
-               Regístrate aquí
-              </Link>
-          </p>
         </form>
-      </div>
-      <div className="ml-8">
-        <p className="text-gray-600 text-lg">
-          Bienvenido a nuestra plataforma de registro. Complete el formulario a la izquierda para crear su cuenta.
-        </p>
-        <img src="src\assets\images\gym_reg.jpg" alt="Descripción de la imagen" className="mt-4 w-64 h-auto" />
       </div>
     </div>
   );

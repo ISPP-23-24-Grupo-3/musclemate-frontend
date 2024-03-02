@@ -16,7 +16,7 @@ const Header = () => {
                         Entrar
                     </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/register-client">
                     <Button size="2" variant="surface" color="green">
                     Registrarse
                     </Button>
