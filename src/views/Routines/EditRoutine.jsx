@@ -48,7 +48,7 @@ export const EditRoutine = () => {
   const updateWorkouts = (workouts) =>
     setRoutine({ ...routine, workouts: workouts });
 
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
 
   return (
     <>
@@ -65,13 +65,16 @@ export const EditRoutine = () => {
                 set_editing_name(false);
               })}
             >
-              <TextField.Input {...register("name")} />
+              <TextField.Input {...register("name", { required: true })} />
               <Button>Aceptar</Button>
             </form>
             <IconButton
               className={editing_name && "!hidden"}
               radius="full"
-              onClick={() => set_editing_name(true)}
+              onClick={() => {
+                set_editing_name(true);
+                setValue("name", routine.name);
+              }}
             >
               <LuPencil />
             </IconButton>
