@@ -31,8 +31,13 @@ export const AuthProvider = () => {
             setAuthTokens(data)
             setUser(jwtDecode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
-            navigate('/')
+            if (user.rol === 'owner'){
+                navigate('/owner-home')
+            }else{
+                navigate('/')
+            }
         }else{
+            
             alert('Something went wrong!')
         }
     }
