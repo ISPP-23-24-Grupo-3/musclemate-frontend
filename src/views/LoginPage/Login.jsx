@@ -8,17 +8,6 @@ import AuthContext from "../../utils/context/AuthContext";
 const UserLogin = () => {
 
   let {loginUser} = useContext(AuthContext)
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    // Reproducir el video al montar el componente
-    videoRef.current.play();
-  }, []);
-
-  const handleVideoLoaded = () => {
-    // Volver a reproducir el video cuando se haya cargado completamente
-    videoRef.current.play();
-  };
 
   return (
     <div className="mt-8 flex flex-col md:flex-row justify-between items-center">
@@ -57,17 +46,7 @@ const UserLogin = () => {
         </form>
       </div>
       <div className="w-full md:w-1/2 mt-8 md:mt-0">
-        <video
-          ref={videoRef}
-          src={loginVideo}
-          autoPlay
-          loop
-          muted
-          onLoadedData={handleVideoLoaded}
-          className="h-auto"
-        >
-          Tu navegador no admite la reproducción de videos.
-        </video>
+        <img src="src\assets\images\login_image.jpg" alt="Gym image"/>
       </div>
     </div>
   );
