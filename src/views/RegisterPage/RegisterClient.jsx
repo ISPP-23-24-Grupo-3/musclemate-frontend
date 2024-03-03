@@ -45,8 +45,8 @@ const ClientRegister = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
+    <div className="flex flex-col mt-3 md:flex-row justify-center items-center min-h-screen">
+      <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl mb-8 md:mb-0 md:mr-8">
         <div className="w-full">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Registro de nuevo propietario
@@ -162,8 +162,8 @@ const ClientRegister = () => {
          
       </div>
       
-      <div className="ml-8">
-          <img src="src\assets\images\gym_reg.jpg" alt="Descripción de la imagen" className="mt-4 w-auto h-auto max-w-full max-h-full" style={{ maxWidth: "3000px", maxHeight: "3000px" }}/>
+      <div className="w-full md:w-1/2">
+          <img src="https://img.grouponcdn.com/deal/pzR5AeLirhPUNLX4zHZz/zs-2048x1242/v1/c870x524.jpg" alt="Descripción de la imagen" className="mt-4 w-full h-auto"/>
         </div>
     </div>
   );
