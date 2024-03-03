@@ -4,6 +4,7 @@ import { HiTicket } from "react-icons/hi";
 
 const TicketList = () => {
   const { id } = useParams();
+  const machineId = parseInt(id);
   const [machineName, setMachineName] = useState("");
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
@@ -12,7 +13,7 @@ const TicketList = () => {
     fetch("/api/equipments/")
       .then(response => response.json())
       .then(data => {
-        const machine = data.find(machine => machine.id === id);
+        const machine = data.find(machine => machine.id === machineId);
         if (machine) {
           setMachineName(machine.name);
         } else {
