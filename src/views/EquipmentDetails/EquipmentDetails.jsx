@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 
 const EquipmentDetails = () => {
   const { id } = useParams();
@@ -90,6 +90,10 @@ const EquipmentDetails = () => {
         <div className="mb-6">
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
+        {/* Botón para ver los tickets */}
+        <Link to={`/machines/${machineDetails.id}/tickets`} className="block mt-4 bg-radixgreen text-white px-4 py-2 rounded hover:bg-green-600 text-center">
+          Ver Tickets
+        </Link>
       </div>
     </div>
   );

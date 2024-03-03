@@ -51,7 +51,7 @@ const router = createBrowserRouter([
                 element: <MachineList />,
               },
               {
-                path: "/machines/:serialNumber/tickets", // Ruta para los tickets de una máquina
+                path: "/machines/:id/tickets", // Ruta para los tickets de una máquina
                 element: <TicketList />,
               },
               {
