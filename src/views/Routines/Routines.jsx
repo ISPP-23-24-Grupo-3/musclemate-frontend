@@ -7,11 +7,10 @@ import {
   Section,
   Text,
   IconButton,
-  Card,
   TextField,
 } from "@radix-ui/themes";
 import { FaPencil } from "react-icons/fa6";
-import { CgGym, CgSpinner } from "react-icons/cg";
+import { CgGym } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
@@ -22,55 +21,50 @@ import AuthContext from "../../utils/context/AuthContext";
 export const Routines = () => {
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
-  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const [client, setClient] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRoutines = async (client) => {
-      try {
-        const response = await fetch("/api/routines/");
-        if (!response.ok) {
-          setError(
-            "There was a problem while searching your routines (Unexpected status code). Please stand by.",
-          );
-        }
-        const routines = await response.json();
-        return routines.filter((routine) => routine.client === client.id);
-      } catch (error) {
-        setError(
-          "There was a problem while searching your routines. Please stand by.",
-        );
-      }
+      const response = await fetch("/api/routines/");
+      const routines = await response.json();
+      return routines.filter((routine) => routine.client === client.id);
     };
 
     const fetchClient = async () => {
-      try {
-        const response = await fetch("api/clients/");
-        if (!response.ok) {
-          setError("Error while fetching client");
-        }
-        const clients = await response.json();
-        return clients.find((client) => client.user == user.username);
-      } catch (error) {
-        setError("Error while fetching client");
-      }
+      const response = await fetch("api/clients/");
+      const clients = await response.json();
+      const foundClient = clients.find(
+        (client) => client.user == user.username,
+      );
+      setClient(foundClient);
+      return foundClient;
     };
 
     fetchClient()
       .then((cl) => fetchRoutines(cl))
-      .then((r) => setRoutines(r));
+      .then((r) => setRoutines(r))
+      .catch((e) => {
+        setError(
+          "There was a problem while searching your routines. Please stand by.",
+        );
+      });
   }, [user.username]);
 
   return (
     <Section>
-      <Heading
-        size="8"
-        className="text-radixgreen !mb-3 text-center md:text-left"
-      >
-        Mis Rutinas
-      </Heading>
+      <div className="flex mb-3 justify-between">
+        <Heading size="8" className="text-radixgreen text-center md:text-left">
+          Mis Rutinas
+        </Heading>
+      </div>
 
-      <RoutineForm set_routines={setRoutines} routines={routines} />
+      <RoutineForm
+        client={client}
+        set_routines={setRoutines}
+        routines={routines}
+      />
 
       {error ? (
         <Error message={error} size="3" />
@@ -83,8 +77,8 @@ export const Routines = () => {
 
 const ListRoutines = ({ routines }) => {
   const navigate = useNavigate();
-  const editRoutine = () => navigate("edit");
-  const startRoutine = () => navigate("start");
+  const editRoutine = (routine) => navigate("edit/" + routine.id);
+  const startRoutine = (routine) => navigate("start/" + routine.id);
 
   if (routines.length === 0) {
     return (
@@ -101,11 +95,20 @@ const ListRoutines = ({ routines }) => {
           <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
             {routine.name}
           </Text>
-          <Box>
-            <IconButton size="3" mr="2" radius="full" onClick={editRoutine}>
+          <Box className={routine.temp_id && "hidden"}>
+            <IconButton
+              size="3"
+              mr="2"
+              radius="full"
+              onClick={() => editRoutine(routine)}
+            >
               <FaPencil />
             </IconButton>
-            <IconButton size="3" radius="full" onClick={startRoutine}>
+            <IconButton
+              size="3"
+              radius="full"
+              onClick={() => startRoutine(routine)}
+            >
               <CgGym className="size-6 rotate-30" />
             </IconButton>
           </Box>
@@ -115,21 +118,53 @@ const ListRoutines = ({ routines }) => {
   );
 };
 
-const RoutineForm = ({ set_routines, routines }) => {
+const RoutineForm = ({ set_routines, routines, client }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({
+    values: {
+      client: client.id,
+    },
+  });
   const [visible_form, set_visible_form] = useState(false);
-  const addRoutine = () => set_visible_form(true);
+  const showForm = () => set_visible_form(true);
 
   const onSubmit = (data) => {
-    set_routines([data, ...routines]);
+    const tempObject = { ...data, temp_id: Date.now() };
+    set_routines((c_routines) => [tempObject, ...c_routines]);
+
+    fetch("api/routines/create/", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((posted_routine) => {
+        console.log(posted_routine);
+        console.log("Success");
+        set_routines((c_routines) =>
+          c_routines.map((r) =>
+            r.temp_id == tempObject.temp_id ? posted_routine : r,
+          ),
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        console.log("Deleting");
+        set_routines(routines.filter((r) => r.temp_id !== tempObject.temp_id));
+      });
+
     set_visible_form(false);
     reset();
   };
+
   return (
     <>
       <Button
@@ -138,7 +173,7 @@ const RoutineForm = ({ set_routines, routines }) => {
         mb="5"
         size="3"
         variant="solid"
-        onClick={addRoutine}
+        onClick={showForm}
       >
         <IoMdAddCircleOutline className="size-6" />
         Añadir rutina
