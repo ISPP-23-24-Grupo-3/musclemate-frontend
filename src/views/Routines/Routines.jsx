@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,32 +17,49 @@ import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
+import AuthContext from "../../utils/context/AuthContext";
 
 export const Routines = () => {
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchRoutines().then((routines) => setRoutines(routines));
-  }, []);
-
-  const fetchRoutines = async () => {
-    try {
-      const response = await fetch("/api/routines/");
-      if (!response.ok) {
+    const fetchRoutines = async (client) => {
+      try {
+        const response = await fetch("/api/routines/");
+        if (!response.ok) {
+          setError(
+            "There was a problem while searching your routines (Unexpected status code). Please stand by.",
+          );
+        }
+        const routines = await response.json();
+        return routines.filter((routine) => routine.client === client.id);
+      } catch (error) {
         setError(
-          "There was a problem while searching your routines (Unexpected status code). Please stand by.",
+          "There was a problem while searching your routines. Please stand by.",
         );
       }
-      const routines = await response.json();
-      return routines;
-    } catch (error) {
-      setError(
-        "There was a problem while searching your routines. Please stand by.",
-      );
-    }
-  };
+    };
+
+    const fetchClient = async () => {
+      try {
+        const response = await fetch("api/clients/");
+        if (!response.ok) {
+          setError("Error while fetching client");
+        }
+        const clients = await response.json();
+        return clients.find((client) => client.user == user.username);
+      } catch (error) {
+        setError("Error while fetching client");
+      }
+    };
+
+    fetchClient()
+      .then((cl) => fetchRoutines(cl))
+      .then((r) => setRoutines(r));
+  }, [user.username]);
 
   return (
     <Section>
