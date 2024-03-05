@@ -9,6 +9,20 @@ const Profile = () => {
     const [user, setUser] = useState(null);
     const [isCodeShown, setIsCodeShown] = useState(false);
     
+    function getUsers() {
+        fetch("api/clients/")
+          .then((response) => response.json())
+          .then((data) => {
+                const user = data.find(user => user.id === Number(userId));
+                setUser(user);
+            });
+      }
+    
+      useEffect(() => {
+        getUsers();
+        console.log(user);
+      }, [userId]);
+
     useEffect(() => {
         fetch(lista)
             .then((response) => response.json())

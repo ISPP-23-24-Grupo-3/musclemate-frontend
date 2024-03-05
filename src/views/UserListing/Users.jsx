@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect} from "react";
-import lista from "./lista.txt";
 
 import { IoMdAddCircleOutline, IoMdSearch, IoIosClose,} from "react-icons/io";
 import * as Toggle from "@radix-ui/react-toggle";
@@ -24,10 +23,15 @@ const Users = () => {
   const removeFilter = (filter) =>
     setFilters(filters.filter((f) => f != filter));
 
-  useEffect(() => {
-    fetch(lista)
+  function getUsers() {
+    fetch("api/clients/")
       .then((response) => response.json())
       .then((data) => setUsers(data));
+  }
+
+  useEffect(() => {
+    getUsers();
+    console.log(users);
   }, []);
 
   return (
