@@ -21,6 +21,7 @@ import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+import Profile from "./views/UserListing/Profile";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
               {
                 path: "/equipment-details/:id",
                 element: <EquipmentDetails />,
+              },
+              {
+                path: "/users/:id/profile",
+                element: <Profile />,
               },
             ],
           },

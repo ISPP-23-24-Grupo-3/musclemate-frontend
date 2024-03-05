@@ -1,7 +1,7 @@
 import { useState, useEffect} from "react";
 import { useParams } from 'react-router-dom';
 import lista from "./lista.txt";
-import { Button, Popover, Heading,} from "@radix-ui/themes";
+import { Button } from "@radix-ui/themes";
 
 
 const Profile = () => {
