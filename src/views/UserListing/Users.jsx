@@ -5,6 +5,7 @@ import { IoMdAddCircleOutline, IoMdSearch, IoIosClose,} from "react-icons/io";
 import * as Toggle from "@radix-ui/react-toggle";
 import { HiOutlineFilter } from "react-icons/hi";
 import { Button, Popover, TextField, Heading,} from "@radix-ui/themes";
+import { getFromApi } from "../../utils/functions/api";
 
 const MATRICULA = ["Activa", "Caducada"];
 
@@ -24,7 +25,7 @@ const Users = () => {
     setFilters(filters.filter((f) => f != filter));
 
     function getUsers() {
-      getFromApi("api/clients/")
+      getFromApi("clients/")
         .then((response) => {
           console.log(response);
           return response.json();

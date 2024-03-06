@@ -2,6 +2,7 @@ import { useState, useEffect} from "react";
 import { useParams } from 'react-router-dom';
 import { Button } from "@radix-ui/themes";
 
+import { getFromApi } from "../../utils/functions/api";
 
 const Profile = () => {
     const { userId } = useParams();
@@ -10,7 +11,7 @@ const Profile = () => {
     const [isCodeShown, setIsCodeShown] = useState(false);
 
     useEffect(() => {
-        getFromApi("api/clients/"+userId + "/") 
+        getFromApi("clients/"+ userId + "/") 
         .then((response) => {
             console.log(response);
             return response.json();
@@ -18,15 +19,18 @@ const Profile = () => {
         .then((data) => {
             console.log(data);
             setUser(data);
-            user && getFromApi("api/gyms/"+user.gym+"/")
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                setGym(data);
-            });
         });
     }, [userId]);
+
+    useEffect(() => {
+        getFromApi("gyms/"+ user?.gym + "/") 
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            setGym(data);
+        });
+    }, [user]);
 
 
     return (

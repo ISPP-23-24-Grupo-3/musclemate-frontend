@@ -17,6 +17,7 @@ import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
+import { getFromApi } from "../../utils/functions/api";
 
 export const Routines = () => {
   const [error, setError] = useState("");
@@ -29,7 +30,7 @@ export const Routines = () => {
 
   const fetchRoutines = async () => {
     try {
-      const response = await fetch("/api/routines/");
+      const response = await getFromApi("routines/");
       if (!response.ok) {
         setError(
           "There was a problem while searching your routines (Unexpected status code). Please stand by.",
