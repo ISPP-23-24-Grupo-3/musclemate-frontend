@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
 import { Outlet, useNavigate } from 'react-router-dom';
+import { postToApi } from '../functions/api';
 
 const AuthContext = createContext()
 
@@ -18,12 +19,8 @@ export const AuthProvider = () => {
 
     let loginUser = async (e )=> {
         e.preventDefault()
-        let response = await fetch(`${VITE_BACKEND_URL}/token/`, {
-            method:'POST',
-            headers:{
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({'username':e.target.username.value, 'password':e.target.password.value})
+        let response = await postToApi(`token/`, {
+            'username':e.target.username.value, 'password':e.target.password.value
         })
         let data = await response.json()
 
@@ -53,12 +50,8 @@ export const AuthProvider = () => {
 
     let updateToken = async ()=> {
 
-        let response = await fetch(`${VITE_BACKEND_URL}/token/refresh/`, {
-            method:'POST',
-            headers:{
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({'refresh':authTokens?.refresh})
+        let response = await postToApi(`token/refresh/`, {
+            'refresh':authTokens?.refresh
         })
 
         let data = await response.json()
