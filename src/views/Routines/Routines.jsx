@@ -18,6 +18,7 @@ import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
 import AuthContext from "../../utils/context/AuthContext";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { getFromApi } from "../../utils/functions/api";
 
 export const Routines = () => {
   const [error, setError] = useState("");
@@ -27,8 +28,17 @@ export const Routines = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchRoutines = async (client) => {
-      const response = await fetch("/api/routines/");
+    fetchRoutines().then((routines) => setRoutines(routines));
+  }, []);
+
+  const fetchRoutines = async () => {
+    try {
+      const response = await getFromApi("routines/");
+      if (!response.ok) {
+        setError(
+          "There was a problem while searching your routines (Unexpected status code). Please stand by.",
+        );
+      }
       const routines = await response.json();
       return routines.filter((routine) => routine.client === client.id);
     };
