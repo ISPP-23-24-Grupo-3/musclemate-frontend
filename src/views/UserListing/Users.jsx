@@ -24,7 +24,7 @@ const Users = () => {
     setFilters(filters.filter((f) => f != filter));
 
     function getUsers() {
-      fetch("api/clients/")
+      getFromApi("api/clients/")
         .then((response) => {
           console.log(response);
           return response.json();

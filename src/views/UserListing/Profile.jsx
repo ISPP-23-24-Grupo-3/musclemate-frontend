@@ -10,7 +10,7 @@ const Profile = () => {
     const [isCodeShown, setIsCodeShown] = useState(false);
 
     useEffect(() => {
-        fetch("/api/clients/"+userId + "/") 
+        getFromApi("api/clients/"+userId + "/") 
         .then((response) => {
             console.log(response);
             return response.json();
@@ -18,7 +18,7 @@ const Profile = () => {
         .then((data) => {
             console.log(data);
             setUser(data);
-            user && fetch("/api/gyms/"+user.gym+"/")
+            user && getFromApi("api/gyms/"+user.gym+"/")
             .then((response) => {
                 return response.json();
             })
