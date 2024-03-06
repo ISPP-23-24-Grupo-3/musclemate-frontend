@@ -39,9 +39,6 @@ services:
     volumes:
       - ./musclemate-frontend/src/:/app/src
       - type: bind
-        source: ./musclemate-frontend/.env.docker
-        target: /app/.env
-      - type: bind
         source: ./musclemate-frontend/package.json
         target: /app/package.json
       - type: bind
