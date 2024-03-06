@@ -18,7 +18,7 @@ import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
 import AuthContext from "../../utils/context/AuthContext";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { getFromApi } from "../../utils/functions/api";
+import { getFromApi, postToApi } from "../../utils/functions/api";
 
 export const Routines = () => {
   const [error, setError] = useState("");
@@ -136,13 +136,7 @@ const RoutineForm = ({ set_routines, routines, client }) => {
     const tempObject = { ...data, temp_id: Date.now() };
     set_routines((c_routines) => [tempObject, ...c_routines]);
 
-    fetch("api/routines/create/", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    postToApi("routines/create/", data)
       .then((res) => {
         if (!res.ok) throw new Error("Something went wrong");
         return res.json();
