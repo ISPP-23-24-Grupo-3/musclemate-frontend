@@ -21,6 +21,7 @@ import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+import AddTickets from "./views/Tickets/AddTickets"; // Importa la vista AddTickets
 
 const router = createBrowserRouter([
   {
@@ -80,6 +81,7 @@ const router = createBrowserRouter([
               { path: "/routines/:id/edit", element: <EditRoutine /> },
               { path: "/routines/new", element: <EditRoutine /> },
               { path: "/routines/", element: <Routines /> },
+              { path: "/add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
             ],
           },
         ],
