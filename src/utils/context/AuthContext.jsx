@@ -53,7 +53,7 @@ export const AuthProvider = () => {
 
     let updateToken = async ()=> {
 
-        let response = await fetch('api/token/refresh/', {
+        let response = await fetch(`${VITE_BACKEND_URL}/token/refresh/`, {
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
@@ -86,6 +86,10 @@ export const AuthProvider = () => {
 
     useEffect(()=> {
 
+        if(loading){
+            updateToken()
+        }
+
         let fourMinutes = 1000 * 60 * 4
 
         let interval =  setInterval(()=> {
@@ -99,7 +103,7 @@ export const AuthProvider = () => {
 
     return(
         <AuthContext.Provider value={contextData} >
-            <Outlet />
+            {loading ? null : <Outlet />}
         </AuthContext.Provider>
     )
 }
