@@ -15,8 +15,10 @@ import { CgGym } from "react-icons/cg";
 import { useForm } from "react-hook-form";
 import { LuPencil } from "react-icons/lu";
 import { useParams } from "react-router-dom";
+import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
+import { getFromApi } from "../../utils/functions/api";
 
 const workouts = [
   {
@@ -50,7 +52,15 @@ export const EditRoutine = () => {
   const updateWorkouts = (workouts) =>
     setRoutine({ ...routine, workouts: workouts });
 
-  useEffect(() => {});
+  useEffect(() => {
+    const fetchWorkouts = async (routineId) => {
+      const response = await getFromApi("workouts/");
+      const fetchedWorkouts = await response.json();
+      return fetchedWorkouts.filter((w) => w.routine === routineId);
+    };
+
+    fetchWorkouts(routineId).then((w) => updateWorkouts(w));
+  });
 
   const { register, handleSubmit, setValue } = useForm();
 
@@ -122,6 +132,7 @@ export const EditRoutine = () => {
 const WorkoutList = ({ workouts }) => {
   return (
     <>
+      <Info message="No tienes ningún ejercicio registrado" />
       {workouts.map((workout) => (
         <Card key={workout.id}>
           <Flex justify="between">
