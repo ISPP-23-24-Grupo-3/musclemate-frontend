@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { getFromApi } from "../../utils/functions/api";
 
 const EquipmentDetails = () => {
   const { id } = useParams();
@@ -32,14 +33,14 @@ const EquipmentDetails = () => {
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
-        const response = await fetch(`/api/equipments/detail/${id}`);
+        const response = await getFromApi(`equipments/detail/${id}`);
         if (response.ok) {
           const data = await response.json();
           setMachineDetails(data);
           // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
           if (data.gym) {
             const gymId = data.gym;
-            const gymResponse = await fetch(`/api/gyms/${gymId}/`);
+            const gymResponse = await getFromApi(`gyms/${gymId}/`);
             if (gymResponse.ok) {
               const gymData = await gymResponse.json();
               setGymName(gymData.name);
