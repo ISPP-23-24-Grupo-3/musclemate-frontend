@@ -28,23 +28,14 @@ export const Routines = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchRoutines().then((routines) => setRoutines(routines));
-  }, []);
-
-  const fetchRoutines = async () => {
-    try {
+    const fetchRoutines = async (cl) => {
       const response = await getFromApi("routines/");
-      if (!response.ok) {
-        setError(
-          "There was a problem while searching your routines (Unexpected status code). Please stand by.",
-        );
-      }
-      const routines = await response.json();
-      return routines.filter((routine) => routine.client === client.id);
+      const fetchedRoutines = await response.json();
+      return fetchedRoutines.filter((r) => r.client == cl.id);
     };
 
     const fetchClient = async () => {
-      const response = await fetch("api/clients/");
+      const response = await getFromApi("clients/");
       const clients = await response.json();
       const foundClient = clients.find(
         (client) => client.user == user.username,
@@ -56,7 +47,7 @@ export const Routines = () => {
     fetchClient()
       .then((cl) => fetchRoutines(cl))
       .then((r) => setRoutines(r))
-      .catch((e) => {
+      .catch(() => {
         setError(
           "There was a problem while searching your routines. Please stand by.",
         );
