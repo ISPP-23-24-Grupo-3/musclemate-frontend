@@ -7,15 +7,6 @@ const env = loadEnv("all", process.cwd());
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    host: true,
-    port: 5173,
-    proxy: {
-      "/api": {
-        target: env.VITE_BACKEND_URL,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-    },
   },
   plugins: [
     react(),

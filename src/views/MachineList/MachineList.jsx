@@ -39,7 +39,7 @@ export default function MachineList() {
   const [machines, setMachines] = useState([]);
 
   function getMachines() {
-    getFromApi('machines/').then((response) => response.json()).then((data) => setMachines(data));
+    getFromApi('equipments/').then((response) => response.json()).then((data) => setMachines(data));
   }
 
 

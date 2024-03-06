@@ -33,7 +33,7 @@ const EquipmentDetails = () => {
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
-        const response = await getFromApi(`machines/${id}/`);
+        const response = await getFromApi(`equipments/detail/${id}`);
         if (response.ok) {
           const data = await response.json();
           setMachineDetails(data);

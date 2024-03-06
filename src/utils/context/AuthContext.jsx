@@ -7,7 +7,7 @@ const AuthContext = createContext()
 
 export default AuthContext;
 
-
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 export const AuthProvider = () => {
     let [authTokens, setAuthTokens] = useState(()=> localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
@@ -18,7 +18,7 @@ export const AuthProvider = () => {
 
     let loginUser = async (e )=> {
         e.preventDefault()
-        let response = await fetch('api/token/', {
+        let response = await fetch(`${VITE_BACKEND_URL}/token/`, {
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
