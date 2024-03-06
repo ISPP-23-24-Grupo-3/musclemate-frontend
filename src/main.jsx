@@ -21,6 +21,7 @@ import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+import TicketManagement from "./views/TicketManagement/TicketManagement";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
               {
                 path: "/users",
                 element: <Users />,
+              },
+              {
+                path: "/tickets",
+                element: <TicketManagement />,
               },
               {
                 path: "/owner-home",
