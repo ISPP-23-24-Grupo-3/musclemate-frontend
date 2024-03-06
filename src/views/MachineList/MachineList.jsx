@@ -18,6 +18,7 @@ import {
 } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
+import { getFromApi } from "../../utils/functions/api";
 
 // TODO: Add picture support
 const MUSCLES = [
@@ -38,16 +39,13 @@ export default function MachineList() {
   const [machines, setMachines] = useState([]);
 
   function getMachines() {
-    fetch("/api/equipments/")
-      .then((response) => response.json())
-      .then((data) => setMachines(data));
-    }
+    getFromApi('machines/').then((response) => response.json()).then((data) => setMachines(data));
+  }
 
 
 
   useEffect(() => {
     getMachines();
-    console.log(machines);
   }, [])
   
 

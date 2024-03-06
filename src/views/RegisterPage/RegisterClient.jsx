@@ -3,6 +3,7 @@ import { HiUser, HiOutlineMail,HiPhone } from "react-icons/hi";
 import { HiHome} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
+import { postToApi } from "../../utils/functions/api";
 
 
 
@@ -11,19 +12,11 @@ const ClientRegister = () => {
 
 
   const postUser = async () => {
-    const response = await fetch("/api/users/create/", {
-      method: "POST",
-      headers : {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "username":"owner1",
-         "password": "pbkdf2_sha256$720000$WSQKOFW6AKLFtPIMa6E3aU$QQt4xn2PQjMAW8X31Jf3UXhxp8IkYA82lTbcQaL/K58=",
-         "rol": "owner"
-      })
-      
-    })
-    return response.json()
+    postToApi('users/create/', {
+      "username":"owner1",
+       "password": "pbkdf2_sha256$720000$WSQKOFW6AKLFtPIMa6E3aU$QQt4xn2PQjMAW8X31Jf3UXhxp8IkYA82lTbcQaL/K58=",
+       "rol": "owner"
+    }).then(res => res.json())
   }
 
   const onSubmit =  (register) => {
