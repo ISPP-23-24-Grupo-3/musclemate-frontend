@@ -14,6 +14,7 @@ import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
 import { useForm } from "react-hook-form";
 import { LuPencil } from "react-icons/lu";
+import { useParams } from "react-router-dom";
 
 import PropTypes from "prop-types";
 
@@ -38,15 +39,18 @@ const workouts = [
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
-    name: "Routine 1",
-    workouts,
+    name: "",
+    workouts: [],
   });
   const [hide_form, set_hide_form] = useState(true);
   const [editing_name, set_editing_name] = useState(false);
 
+  const routineId = useParams().id;
   const updateName = (name) => setRoutine({ ...routine, name: name });
   const updateWorkouts = (workouts) =>
     setRoutine({ ...routine, workouts: workouts });
+
+  useEffect(() => {});
 
   const { register, handleSubmit, setValue } = useForm();
 
@@ -112,23 +116,6 @@ export const EditRoutine = () => {
         </Flex>
       </Section>
     </>
-  );
-};
-
-const EditDialog = ({ updateRoutine }) => {
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger>
-        <Button size="1">Editar nombre</Button>
-      </Dialog.Trigger>
-      <Dialog.Content>
-        <TextField.Input
-          placeholder="Nombre de la rutina"
-          onChange={updateRoutine}
-        ></TextField.Input>
-        <Text>Hola</Text>
-      </Dialog.Content>
-    </Dialog.Root>
   );
 };
 
