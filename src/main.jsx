@@ -41,7 +41,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/register-client",
-            element: <RegisterClient/>,
+            element: <RegisterClient />,
           },
           {
             path: "/",
@@ -57,7 +57,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "/add-machine",
-                element: <GymMachineForm/>,
+                element: <GymMachineForm />,
               },
               {
                 path: "/users",
@@ -77,7 +77,7 @@ const router = createBrowserRouter([
             path: "/",
             element: <UserRoute />,
             children: [
-              { path: "/routines/:id/edit", element: <EditRoutine /> },
+              { path: "/routines/:id", element: <EditRoutine /> },
               { path: "/routines/new", element: <EditRoutine /> },
               { path: "/routines/", element: <Routines /> },
             ],
