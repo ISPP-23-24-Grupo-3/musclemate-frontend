@@ -1,36 +1,33 @@
 import { useState, useEffect} from "react";
 import { useParams } from 'react-router-dom';
-import lista from "./lista.txt";
 import { Button } from "@radix-ui/themes";
 
 
 const Profile = () => {
     const { userId } = useParams();
     const [user, setUser] = useState(null);
+    const [gym, setGym] = useState(null);
     const [isCodeShown, setIsCodeShown] = useState(false);
-    
-    function getUsers() {
-        fetch("api/clients/")
-          .then((response) => response.json())
-          .then((data) => {
-                const user = data.find(user => user.id === Number(userId));
-                setUser(user);
-            });
-      }
-    
-      useEffect(() => {
-        getUsers();
-        console.log(user);
-      }, [userId]);
 
     useEffect(() => {
-        fetch(lista)
-            .then((response) => response.json())
+        fetch("/api/clients/"+userId + "/") 
+        .then((response) => {
+            console.log(response);
+            return response.json();
+        })
+        .then((data) => {
+            console.log(data);
+            setUser(data);
+            user && fetch("/api/gyms/"+user.gym+"/")
+            .then((response) => {
+                return response.json();
+            })
             .then((data) => {
-                const user = data.find(user => user.id === Number(userId));
-                setUser(user);
+                setGym(data);
             });
+        });
     }, [userId]);
+
 
     return (
         <>
@@ -40,7 +37,8 @@ const Profile = () => {
                         <img className="w-80 h-80" src={user ? user.photo : "https://i.imgur.com/Y23W1X9.png"}
                          onError={(e) => {e.target.onerror = null; e.target.src="https://i.imgur.com/Y23W1X9.png"}}/>
                     </div>
-                    <p className="text-center text-radixgreen text-2xl font-bold mt-5 mb-3">{user ? user.name+" "+user.lastName : "Cargando..."}</p>
+                    <p className="text-center text-radixgreen text-2xl font-bold mt-5 mb-3">{user ? user.user : "Cargando..."}</p>
+                    <p className="text-center text-black/60 text-2xl uppercase font-bold mb-4">{gym ? gym.name : "Cargando..."}</p>
                     
                     <Button className="bg-radixgreen/60 text-white" onClick={() => setIsCodeShown(!isCodeShown)}>
                         {isCodeShown ? 'Ocultar Código de Usuario' : 'Mostrar Código de Usuario'}
@@ -55,12 +53,12 @@ const Profile = () => {
                         <p className="text-radixgreen text-3xl font-bold mt-5 mb-2">Información del Usuario</p>
                         <hr className="border-radixgreen"/>
                     </div>
-                    <p className="text-radixgreen text-xl font-bold mt-5">Fecha de Nacimiento: <span className="text-black/60">{user ? user.birth : "Cargando..."}</span></p>
+                    <p className="text-radixgreen text-xl capitalize font-bold mt-5">Nombre: <span className="text-black/60">{user ? user.name+" "+user.lastName : "Cargando..."}</span></p>
+                    <p className="text-radixgreen text-xl font-bold mt-3">Fecha de Nacimiento: <span className="text-black/60">{user ? user.birth : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Mail:  <span className="text-black/60">{user ? user.email : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Número de Teléfono:  <span className="text-black/60">{user ? user.phoneNumber : "Cargando..."}</span></p>
-                    <p className="text-radixgreen text-xl font-bold mt-3">Dirección:  <span className="text-black/60">{user ? user.address : "Cargando..."}</span></p>
-                    <p className="text-radixgreen text-xl font-bold mt-3">Población:  <span className="text-black/60">{user ? user.city : "Cargando..."}</span></p>
-
+                    <p className="text-radixgreen text-xl capitalize font-bold mt-3">Dirección:  <span className="text-black/60">{user ? user.address : "Cargando..."}</span></p>
+                    <p className="text-radixgreen text-xl capitalize font-bold mt-3">Población:  <span className="text-black/60">{user ? user.city : "Cargando..."}</span></p>
                     <div>
                         <p className={user && user.register ? "bg-amber-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center": 
                          "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>

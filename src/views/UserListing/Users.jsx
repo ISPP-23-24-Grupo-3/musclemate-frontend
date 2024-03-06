@@ -23,16 +23,21 @@ const Users = () => {
   const removeFilter = (filter) =>
     setFilters(filters.filter((f) => f != filter));
 
-  function getUsers() {
-    fetch("api/clients/")
-      .then((response) => response.json())
-      .then((data) => setUsers(data));
-  }
-
-  useEffect(() => {
-    getUsers();
-    console.log(users);
-  }, []);
+    function getUsers() {
+      fetch("api/clients/")
+        .then((response) => {
+          console.log(response);
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          setUsers(data);
+        });
+    }
+  
+    useEffect(() => {
+      getUsers();
+    }, []);
 
   return (
     <>
