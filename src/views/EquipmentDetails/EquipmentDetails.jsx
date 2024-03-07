@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { getFromApi } from "../../utils/functions/api";
+import { HiTicket } from "react-icons/hi";
 
 const EquipmentDetails = () => {
   const { id } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
+  const [apiTickets, setApiTickets] = useState([]);
+  const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -59,6 +62,28 @@ const EquipmentDetails = () => {
     fetchMachineDetails();
   }, [id]);
 
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await getFromApi("tickets/");
+        if (response.ok) {
+          const data = await response.json();
+          const filteredTickets = data.filter(ticket => ticket.equipment_name === machineDetails?.name);
+          setApiTickets(filteredTickets);
+          setApiDataLoaded(true);
+        } else {
+          console.error("Error fetching API tickets:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching API tickets:", error);
+      }
+    };
+
+    if (machineDetails?.name) {
+      fetchTickets();
+    }
+  }, [machineDetails]);
+
   if (error) {
     return <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">{error}</div>;
   }
@@ -68,8 +93,8 @@ const EquipmentDetails = () => {
   }
 
   return (
-    <div className="mt-8 flex justify-center">
-      <div className="max-w-300px p-10 border border-radixgreen rounded">
+    <div className="mt-8 max-w-lg mx-auto">
+      <div className="p-10 border border-radixgreen rounded">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Detalles de la Máquina de Gimnasio
         </h2>
@@ -91,10 +116,30 @@ const EquipmentDetails = () => {
         <div className="mb-6">
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
-        {/* Botón para ver los tickets */}
-        <Link to={`/machines/${machineDetails.id}/tickets`} className="block mt-4 bg-radixgreen text-white px-4 py-2 rounded hover:bg-green-600 text-center">
-          Ver Tickets
-        </Link>
+      </div>
+      <div className="mt-8 text-center">
+        <h2 className="text-2xl font-semibold mb-4">
+          Tickets
+        </h2>
+        <ul>
+          {apiDataLoaded && apiTickets.length > 0 ? (
+            apiTickets.map(ticket => (
+              <li key={ticket.id} className="bg-white shadow-md p-4 rounded-md mb-4">
+                <div className="flex items-center mb-2">
+                  <HiTicket className="text-green-500 w-6 h-6 mr-2" />
+                  <div>
+                    <p className="text-radixgreen font-bold mb-1">Asunto: <span className="text-black">{ticket.label}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Descripción: <span className="text-black">{ticket.description}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Gimnasio: <span className="text-black">{ticket.gym_name}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Email: <span className="text-black">{ticket.client_email}</span></p>
+                  </div>
+                </div>
+              </li>
+            ))
+          ) : (
+            <p className="text-red-500">No hay tickets disponibles.</p>
+          )}
+        </ul>
       </div>
     </div>
   );

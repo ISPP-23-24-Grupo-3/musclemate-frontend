@@ -16,7 +16,6 @@ import Users from "./views/UserListing/Users";
 import "@radix-ui/themes/styles.css";
 import MachineList from "./views/MachineList/MachineList";
 import MainLayout from "./views/MainLayout/MainLayout";
-import TicketList from './views/TicketList/TicketList'; 
 import { EditRoutine } from "./views/Routines/EditRoutine";
 import { AuthProvider } from "./utils/context/AuthContext";
 import OwnerRoute from "./components/OwnerRoute";
@@ -59,11 +58,6 @@ const router = createBrowserRouter([
                 element: <MachineList />,
               },
               {
-
-                path: "/machines/:id/tickets", 
-                element: <TicketList />,
-              },
-              {
                 path: "/register-client",
                 element: <RegisterClient />,
               },
@@ -83,10 +77,6 @@ const router = createBrowserRouter([
               {
                 path: "/equipment-details/:id",
                 element: <EquipmentDetails />,
-              },
-              {
-                path: "/machines/:id/tickets", 
-                element: <TicketList />,
               },
             ],
           },
