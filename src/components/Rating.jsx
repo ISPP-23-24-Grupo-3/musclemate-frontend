@@ -58,8 +58,8 @@ function HalfStar() {
 }
 
 function Rating({ rating }) {
-  const filled_stars = Math.floor(rating);
-  const empty_stars = Math.floor(5 - rating);
+  const filled_stars = Math.floor(rating) || 0;
+  const empty_stars = Math.floor(5 - rating) || 0;
   return (
     <div className="flex fill-current stroke-current text-yellow-400">
       {[...Array(filled_stars)].map((_, index) => (

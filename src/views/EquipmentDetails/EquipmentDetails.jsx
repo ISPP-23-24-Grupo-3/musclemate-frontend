@@ -2,11 +2,17 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getFromApi } from "../../utils/functions/api";
 
+import Rating from "../../components/Rating";
+
 const EquipmentDetails = () => {
   const { id } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
+
+
+  const [machineRating, setMachineRating] = useState(null); // Añade esta línea
+
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -48,6 +54,18 @@ const EquipmentDetails = () => {
               setGymName("Nombre de gimnasio no disponible");
             }
           }
+
+
+          const assessmentResponse = await getFromApi(`assessments/${id}`);
+          if (assessmentResponse.ok) {
+            const assessmentData = await assessmentResponse.json();
+            setMachineRating(assessmentData.rating);
+          } else {
+            setMachineRating("Valoración no disponible");
+          }
+
+
+
         } else {
           setError("No se encontró la máquina con la ID proporcionada.");
         }
@@ -91,6 +109,14 @@ const EquipmentDetails = () => {
         <div className="mb-6">
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
+
+        <div className="mb-6">
+          <strong className="text-radixgreen">Valoración:</strong> 
+          {machineRating !== null && <Rating rating={machineRating} />}
+        </div>
+
+
+
       </div>
     </div>
   );
