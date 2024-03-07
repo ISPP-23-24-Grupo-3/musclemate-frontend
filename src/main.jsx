@@ -1,4 +1,3 @@
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -24,77 +23,6 @@ import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        path: "/",
-        element: <App />,
-      },
-      {
-        path: "/",
-        element: <AuthProvider />,
-        children: [
-          {
-            path: "/login",
-            element: <Login />,
-          },
-          
-          {
-            path: "/register-client",
-            element: <RegisterClient/>,
-          },
-          {
-            path: "/",
-            element: <OwnerRoute />,
-            children: [
-              {
-                path: "/register-user",
-                element: <RegisterUser />,
-              },
-              {
-                path: "/my-machines",
-                element: <MachineList />,
-              },
-              {
-                path: "/register-client",
-                element: <RegisterClient />,
-              },
-              {
-                path: "/add-machine",
-                element: <GymMachineForm/>,
-              },
-              {
-                path: "/users",
-                element: <Users />,
-              },
-
-              {
-                path: "/owner-home",
-                element: <OwnerHomePage />,
-              },
-              {
-                path: "/equipment-details/:id",
-                element: <EquipmentDetails />,
-              },
-            ],
-          },
-          {
-            path: "/",
-            element: <UserRoute />,
-            children: [
-
-              { path: "/routines/:id/edit", element: <EditRoutine /> },
-              { path: "/routines/new", element: <EditRoutine /> },
-              { path: "/routines/", element: <Routines /> },
-
-            ],
-          },
-        ],
-      },
-    ],
-  },
       {
         path: "/",
         element: <AuthProvider />,
