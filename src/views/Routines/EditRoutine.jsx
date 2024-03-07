@@ -18,7 +18,7 @@ import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
-import { getFromApi } from "../../utils/functions/api";
+import { getFromApi, postToApi } from "../../utils/functions/api";
 
 const workouts = [
   {
@@ -60,7 +60,8 @@ export const EditRoutine = () => {
     };
 
     fetchWorkouts(routineId).then((w) => updateWorkouts(w));
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routineId]);
 
   const { register, handleSubmit, setValue } = useForm();
 
@@ -179,7 +180,22 @@ WorkoutList.propTypes = {
 
 const EditableWorkout = ({ workouts, editWorkout, hideForm, setHideForm }) => {
   const onSubmit = (data) => {
-    editWorkout([data, ...workouts]);
+    const temp_workout = { ...data, temp_id: Date.now() };
+    editWorkout([temp_workout, ...workouts]);
+
+    postToApi("workouts/create/", data)
+      .then((r) => r.json())
+      .then((posted_w) =>
+        editWorkout(
+          workouts.map((w) =>
+            w.temp_id == temp_workout.temp_id ? posted_w : w,
+          ),
+        ),
+      )
+      .catch(() =>
+        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id)),
+      );
+
     setHideForm(true);
     reset();
   };
