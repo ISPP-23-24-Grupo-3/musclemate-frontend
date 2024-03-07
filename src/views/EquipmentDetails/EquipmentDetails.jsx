@@ -93,27 +93,27 @@ const EquipmentDetails = () => {
   }
 
   return (
-    <div className="mt-8 max-w-lg mx-auto">
+    <div className="mt-8 max-w-xl mx-auto">
       <div className="p-10 border border-radixgreen rounded">
-        <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
+        <h2 className="mb-6 text-radixgreen font-bold text-3xl text-center">
           Detalles de la Máquina de Gimnasio
         </h2>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Nombre:</strong> {machineDetails.name}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Descripción:</strong> {machineDetails.description}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Gimnasio:</strong> {gymName || 'No disponible'}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-        <div className="mb-6">
+        <div>
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
       </div>
