@@ -1,68 +1,40 @@
 project:
-  name: 'ISPP-2024-L1-03'
-  owner: 'L1'
-  teamId: '03'
+  name: ISPP-2024-L1-03-muscle-front
+  owner: L1
+  teamId: "03"
   identities: {}
   notifications:
-    email: 'etomasvela@gmail.com'
+    email: etomasvela@gmail.com
   members:
     member1:
-      name: 'Pedro'
-      surname: 'González Marcos' 
-      githubUsername: 'pgmarc'
+      name: Pedro
+      surname: "González Marcos"
+      githubUsername: pgmarc
     member2:
-      name: 'David'
-      surname: 'Del Hoyo Carcaboso' 
-      githubUsername: 'davdelcar'
+      name: David
+      surname: "Del Hoyo Carcaboso"
+      githubUsername: davdelcar
     member3:
-      name: 'Agustín'
-      surname: 'Devós Bono' 
-      githubUsername: 'agudevbon'
+      name: Ángel
+      surname: "Muñoz Prieto"
+      githubUsername: angmunpri
     member4:
-      name: 'Alejandro'
-      surname: 'Sosa Corral' 
-      githubUsername: 'AleSosa13'
+      name: Elena
+      surname: "Tomás Vela"
+      githubUsername: ElenaTomasVela
     member5:
-      name: 'Ángel'
-      surname: 'Muñoz Prieto' 
-      githubUsername: 'angmunpri'
+      name: "Juan Carlos"
+      surname: "Moreno Pérez"
+      githubUsername: juancarlos1907
     member6:
-      name: 'David'
-      surname: 'Zarandieta Ortiz' 
-      githubUsername: 'davidzarandieta'
+      name: Jorge
+      surname: "Romero Limón"
+      githubUsername: lemonada02
     member7:
-      name: 'Elena'
-      surname: 'Tomás Vela' 
-      githubUsername: 'ElenaTomasVela'
+      name: Luis
+      surname: "García Parras"
+      githubUsername: luisgp9
     member8:
-      name: 'Juan Carlos'
-      surname: 'Moreno Pérez' 
-      githubUsername: 'juancarlos1907'
-    member9:
-      name: 'Juan Jesús'
-      surname: 'Martín Hernández' 
-      githubUsername: 'juanjesussevi'
-    member10:
-      name: 'David'
-      surname: 'Dana Cabello' 
-      githubUsername: 'Leonidas6000'
-    member11:
-      name: 'Jorge'
-      surname: 'Romero Limón' 
-      githubUsername: 'lemonada02'
-    member12:
-      name: 'Manuel'
-      surname: 'Ortega García' 
-      githubUsername: 'manortgar'
-    member13:
-      name: 'Manuel'
-      surname: 'Vázquez Martín' 
-      githubUsername: 'manvazmar3'
-    member14:
-      name: 'Luis'
-      surname: 'García Parras' 
-      githubUsername: 'luisgp9'
-    member15:
-      name: 'Alejandro'
-      surname: 'Mateo Capilla' 
-      githubUsername: 'AMC112002'
+      name: Alejandro
+      surname: "Mateo Capilla"
+      githubUsername: AMC112002
