@@ -18,7 +18,7 @@ import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
-import { getFromApi, postToApi } from "../../utils/functions/api";
+import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { fetchClient } from "../../utils/functions/fetchUser";
 
@@ -35,7 +35,15 @@ export const EditRoutine = () => {
   console.log(client.name);
 
   const routineId = useParams().id;
-  const updateName = (name) => setRoutine({ ...routine, name: name });
+  const updateName = (name) => {
+    const prevRoutine = { ...routine };
+    const tempRoutine = { ...routine, name: name };
+    setRoutine({ tempRoutine });
+    putToApi("routines/update/" + routine.id + "/", tempRoutine)
+      .then((r) => r.json())
+      .then((updatedRoutine) => setRoutine(updatedRoutine))
+      .catch(setRoutine(prevRoutine));
+  };
 
   useEffect(() => {
     const fetchWorkouts = async (routineId) => {
