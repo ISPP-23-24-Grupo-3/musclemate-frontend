@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./views/LoginPage/Login";
 import { Routines } from "./views/Routines/Routines";
@@ -21,60 +21,88 @@ import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 
+import Profile from "./views/UserListing/Profile";
+
+
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        path: "/",
-        element: <App />,
-      },
       {
         path: "/",
         element: <AuthProvider />,
         children: [
           {
-            path: "/login",
-            element: <Login />,
-          },
-          {
-            path: "/register-client",
-            element: <RegisterClient/>,
-          },
-          {
             path: "/",
-            element: <OwnerRoute />,
+            element: <MainLayout />,
             children: [
               {
-                path: "/register-user",
-                element: <RegisterUser />,
+                path: "/",
+                element: <App />,
               },
               {
-                path: "/my-machines",
-                element: <MachineList />,
+                path: "/login",
+                element: <Login />,
               },
               {
-                path: "/add-machine",
-                element: <GymMachineForm/>,
+                path: "/register-client",
+                element: <RegisterClient/>,
               },
               {
-                path: "/users",
-                element: <Users />,
+                path: "/",
+                element: <OwnerRoute />,
+                children: [
+                  {
+                    path: "/register-user",
+                    element: <RegisterUser />,
+                  },
+                  {
+                    path: "/my-machines",
+                    element: <MachineList />,
+                  },
+                  {
+                    path: "/add-machine",
+                    element: <GymMachineForm/>,
+                  },
+                  {
+                    path: "/users",
+                    element: <Users />,
+                  },
+                  {
+                    path: "/owner-home",
+                    element: <OwnerHomePage />,
+                  },
+                  {
+                    path: "/equipment-details/:id",
+                    element: <EquipmentDetails />,
+                  },
+                ],
               },
               {
+
                 path: "/tickets",
                 element: <TicketManagement />,
               },
               {
                 path: "/owner-home",
                 element: <OwnerHomePage />,
+
+                path: "/",
+                element: <UserRoute />,
+                children: [
+                  { path: "/routines/:id/edit", element: <EditRoutine /> },
+                  { path: "/routines/new", element: <EditRoutine /> },
+                  { path: "/routines/", element: <Routines /> },
+                ],
+
               },
               {
                 path: "/equipment-details/:id",
                 element: <EquipmentDetails />,
+              },
+              {
+                path: "/users/:userId/profile",
+                element: <Profile />,
               },
             ],
           },
@@ -87,10 +115,9 @@ const router = createBrowserRouter([
               { path: "/routines/", element: <Routines /> },
             ],
           },
+          
         ],
       },
-    ],
-  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
