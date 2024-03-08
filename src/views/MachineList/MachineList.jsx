@@ -38,19 +38,42 @@ export default function MachineList() {
   const [search, set_search] = useState("");
   const [machines, setMachines] = useState([]);
 
+  const [machineRatings, setMachineRatings] = useState([]);
+
   function getMachines() {
     getFromApi('equipments/').then((response) => response.json()).then((data) => setMachines(data));
   }
-
-
 
   useEffect(() => {
     getMachines();
   }, [])
   
+  // Machine Ratings
+  useEffect(() => {
+    if (machines.length > 0) {
+      getFromApi('assessments/')
+        .then(response => response.json())
+        .then(data => {
+          const ratingsData = machines.map(machine => {
+            const machineRatings = data.filter(assessment => assessment.equipment === machine.id).map(rating => rating.stars);
+            const rating = actualRate(machineRatings, machineRatings.length);
+            // console.log(rating);
 
+            return { id: machine.id, ratings: rating };
+          });
+          // console.log(ratingsData);
+          setMachineRatings(ratingsData);
+        });
+    }
+  }, [machines]);
 
-
+  function actualRate(ratings, length) {
+    var value = 0;
+    for (let i = 0; i < length; i++) {
+      value += ratings[i];
+    }
+    return length > 0 ? value / length : 0;
+  }
 
   const SORTING_FUNCTIONS = {
     name: (a, b) => a.name.localeCompare(b.name),
@@ -195,20 +218,18 @@ export default function MachineList() {
         </Button>
 
         {filtered_machine_list.map((machine) => {
-          const ratings = machine?.reviews?.map((review) => review.rating);
-          const avg_rating =
-            ratings?.reduce((previous, current) => {
-              return previous + current;
-            }, 0) / ratings?.length;
           const issues = machine.issues?.length;
           const reviews = machine.reviews?.length;
+
+          const machineRatingData = machineRatings.find(ratingData => ratingData.id === machine.id);
+          var value= (machineRatingData ? machineRatingData.ratings : 0);
 
           return (
             <Link to={`/equipment-details/${machine.id}`} key={machine.id}>
             <Button key={machine.id} variant="soft" size="3" className="flex !justify-between !h-fit !p-2 !px-4 w-full">
                 <div className="flex flex-col justify-between items-start">
                   <p className="font-semibold">{machine.name}</p>
-                  <Rating rating={avg_rating ? avg_rating : 0 } />
+                  <Rating rating={value}/>
                 </div>
               <div className="flex flex-col items-start gap-1">
                 <span>

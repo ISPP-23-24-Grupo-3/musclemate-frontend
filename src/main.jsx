@@ -68,7 +68,7 @@ const router = createBrowserRouter([
                     element: <OwnerHomePage />,
                   },
                   {
-                    path: "/equipment-details/:id",
+                    path: "/equipment-details/:equipmentId",
                     element: <EquipmentDetails />,
                   },
                 ],

@@ -1,7 +1,7 @@
 function FilledStar() {
   return (
     <svg
-      className="w-4"
+      className="w-8"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-0.4 -0.4 6.61 6.61"
     >
@@ -19,7 +19,7 @@ function FilledStar() {
 function EmptyStar() {
   return (
     <svg
-      className="fill-none w-4"
+      className="fill-none w-8"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-0.4 -0.4 6.61 6.61"
     >
@@ -37,7 +37,7 @@ function EmptyStar() {
 function HalfStar() {
   return (
     <svg
-      className="w-4 fill-none"
+      className="w-8 fill-none"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-0.4 -0.4 6.61 6.61"
     >
