@@ -9,7 +9,7 @@ import {
   TextField,
   Section,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
 import { useForm } from "react-hook-form";
@@ -19,38 +19,23 @@ import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
 import { getFromApi, postToApi } from "../../utils/functions/api";
-
-const workouts = [
-  {
-    id: 1,
-    name: "Press de banca",
-    sets: 4,
-    reps: 3,
-    weight: 12,
-    machine: "Press de banca",
-  },
-  {
-    id: 2,
-    name: "Extensiones de triceps",
-    sets: 4,
-    reps: 3,
-    weight: 24,
-    machine: "Polea",
-  },
-];
+import AuthContext from "../../utils/context/AuthContext";
+import { fetchClient } from "../../utils/functions/fetchUser";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
     name: "",
-    workouts: [],
   });
+
+  const [workouts, set_workouts] = useState([]);
   const [hide_form, set_hide_form] = useState(true);
   const [editing_name, set_editing_name] = useState(false);
+  const [client, set_client] = useState({});
+  const { user } = useContext(AuthContext);
+  console.log(client.name);
 
   const routineId = useParams().id;
   const updateName = (name) => setRoutine({ ...routine, name: name });
-  const updateWorkouts = (workouts) =>
-    setRoutine({ ...routine, workouts: workouts });
 
   useEffect(() => {
     const fetchWorkouts = async (routineId) => {
@@ -58,8 +43,16 @@ export const EditRoutine = () => {
       const fetchedWorkouts = await response.json();
       return fetchedWorkouts.filter((w) => w.routine === routineId);
     };
+    const fetchRoutine = async (id) => {
+      const response = await getFromApi(`routines/`);
+      const fetchedRoutines = await response.json();
+      const fetchedRoutine = fetchedRoutines.find((r) => r.id == id);
+      return fetchedRoutine;
+    };
 
-    fetchWorkouts(routineId).then((w) => updateWorkouts(w));
+    fetchWorkouts(routineId).then((w) => set_workouts(w));
+    fetchRoutine(routineId).then((r) => setRoutine(r));
+    fetchClient(user.username).then((c) => set_client(c));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routineId]);
 
@@ -118,12 +111,14 @@ export const EditRoutine = () => {
         <Heading as="h2">Ejercicios</Heading>
         <Flex direction="column" gap="3" className="mt-4">
           <EditableWorkout
-            workouts={routine.workouts}
-            editWorkout={updateWorkouts}
+            workouts={workouts}
+            editWorkout={set_workouts}
             hideForm={hide_form}
             setHideForm={set_hide_form}
+            client={client}
+            routine={routine}
           />
-          <WorkoutList workouts={routine.workouts} />
+          <WorkoutList workouts={workouts} />
         </Flex>
       </Section>
     </>
@@ -178,23 +173,34 @@ WorkoutList.propTypes = {
   ),
 };
 
-const EditableWorkout = ({ workouts, editWorkout, hideForm, setHideForm }) => {
-  const onSubmit = (data) => {
-    const temp_workout = { ...data, temp_id: Date.now() };
+const EditableWorkout = ({
+  workouts,
+  editWorkout,
+  hideForm,
+  setHideForm,
+  client,
+  routine,
+}) => {
+  const addWorkout = (workout) => {
+    const temp_workout = { ...workout, temp_id: Date.now() };
     editWorkout([temp_workout, ...workouts]);
 
-    postToApi("workouts/create/", data)
+    postToApi("workouts/create/", workout)
       .then((r) => r.json())
-      .then((posted_w) =>
+      .then((postedWorkout) =>
         editWorkout(
           workouts.map((w) =>
-            w.temp_id == temp_workout.temp_id ? posted_w : w,
+            w.temp_id == temp_workout.temp_id ? postedWorkout : w,
           ),
         ),
       )
-      .catch(() =>
+      .catch(
         editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id)),
       );
+  };
+
+  const onSubmit = (data) => {
+    addWorkout(data);
 
     setHideForm(true);
     reset();
@@ -205,7 +211,12 @@ const EditableWorkout = ({ workouts, editWorkout, hideForm, setHideForm }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    values: {
+      client: client.id,
+      routine: routine.name,
+    },
+  });
 
   return (
     <>
