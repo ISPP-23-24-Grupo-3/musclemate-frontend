@@ -33,6 +33,12 @@ const EquipmentDetails = () => {
     }
   };
 
+  // Función para formatear la fecha
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
@@ -124,14 +130,22 @@ const EquipmentDetails = () => {
         <ul>
           {apiDataLoaded && apiTickets.length > 0 ? (
             apiTickets.map(ticket => (
-              <li key={ticket.id} className="bg-white shadow-md p-4 rounded-md mb-4">
+              <li key={ticket.id} className={`bg-white shadow-md p-4 rounded-md mb-4 ${ticket.status ? 'text-green-500' : 'text-red-500'}`}>
                 <div className="flex items-center mb-2">
-                  <HiTicket className="text-green-500 w-6 h-6 mr-2" />
+                  <HiTicket className="w-6 h-6 mr-2" />
                   <div>
-                    <p className="text-radixgreen font-bold mb-1">Asunto: <span className="text-black">{ticket.label}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Usuario: <span className="text-black">{ticket.client.name} {ticket.client.lastName}</span><span className="ml-7">Asunto: <span className="text-black">{ticket.label}</span></span></p>               
                     <p className="text-radixgreen font-bold mb-1">Descripción: <span className="text-black">{ticket.description}</span></p>
                     <p className="text-radixgreen font-bold mb-1">Gimnasio: <span className="text-black">{ticket.gym_name}</span></p>
-                    <p className="text-radixgreen font-bold mb-1">Email: <span className="text-black">{ticket.client_email}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Email: <span className="text-black">{ticket.client.email}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Fecha: <span className="text-black">{formatDate(ticket.date)}</span></p>
+                  </div>
+                  <div className="ml-auto">
+                    {ticket.status ? (
+                      <span className="text-green-500 font-bold">Resuelto</span>
+                    ) : (
+                      <span className="text-red-500 font-bold">No resuelto</span>
+                    )}
                   </div>
                 </div>
               </li>
