@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getFromApi } from "../../utils/functions/api";
+import { HiTicket } from "react-icons/hi";
 
 const EquipmentDetails = () => {
   const { id } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
+  const [apiTickets, setApiTickets] = useState([]);
+  const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -28,6 +31,12 @@ const EquipmentDetails = () => {
       default:
         return group;
     }
+  };
+
+  // Función para formatear la fecha
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   useEffect(() => {
@@ -59,6 +68,28 @@ const EquipmentDetails = () => {
     fetchMachineDetails();
   }, [id]);
 
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await getFromApi("tickets/");
+        if (response.ok) {
+          const data = await response.json();
+          const filteredTickets = data.filter(ticket => ticket.equipment_name === machineDetails?.name);
+          setApiTickets(filteredTickets);
+          setApiDataLoaded(true);
+        } else {
+          console.error("Error fetching API tickets:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching API tickets:", error);
+      }
+    };
+
+    if (machineDetails?.name) {
+      fetchTickets();
+    }
+  }, [machineDetails]);
+
   if (error) {
     return <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">{error}</div>;
   }
@@ -68,29 +99,61 @@ const EquipmentDetails = () => {
   }
 
   return (
-    <div className="mt-8 flex justify-center">
-      <div className="max-w-300px p-10 border border-radixgreen rounded">
-        <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
+    <div className="mt-8 max-w-xl mx-auto">
+      <div className="p-10 border border-radixgreen rounded">
+        <h2 className="mb-6 text-radixgreen font-bold text-3xl text-center">
           Detalles de la Máquina de Gimnasio
         </h2>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Nombre:</strong> {machineDetails.name}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Descripción:</strong> {machineDetails.description}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Gimnasio:</strong> {gymName || 'No disponible'}
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-        <div className="mb-6">
+        <div>
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
+      </div>
+      <div className="mt-8 text-center">
+        <h2 className="text-2xl font-semibold mb-4">
+          Tickets
+        </h2>
+        <ul>
+          {apiDataLoaded && apiTickets.length > 0 ? (
+            apiTickets.map(ticket => (
+              <li key={ticket.id} className={`bg-white shadow-md p-4 rounded-md mb-4 ${ticket.status ? 'text-green-500' : 'text-red-500'}`}>
+                <div className="flex items-center mb-2">
+                  <HiTicket className="w-6 h-6 mr-2" />
+                  <div>
+                    <p className="text-radixgreen font-bold mb-1">Usuario: <span className="text-black">{ticket.client.name} {ticket.client.lastName}</span><span className="ml-7">Asunto: <span className="text-black">{ticket.label}</span></span></p>               
+                    <p className="text-radixgreen font-bold mb-1">Descripción: <span className="text-black">{ticket.description}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Gimnasio: <span className="text-black">{ticket.gym_name}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Email: <span className="text-black">{ticket.client.email}</span></p>
+                    <p className="text-radixgreen font-bold mb-1">Fecha: <span className="text-black">{formatDate(ticket.date)}</span></p>
+                  </div>
+                  <div className="ml-auto">
+                    {ticket.status ? (
+                      <span className="text-green-500 font-bold">Resuelto</span>
+                    ) : (
+                      <span className="text-red-500 font-bold">No resuelto</span>
+                    )}
+                  </div>
+                </div>
+              </li>
+            ))
+          ) : (
+            <p className="text-red-500">No hay tickets disponibles.</p>
+          )}
+        </ul>
       </div>
     </div>
   );
