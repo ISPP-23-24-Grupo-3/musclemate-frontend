@@ -87,14 +87,6 @@ const router = createBrowserRouter([
                 path: "/owner-home",
                 element: <OwnerHomePage />,
 
-                path: "/",
-                element: <UserRoute />,
-                children: [
-                  { path: "/routines/:id/edit", element: <EditRoutine /> },
-                  { path: "/routines/new", element: <EditRoutine /> },
-                  { path: "/routines/", element: <Routines /> },
-                ],
-
               },
               {
                 path: "/equipment-details/:id",

@@ -62,14 +62,16 @@ const TicketManagement = () => {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
         const updatedTicket = await response.json();
+        console.log(updatedTicket);
         updatedTicket.status = checked; // Actualiza el estado del ticket
         // Realiza la solicitud PUT para actualizar el estado en la base de datos
-        const updateResponse = await putToApi(`tickets/detail/${ticketId}/`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedTicket),
+        const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
+          "label": updatedTicket.label,
+          "description": updatedTicket.description,
+          "gym": updatedTicket.gym,
+          "equipment": updatedTicket.equipment,
+          "client": updatedTicket.client,
+          "status": updatedTicket.status,
         });
         if (updateResponse.ok) {
           // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
