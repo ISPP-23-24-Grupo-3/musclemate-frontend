@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect} from "react";
-import lista from "./lista.txt";
 
 import { IoMdAddCircleOutline, IoMdSearch, IoIosClose,} from "react-icons/io";
 import * as Toggle from "@radix-ui/react-toggle";
 import { HiOutlineFilter } from "react-icons/hi";
 import { Button, Popover, TextField, Heading,} from "@radix-ui/themes";
+import { getFromApi } from "../../utils/functions/api";
 
 const MATRICULA = ["Activa", "Caducada"];
 
@@ -17,25 +17,32 @@ const Users = () => {
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().startsWith(search.toLowerCase()),
-    ).filter((user) => filters!=0 ? filters.some((f) => user.state === f) : true)
+    ).filter((user) => filters!=0 ? filters.some((f) => (user.register ? 'Activa' : 'Caducada') === f) : true)
   
 
   const addFilter = (filter) => setFilters([filter, ...filters]);
   const removeFilter = (filter) =>
     setFilters(filters.filter((f) => f != filter));
 
-  useEffect(() => {
-    fetch(lista)
-      .then((response) => response.json())
-      .then((data) => setUsers(data));
-  }, []);
+    function getUsers() {
+      getFromApi("clients/")
+        .then((response) => {
+          console.log(response);
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          setUsers(data);
+        });
+    }
+  
+    useEffect(() => {
+      getUsers();
+    }, []);
 
   return (
     <>
-      <Heading
-        size="8"
-        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
-      >
+      <Heading size="8" className="text-radixgreen !mt-8 !mb-3 text-center md:text-left">
         Usuarios
       </Heading>
       
@@ -106,16 +113,17 @@ const Users = () => {
             <Button key={users.id} variant="soft" size="3"
               className="flex !justify-between !h-fit !p-2 !px-4">
               <div className="flex flex-col">
-                <p className="font-semibold">{users.name}</p>
+                <p className="font-semibold">{users.name} {users.lastName}</p>
               </div>
               <div className="flex flex-col items-start gap-1">
-                <span className="text-red-500/80">
-                  <svg className="fill-current size-6 inline-block mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <span className= {users.register ? "" : "text-red-500/80"}>
+                  {!users.register && (
+                  <svg className= "fill-current size-6 inline-block mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 6.25C12.4142 6.25 12.75 6.58579 12.75 7V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V7C11.25 6.58579 11.5858 6.25 12 6.25Z" />
                     <path d="M12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z" />
                     <path d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fillRule="evenodd"/>
-                  </svg>
-                  {users.state} 
+                  </svg>)}
+                  {users.register ? "Activa" : "Caducada"} 
                 </span>
               </div>
             </Button>
