@@ -1,24 +1,27 @@
 /// <reference types="cypress"/>
 
 describe("Musclemate", () => {
-  it.skip("Should not login as a client, enter invalid password", () => {
-    cy.visit("https://localhost://5173");
+  it("Should login as a regular user", () => {
+    cy.visit(Cypress.env("MUSCLE_MATE_URL"));
 
     cy.get("a").contains("Entrar").click();
 
     cy.url().should("include", "/login");
 
-    cy.get("input[name='username']").type("fake@email.com");
-    cy.get("input[name='username'").should("have.value", "fake@email.com");
+    cy.get("input[name='username']").type("pgmarc");
+    cy.get("input[name='username'").should("have.value", "pgmarc");
 
-    cy.get("input[name='password']").type("fake@email.com");
-    cy.get("input[name='password'").should("have.value", "fake@email.com");
+    cy.get("input[name='password']").type("sanfermin");
+    cy.get("input[name='password'").should("have.value", "sanfermin");
 
-    cy.get("form").contains("Iniciar Sesión").click();
+    cy.url().should("include", "/");
+
+    cy.get("a").contains("Cerrar sesion").click();
+    cy.get("a").contains("Entrar");
   });
 
   it("Should register as a client", () => {
-    cy.visit("http://localhost:5173");
+    cy.visit(Cypress.env("MUSCLE_MATE_URL"));
 
     cy.get("a").contains("Registrarse").click();
 
