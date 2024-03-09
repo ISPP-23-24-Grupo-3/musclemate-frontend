@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getFromApi, postToApi } from "../../utils/functions/api";
-import { Button } from "@radix-ui/themes";
+import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
+import { Button, TextField } from "@radix-ui/themes";
 
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
@@ -88,11 +88,11 @@ const EquipmentDetails = () => {
   // Rating average (new - button)
   function newRate() {
     var value= 0;
+    machineRatings.push(Number(newRating));
     for (let i = 0; i < machineRatings.length; i++) {
       value += machineRatings[i];
       if(i === (machineRatings.length - 1)){
-        value += newRating;
-        value= value/(machineRatings.length + 1);
+        value= (value/machineRatings.length);
       }
     }
     setActualRating(value);
@@ -184,18 +184,73 @@ const EquipmentDetails = () => {
         <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-        <div>
+        <div className="mb-4">
           <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
 
-        <div className="mb-6">
-            <strong className="text-radixgreen">Valoración:</strong> 
+        <div className="mb-4">
+          <strong className="text-radixgreen">Valoración:</strong> 
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
             <Rating rating={actualRating}/>
-            <Button onClick={() => setValuationOn(true)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">Valorar</Button>
-          
-          
+            <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+              {valuationOn ? 'Volver' : 'Valorar'}
+            </Button>
+          </div>
         </div>
 
+        {actualRating}
+
+        {valuationOn && /*isClient*/ (
+          <div>
+            <div className="mb-4">
+              <strong className="text-radixgreen">Su Valoración:</strong> 
+              <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Rating rating={newRating}/>
+
+                <TextField.Input type="number" value={newRating} onChange={(e) => {
+                  e.target.value > 5 ? e.target.value = 5 : e.target.value < 0 ? e.target.value = 0 : e.target.value;
+                  setNewRating(e.target.value);
+                }} min="0" max="5" step="0.5" className="w-16"/>
+
+
+                {machineRatings.length > 0 ? (
+                  <p className="text-radixgreen">Valoraciones: {machineRatings.length}  {machineRatings}</p>
+                ) : (
+                  <p className="text-radixgreen">Sin valoraciones</p>
+                )}
+
+                <Button onClick={() => {newRate(); setValuationOn(false); }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                  Actualizar valoración
+                </Button>
+
+                {/* <Button onClick={async () => {
+                  const assessments = await getFromApi('assessments');
+                  const existingAssessment = assessments.find(assessment => assessment.client === clientId);
+
+                  if (existingAssessment) {
+                    putToApi('assessments/update/'+ existingAssessment.id, {
+                      id: existingAssessment.id,
+                      stars: newRating,
+                      equipment: Number(equipmentId),
+                      client: clientId
+                    });
+                  } else {
+                    postToApi('assessments/create', {
+                      stars: newRating,
+                      equipment: Number(equipmentId),
+                      client: client.id
+                    });
+                  }
+                  newRate();
+                  setValuationOn(false);
+                }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                  Enviar Valoración
+                </Button>  */}
+                
+              </div>      
+            </div>
+          </div>
+        )}
 
 
       </div>
@@ -227,7 +282,7 @@ const EquipmentDetails = () => {
               </li>
             ))
           ) : (
-            <p className="text-red-500">No hay tickets disponibles.</p>
+            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
           )}
         </ul>
       </div>

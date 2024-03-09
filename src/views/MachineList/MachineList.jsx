@@ -100,15 +100,16 @@ export default function MachineList() {
   const removeFilter = (filter) =>
     set_filters(filters.filter((f) => f != filter));
 
-  const filtered_machine_list = machines.filter((m) =>
-    m.name.toLowerCase().includes(search.toLowerCase()),
-  )
-    .filter((m) =>
-      filters.length != 0 ? filters.some((f) => m.muscular_group.includes(f)) : true,
-    )
-    .sort(
-      (a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1),
-    );
+  const filtered_machine_list = machines.length > 0
+    ? machines.filter((m) =>
+        m.name.toLowerCase().includes(search.toLowerCase()),
+      )
+      .filter((m) =>
+        filters.length !== 0 ? filters.some((f) => m.muscular_group.includes(f)) : true,
+      )
+      .sort((a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1))
+    : [];
+  
 
   return (
     <>
@@ -218,6 +219,13 @@ export default function MachineList() {
         </Button>
 
         {filtered_machine_list.map((machine) => {
+
+          const ratings = machine?.reviews?.map((review) => review.rating);
+          const avg_rating =
+            ratings?.reduce((previous, current) => {
+              return previous + current;
+            }, 0) / ratings?.length;
+
           const issues = machine.issues?.length;
           const reviews = machine.reviews?.length;
 
