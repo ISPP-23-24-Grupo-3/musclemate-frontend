@@ -1,11 +1,74 @@
-import React from "react";
+import React ,{useState, useEffect,useContext} from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
+import { AuthContext } from './AuthContext';
 
 const GymMachineForm = () => {
+
+  const { user } = useContext(AuthContext);
+  const [clientDetails, setClientDetails] = useState(null);  
+  
+  useEffect(() => {
+    const fetchClientDetails = async () => {
+      try {
+        if (user && user.id) {
+          const response = await fetch(`/api/clients/${user.id}/`);
+          if (!response.ok) {
+            throw new Error('Network response was not ok.');
+          }
+          const data = await response.json();
+          const gymId = data.gym;
+          if (gymId) {
+            const gymResponse = await fetch(`/api/gyms/${gymId}/`);
+            if (!gymResponse.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            const gymData = await gymResponse.json();
+            const clientDetailsWithGymName = {
+              ...data,
+              gym_name: gymData.name
+            };
+            setClientDetails(clientDetailsWithGymName);
+          } else {
+            setClientDetails(data);
+          }
+        }
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+      }
+    };
+
+    fetchClientDetails();
+  }, [user]);
+
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (machineInfo) => console.log(machineInfo);
+  const onSubmit = async (machineInfo) => {
+    try {
+      const response = await fetch('/api/equipments/create/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: machineInfo.name,
+          brand: machineInfo.brand,
+          reference: machineInfo.reference,
+          description: machineInfo.description,
+          muscularGroup: machineInfo.muscularGroup,
+          gym: gym.id,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error al agregar la máquina');
+      }
+  
+      console.log('Máquina agregada exitosamente');
+    } catch (error) {
+      console.error('Hubo un error al agregar la máquina:', error);
+    }
+  };
 
   const messages = {
     req: "Este campo es obligatorio",
@@ -101,6 +164,25 @@ const GymMachineForm = () => {
           {errors.muscularGroup && (
             <p className="text-red-500">{errors.muscularGroup.message}</p>
           )}
+
+          <div className="flex items-center mb-4">
+          <label htmlFor="gym" className="mr-3">Gimnasio</label>
+          <select
+            {...register("gym", { required: messages.req })}
+            name="gym"
+            className={`flex-1 px-4 py-3 border rounded-lg ${
+              errors.gym ? 'border-red-500' : 'border-radixgreen'
+            } bg-white text-black`}
+          >
+            <option value="">Seleccionar gimnasio</option>
+            {clientDetails && (
+              <option value={clientDetails.gym}>{clientDetails.gym_name}</option>
+            )}
+          </select>
+        </div>
+        {errors.gym && (
+          <p className="text-red-500">{errors.gym.message}</p>
+        )}
 
           <Button
             type="submit"
