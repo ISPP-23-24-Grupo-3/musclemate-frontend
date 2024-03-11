@@ -37,16 +37,7 @@ services:
     links:
       - backend
     volumes:
-      - ./musclemate-frontend/src/:/app/src
-      - type: bind
-        source: ./musclemate-frontend/.env.docker
-        target: /app/.env
-      - type: bind
-        source: ./musclemate-frontend/package.json
-        target: /app/package.json
-      - type: bind
-        source: ./musclemate-frontend/package-lock.json
-        target: /app/package-lock.json
+      - ./musclemate-frontend/:/app/
 
 volumes:
   postgres_data:

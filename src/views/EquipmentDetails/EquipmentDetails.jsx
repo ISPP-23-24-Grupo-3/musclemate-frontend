@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
+import { Button, TextField } from "@radix-ui/themes";
+
+import Rating from "../../components/Rating";
 import { getFromApi, putToApi } from "../../utils/functions/api"; // Asegúrate de tener una función putToApi para enviar solicitudes PUT
 import { HiTicket } from "react-icons/hi";
 
 const EquipmentDetails = () => {
-  const { id } = useParams();
+  const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
+  const [machineRatings, setMachineRatings] = useState([]);
+  const [actualRating, setActualRating] = useState(0);
+  const [newRating, setNewRating] = useState(0);
+  const [valuationOn, setValuationOn] = useState(false);
+
   const [editMode, setEditMode] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState(null);
 
@@ -46,6 +55,63 @@ const EquipmentDetails = () => {
     }
   };
 
+  // Machine Details
+  useEffect(() => {
+    getFromApi("equipments/detail/"+ equipmentId +"/" ) 
+    .then((response) => {
+        // console.log(response);
+        return response.json();
+    })
+    .then((data) => {
+        // console.log(data);
+        setMachineDetails(data);
+    });
+  }, [equipmentId]);
+
+  // Machine Ratings
+  useEffect(() => {
+    getFromApi("assessments/") 
+    .then((response) => {
+        // console.log(response);
+        return response.json();
+    })
+    .then((data) => {
+        // console.log(data.filter((rating) => rating.equipment === Number(equipmentId)).map((rating) => rating.stars));
+        const ratings = data.filter((rating) => rating.equipment === Number(equipmentId)).map((rating) => rating.stars);
+        // console.log(ratings);
+        setMachineRatings(ratings); 
+      }); 
+  }, [equipmentId]);
+
+  // Rating average (shown)
+  function actualRate() {
+    var value= 0;
+    for (let i = 0; i < machineRatings.length; i++) {
+      value += machineRatings[i];
+      if(i === (machineRatings.length - 1)){
+        value= (value/machineRatings.length);
+      }
+    }
+    setActualRating(value);
+  }
+
+  useEffect(() => {
+    actualRate();
+  }, [machineRatings]);
+
+  // Rating average (new - button)
+  function newRate() {
+    var value= 0;
+    machineRatings.push(Number(newRating));
+    for (let i = 0; i < machineRatings.length; i++) {
+      value += machineRatings[i];
+      if(i === (machineRatings.length - 1)){
+        value= (value/machineRatings.length);
+      }
+    }
+    setActualRating(value);
+  }
+
   // Función para formatear la fecha
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -55,7 +121,7 @@ const EquipmentDetails = () => {
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
-        const response = await getFromApi(`equipments/detail/${id}`);
+        const response = await getFromApi(`equipments/detail/${equipmentId}/`);
         if (response.ok) {
           const data = await response.json();
           setMachineDetails(data);
@@ -79,7 +145,7 @@ const EquipmentDetails = () => {
     };
 
     fetchMachineDetails();
-  }, [id]);
+  }, [equipmentId]);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -204,7 +270,7 @@ const EquipmentDetails = () => {
             <span>{translateMuscularGroup(machineDetails.muscular_group)}</span>
           )}
         </div>
-        <div>
+        <div className="mb-4">
           <strong className="text-radixgreen">Número de Serie:</strong>{" "}
           {editMode ? (
             <input
@@ -217,6 +283,70 @@ const EquipmentDetails = () => {
             <span>{machineDetails.serial_number}</span>
           )}
         </div>
+        <div className="mb-4">
+          <strong className="text-radixgreen">Valoración:</strong> 
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            <Rating rating={actualRating}/>
+            <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+              {valuationOn ? 'Volver' : 'Valorar'}
+            </Button>
+          </div>
+        </div>
+
+        {actualRating}
+
+        {valuationOn && /*isClient*/ (
+          <div>
+            <div className="mb-4">
+              <strong className="text-radixgreen">Su Valoración:</strong> 
+              <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Rating rating={newRating}/>
+
+                <TextField.Input type="number" value={newRating} onChange={(e) => {
+                  e.target.value > 5 ? e.target.value = 5 : e.target.value < 0 ? e.target.value = 0 : e.target.value;
+                  setNewRating(e.target.value);
+                }} min="0" max="5" step="0.5" className="w-16"/>
+
+
+                {machineRatings.length > 0 ? (
+                  <p className="text-radixgreen">Valoraciones: {machineRatings.length}  {machineRatings}</p>
+                ) : (
+                  <p className="text-radixgreen">Sin valoraciones</p>
+                )}
+
+                <Button onClick={() => {newRate(); setValuationOn(false); }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                  Actualizar valoración
+                </Button>
+
+                {/* <Button onClick={async () => {
+                  const assessments = await getFromApi('assessments');
+                  const existingAssessment = assessments.find(assessment => assessment.client === clientId);
+
+                  if (existingAssessment) {
+                    putToApi('assessments/update/'+ existingAssessment.id, {
+                      id: existingAssessment.id,
+                      stars: newRating,
+                      equipment: Number(equipmentId),
+                      client: clientId
+                    });
+                  } else {
+                    postToApi('assessments/create', {
+                      stars: newRating,
+                      equipment: Number(equipmentId),
+                      client: client.id
+                    });
+                  }
+                  newRate();
+                  setValuationOn(false);
+                }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                  Enviar Valoración
+                </Button>  */}
+                
+              </div>      
+            </div>
+          </div>
+        )}
+
         {editMode && (
           <div className="mt-4 text-center">
             <button
@@ -272,7 +402,7 @@ const EquipmentDetails = () => {
               </li>
             ))
           ) : (
-            <p className="text-red-500">No hay tickets disponibles.</p>
+            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
           )}
         </ul>
       </div>
