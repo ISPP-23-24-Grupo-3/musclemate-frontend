@@ -102,6 +102,7 @@ const router = createBrowserRouter([
               { path: "/routines/:id/edit", element: <EditRoutine /> },
               { path: "/routines/new", element: <EditRoutine /> },
               { path: "/routines/", element: <Routines /> },
+              { path: "/add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
             ],
           },
           

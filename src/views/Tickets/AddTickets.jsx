@@ -1,40 +1,35 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
+import { postToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 
 const AddTickets = () => {
   const { user } = useContext(AuthContext);
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
   const [gymId, setGymId] = useState("");
   const [equipmentId, setEquipmentId] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [status, setStatus] = useState(false); // Inicializado a false
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("api/tickets/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          label,
-          description,
-          status,
-          gym: gymId,
-          equipment: equipmentId,
-          client: user.id, // Usuario logueado
-        }),
+      const response = await postToApi("tickets/create/", {
+        label,
+        description,
+        gym: gymId,
+        client: user.id, // Usamos el ID de cliente del contexto de autenticación
+        equipment: equipmentId,
+        status,
       });
       if (response.ok) {
         setSuccessMessage("Ticket creado exitosamente");
         setLabel("");
         setDescription("");
-        setStatus("");
         setGymId("");
         setEquipmentId("");
+        setStatus(false);
       } else {
         setErrorMessage("Error al crear el ticket. Por favor, inténtelo de nuevo más tarde.");
       }
@@ -51,7 +46,7 @@ const AddTickets = () => {
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label htmlFor="label" className="text-radixgreen">Label:</label>
+            <label htmlFor="label" className="text-radixgreen">Asunto:</label>
             <input type="text" id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
           </div>
           <div className="mb-6">
@@ -59,16 +54,16 @@ const AddTickets = () => {
             <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
           <div className="mb-6">
+            <label htmlFor="gymId" className="text-radixgreen">ID del Gimnasio:</label>
+            <input type="text" id="gymId" value={gymId} onChange={(e) => setGymId(e.target.value)} />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="equipmentId" className="text-radixgreen">ID del Equipo:</label>
+            <input type="text" id="equipmentId" value={equipmentId} onChange={(e) => setEquipmentId(e.target.value)} />
+          </div>
+          <div className="mb-6">
             <label htmlFor="status" className="text-radixgreen">Estado:</label>
-            <input type="text" id="status" value={status} onChange={(e) => setStatus(e.target.value)} />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="gym" className="text-radixgreen">ID del Gimnasio:</label>
-            <input type="text" id="gym" value={gymId} onChange={(e) => setGymId(e.target.value)} />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="equipment" className="text-radixgreen">ID del Equipo:</label>
-            <input type="text" id="equipment" value={equipmentId} onChange={(e) => setEquipmentId(e.target.value)} />
+            <input type="checkbox" id="status" checked={status} onChange={(e) => setStatus(e.target.checked)} />
           </div>
           {successMessage && <div className="text-green-700 mb-4">{successMessage}</div>}
           {errorMessage && <div className="text-red-700 mb-4">{errorMessage}</div>}
