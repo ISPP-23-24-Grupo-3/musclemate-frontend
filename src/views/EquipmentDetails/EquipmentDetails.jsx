@@ -11,7 +11,9 @@ const EquipmentDetails = () => {
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
+
   const [apiTickets, setApiTickets] = useState([]);
+  const [allTickets, setAllTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
   const [machineRatings, setMachineRatings] = useState([]);
@@ -122,7 +124,6 @@ const EquipmentDetails = () => {
               ticket.id === ticketId ? updatedTicket : ticket
             )
           );
-          fetchTickets();
         } else {
           console.error("Error updating ticket status:", updateResponse.status);
         }
