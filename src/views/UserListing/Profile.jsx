@@ -11,7 +11,7 @@ const Profile = () => {
     const [isCodeShown, setIsCodeShown] = useState(false);
 
     useEffect(() => {
-        getFromApi("clients/"+ userId + "/") 
+        getFromApi("clients/detail/"+ userId + "/") 
         .then((response) => {
             console.log(response);
             return response.json();
