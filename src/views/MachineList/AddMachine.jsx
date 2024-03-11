@@ -6,7 +6,8 @@ import { AuthContext } from './AuthContext';
 const GymMachineForm = () => {
 
   const { user } = useContext(AuthContext);
-  const [clientDetails, setClientDetails] = useState(null);  
+  const [clientDetails, setClientDetails] = useState(null);
+  const [gymId, setGymId] = useState(null)
   
   useEffect(() => {
     const fetchClientDetails = async () => {
@@ -17,9 +18,11 @@ const GymMachineForm = () => {
             throw new Error('Network response was not ok.');
           }
           const data = await response.json();
-          const gymId = data.gym;
-          if (gymId) {
-            const gymResponse = await fetch(`/api/gyms/${gymId}/`);
+          const fetchedGymId = data.gym;
+          setGymId(fetchedGymId);
+
+          if (fetchedGymId) {
+            const gymResponse = await fetch(`/api/gyms/${fetchedGymId}/`);
             if (!gymResponse.ok) {
               throw new Error('Network response was not ok.');
             }
@@ -56,7 +59,7 @@ const GymMachineForm = () => {
           reference: machineInfo.reference,
           description: machineInfo.description,
           muscularGroup: machineInfo.muscularGroup,
-          gym: gym.id,
+          gym: gymId,
         }),
       });
   
