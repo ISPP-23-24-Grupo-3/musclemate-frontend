@@ -4,7 +4,6 @@ import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
 import { Button, TextField } from "@radix-ui/themes";
 
 import Rating from "../../components/Rating";
-import { getFromApi, putToApi } from "../../utils/functions/api"; // Asegúrate de tener una función putToApi para enviar solicitudes PUT
 import { HiTicket } from "react-icons/hi";
 
 const EquipmentDetails = () => {
