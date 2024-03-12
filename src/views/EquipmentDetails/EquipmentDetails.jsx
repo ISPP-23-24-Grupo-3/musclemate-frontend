@@ -106,7 +106,6 @@ const EquipmentDetails = () => {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
         const updatedTicket = await response.json();
-        console.log(updatedTicket);
         updatedTicket.status = checked; // Actualiza el estado del ticket
         // Realiza la solicitud PUT para actualizar el estado en la base de datos
         const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
@@ -119,7 +118,7 @@ const EquipmentDetails = () => {
         });
         if (updateResponse.ok) {
           // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
-          setAllTickets((prevTickets) =>
+          setApiTickets((prevTickets) =>
             prevTickets.map((ticket) =>
               ticket.id === ticketId ? updatedTicket : ticket
             )
