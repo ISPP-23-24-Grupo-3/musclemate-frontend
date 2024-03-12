@@ -61,8 +61,34 @@ const router = createBrowserRouter([
                 element: <GymMachineForm />,
               },
               {
-                path: "/users",
-                element: <Users />,
+                path: "/",
+                element: <OwnerRoute />,
+                children: [
+                  {
+                    path: "/register-user",
+                    element: <RegisterUser />,
+                  },
+                  {
+                    path: "/my-machines",
+                    element: <MachineList />,
+                  },
+                  {
+                    path: "/add-machine",
+                    element: <GymMachineForm/>,
+                  },
+                  {
+                    path: "/users",
+                    element: <Users />,
+                  },
+                  {
+                    path: "/owner-home",
+                    element: <OwnerHomePage />,
+                  },
+                  {
+                    path: "/equipment-details/:equipmentId",
+                    element: <EquipmentDetails />,
+                  },
+                ],
               },
               {
                 path: "/owner-home",
