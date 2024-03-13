@@ -11,7 +11,9 @@ const EquipmentDetails = () => {
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
+
   const [apiTickets, setApiTickets] = useState([]);
+  const [allTickets, setAllTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
   const [machineRatings, setMachineRatings] = useState([]);
@@ -97,6 +99,40 @@ const EquipmentDetails = () => {
     }
     setActualRating(value);
   }
+
+  const handleCheckboxChange = async (event, ticketId) => {
+    const { checked } = event.target;
+    try {
+      const response = await getFromApi(`tickets/detail/${ticketId}/`);
+      if (response.ok) {
+        const updatedTicket = await response.json();
+        updatedTicket.status = checked; // Actualiza el estado del ticket
+        // Realiza la solicitud PUT para actualizar el estado en la base de datos
+        const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
+          "label": updatedTicket.label,
+          "description": updatedTicket.description,
+          "gym": updatedTicket.gym,
+          "equipment": updatedTicket.equipment,
+          "client": updatedTicket.client,
+          "status": updatedTicket.status,
+        });
+        if (updateResponse.ok) {
+          // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
+          setApiTickets((prevTickets) =>
+            prevTickets.map((ticket) =>
+              ticket.id === ticketId ? updatedTicket : ticket
+            )
+          );
+        } else {
+          console.error("Error updating ticket status:", updateResponse.status);
+        }
+      } else {
+        console.error("Error fetching ticket details:", response.status);
+      }
+    } catch (error) {
+      console.error("Error updating ticket status:", error);
+    }
+  };
 
   // Función para formatear la fecha
   const formatDate = (dateString) => {
@@ -272,11 +308,17 @@ const EquipmentDetails = () => {
                     <p className="text-radixgreen font-bold mb-1">Fecha: <span className="text-black">{formatDate(ticket.date)}</span></p>
                   </div>
                   <div className="ml-auto">
-                    {ticket.status ? (
-                      <span className="text-green-500 font-bold">Resuelto</span>
-                    ) : (
-                      <span className="text-red-500 font-bold">No resuelto</span>
-                    )}
+                    <input
+                        type="checkbox"
+                        checked={ticket.status}
+                        onChange={(e) => handleCheckboxChange(e, ticket.id)}
+                        className="mr-2"
+                      />
+                      <p className="text-radixgreen font-bold mb-1">
+                        <span className={ticket.status ? "text-green-500 ml-2" : "text-red-500 ml-2"}>
+                          {ticket.status ? "Resuelto" : "No Resuelto"}
+                        </span>
+                      </p>
                   </div>
                 </div>
               </li>
