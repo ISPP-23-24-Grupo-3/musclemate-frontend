@@ -37,6 +37,11 @@ export default function OwnerHomePage() {
                     Usuarios
                 </Button>
             </Link>
+            <Link to="/tickets">
+                <Button size="4" variant="classic" className="mt-4">
+                    Ver Tickets
+                </Button>
+            </Link>
         </Flex>
     </Container>
   )
