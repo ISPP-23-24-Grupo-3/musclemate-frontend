@@ -220,7 +220,7 @@ const EquipmentDetails = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await putToApi(`equipments/update/${id}/`, updatedDetails);
+      const response = await putToApi(`equipments/update/${equipmentId}/`, updatedDetails);
       if (response.ok) {
         setMachineDetails(updatedDetails);
         setEditMode(false);
