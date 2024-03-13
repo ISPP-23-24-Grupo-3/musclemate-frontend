@@ -21,7 +21,11 @@ import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+
+import TicketManagement from "./views/TicketManagement/TicketManagement";
+
 import Profile from "./views/UserListing/Profile";
+
 
 const router = createBrowserRouter([
   {
@@ -89,6 +93,10 @@ const router = createBrowserRouter([
                     element: <EquipmentDetails />,
                   },
                 ],
+              },
+              {
+                path: "/tickets",
+                element: <TicketManagement />,
               },
               {
                 path: "/owner-home",
