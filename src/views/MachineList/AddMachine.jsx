@@ -2,66 +2,59 @@ import React ,{useState, useEffect,useContext} from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 import { AuthContext } from './AuthContext';
+import { getFromApi, postToApi } from "../../utils/functions/api";
 
 const GymMachineForm = () => {
 
   const { user } = useContext(AuthContext);
   const [clientDetails, setClientDetails] = useState(null);
-  const [gymId, setGymId] = useState(null)
-  
+  const [gyms, setGyms] = useState(null)
+  const [selectGym, setSelectGym] =useState(null);
+  const [machines, setMachines] = useState(null);
+
   useEffect(() => {
-    const fetchClientDetails = async () => {
+    const clientDetails = async () => {
       try {
         if (user && user.id) {
-          const response = await fetch(`/api/clients/${user.id}/`);
+          const response = await getFromApi(`owners/`);
           if (!response.ok) {
             throw new Error('Network response was not ok.');
           }
           const data = await response.json();
-          const fetchedGymId = data.gym;
-          setGymId(fetchedGymId);
-
-          if (fetchedGymId) {
-            const gymResponse = await fetch(`/api/gyms/${fetchedGymId}/`);
-            if (!gymResponse.ok) {
-              throw new Error('Network response was not ok.');
-            }
-            const gymData = await gymResponse.json();
-            const clientDetailsWithGymName = {
-              ...data,
-              gym_name: gymData.name
-            };
-            setClientDetails(clientDetailsWithGymName);
-          } else {
-            setClientDetails(data);
-          }
+          const owner = data.find(o=>o.user==user.username)
+          const responseGym = await getFromApi('gyms/');
+          const dataGym = await responseGym.json();
+          const gyms = dataGym.filter(g=>g.owner==owner.id);
+          setGyms(gyms);
         }
       } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
       }
     };
+    clientDetails();
+    }, [user]);
 
-    fetchClientDetails();
-  }, [user]);
+  useEffect(() => {
+    const selectedGym = async() => {
+      try{
+        const machinesGym = await getFromApi(`equipments/`);
+        const machineResponse = await machinesGym.json();
+        const machinesGyms = machineResponse.filter(m=>m.gym==selectGym)
+        setMachines(machinesGyms);
+      }catch(error) {
+        console.error('There was a problem with the fetch operation:', error);
+      }
+    };
+    selectedGym();
+    },[selectGym]);
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+
+  const { register, handleSubmit, formState: { errors } } = useForm( {values: {gym: selectGym,}},);
 
   const onSubmit = async (machineInfo) => {
     try {
-      const response = await fetch('/api/equipments/create/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: machineInfo.name,
-          brand: machineInfo.brand,
-          reference: machineInfo.reference,
-          description: machineInfo.description,
-          muscularGroup: machineInfo.muscularGroup,
-          gym: gymId,
-        }),
-      });
+      const response = await postToApi('equipments/create/',
+        machineInfo);
   
       if (!response.ok) {
         throw new Error('Error al agregar la máquina');
