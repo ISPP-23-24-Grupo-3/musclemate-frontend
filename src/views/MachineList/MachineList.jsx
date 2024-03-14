@@ -9,13 +9,7 @@ import {
 import * as Toggle from "@radix-ui/react-toggle";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { HiOutlineFilter } from "react-icons/hi";
-import {
-  Button,
-  Popover,
-  TextField,
-  Heading,
-  IconButton,
-} from "@radix-ui/themes";
+import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
 import { getFromApi } from "../../utils/functions/api";
@@ -219,7 +213,6 @@ export default function MachineList() {
         </Button>
 
         {filtered_machine_list.map((machine) => {
-
           const ratings = machine?.reviews?.map((review) => review.rating);
           const avg_rating =
             ratings?.reduce((previous, current) => {
