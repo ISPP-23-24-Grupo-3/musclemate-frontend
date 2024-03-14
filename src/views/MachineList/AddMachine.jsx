@@ -3,7 +3,11 @@ import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 
 const GymMachineForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const onSubmit = (machineInfo) => console.log(machineInfo);
 
@@ -24,29 +28,36 @@ const GymMachineForm = () => {
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex items-center mb-4">
-            <label htmlFor="name" className="mr-3">Nombre de la máquina</label>
+            <label htmlFor="name" className="mr-3">
+              Nombre de la máquina
+            </label>
             <input
-              {...register("name", { required: messages.req, minLength: { value: 5, message: messages.name } })}
+              {...register("name", {
+                required: messages.req,
+                minLength: { value: 5, message: messages.name },
+              })}
               name="name"
               type="text"
               className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.name ? 'border-red-500' : 'border-radixgreen'
+                errors.name ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
-              
             />
           </div>
-          {errors.name && (
-            <p className="text-red-500">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
           <div className="flex items-center mb-4">
-            <label htmlFor="brand" className="mr-3">Marca</label>
+            <label htmlFor="brand" className="mr-3">
+              Marca
+            </label>
             <input
-              {...register("brand", { required: messages.req, minLength: { value: 3, message: messages.brand } })}
+              {...register("brand", {
+                required: messages.req,
+                minLength: { value: 3, message: messages.brand },
+              })}
               name="brand"
               type="text"
               className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.brand ? 'border-red-500' : 'border-radixgreen'
+                errors.brand ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "7.5rem" }}
             />
@@ -56,13 +67,15 @@ const GymMachineForm = () => {
           )}
 
           <div className="flex items-center mb-4">
-            <label htmlFor="reference" className="mr-3">Número de referencia</label>
+            <label htmlFor="reference" className="mr-3">
+              Número de referencia
+            </label>
             <input
               {...register("reference", { required: messages.req })}
               name="reference"
               type="text"
               className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.reference ? 'border-red-500' : 'border-radixgreen'
+                errors.reference ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "0.4rem" }}
             />
@@ -72,12 +85,17 @@ const GymMachineForm = () => {
           )}
 
           <div className="flex items-center mb-4">
-            <label htmlFor="description" className="mr-3">Descripción</label>
+            <label htmlFor="description" className="mr-3">
+              Descripción
+            </label>
             <textarea
-              {...register("description", { required: messages.req, minLength: { value: 10, message: messages.description } })}
+              {...register("description", {
+                required: messages.req,
+                minLength: { value: 10, message: messages.description },
+              })}
               name="description"
               className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.description ? 'border-red-500' : 'border-radixgreen'
+                errors.description ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               rows="4"
             />
@@ -87,13 +105,15 @@ const GymMachineForm = () => {
           )}
 
           <div className="flex items-center mb-4">
-            <label htmlFor="muscularGroup" className="mr-3">Grupo muscular</label>
+            <label htmlFor="muscularGroup" className="mr-3">
+              Grupo muscular
+            </label>
             <input
               {...register("muscularGroup", { required: messages.req })}
               name="muscularGroup"
               type="text"
               className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.muscularGroup ? 'border-red-500' : 'border-radixgreen'
+                errors.muscularGroup ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "3rem" }}
             />

@@ -69,16 +69,16 @@ const router = createBrowserRouter([
                 element: <Profile />,
               },
               {
-                path: "machines",
+                path: "equipments",
                 element: <MachineList />,
               },
               {
-                path: "machines/add",
+                path: "equipments/add",
                 element: <GymMachineForm />,
               },
               {
-                path: "equipments/:id",
-                elemment: <EquipmentDetails />,
+                path: "equipments/:equipmentId",
+                element: <EquipmentDetails />,
               },
             ],
           },
