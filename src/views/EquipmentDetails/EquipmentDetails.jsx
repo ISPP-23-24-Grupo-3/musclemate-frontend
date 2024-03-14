@@ -15,11 +15,24 @@ const EquipmentDetails = () => {
   const [apiTickets, setApiTickets] = useState([]);
   const [allTickets, setAllTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
-
   const [machineRatings, setMachineRatings] = useState([]);
   const [actualRating, setActualRating] = useState(0);
   const [newRating, setNewRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
+  const [updatedDetails, setUpdatedDetails] = useState(null);
+
+  // Opciones de grupo muscular
+  const muscularGroupOptions = [
+    { value: "arms", label: "Brazos" },
+    { value: "legs", label: "Piernas" },
+    { value: "core", label: "Core" },
+    { value: "chest", label: "Pecho" },
+    { value: "back", label: "Espalda" },
+    { value: "shoulders", label: "Hombros" },
+    { value: "other", label: "Otros" }
+  ];
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -207,7 +220,7 @@ const EquipmentDetails = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await putToApi(`equipments/update/${id}/`, updatedDetails);
+      const response = await putToApi(`equipments/update/${equipmentId}/`, updatedDetails);
       if (response.ok) {
         setMachineDetails(updatedDetails);
         setEditMode(false);
@@ -293,9 +306,18 @@ const EquipmentDetails = () => {
           )}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
+          <strong className="text-radixgreen">Número de Serie:</strong>{" "}
+          {editMode ? (
+            <input
+              type="text"
+              className="border border-gray-300 rounded px-2 py-1"
+              value={updatedDetails.serial_number}
+              onChange={(e) => handleInputChange(e, "serial_number")}
+            />
+          ) : (
+            <span>{machineDetails.serial_number}</span>
+          )}
         </div>
-
         <div className="mb-4">
           <strong className="text-radixgreen">Valoración:</strong> 
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
@@ -360,7 +382,32 @@ const EquipmentDetails = () => {
           </div>
         )}
 
-
+        {editMode && (
+          <div className="mt-4 text-center">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+              onClick={handleSaveChanges}
+            >
+              Guardar
+            </button>
+            <button
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              onClick={toggleEditMode}
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+        {!editMode && (
+          <div className="mt-4 text-center">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={toggleEditMode}
+            >
+              Editar
+            </button>
+          </div>
+        )}
       </div>
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-semibold mb-4">
