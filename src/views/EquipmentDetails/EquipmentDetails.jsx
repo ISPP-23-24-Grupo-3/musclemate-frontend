@@ -1,28 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getFromApi, putToApi } from "../../utils/functions/api"; // Asegúrate de tener una función putToApi para enviar solicitudes PUT
+import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
+import { Button, TextField } from "@radix-ui/themes";
+
+import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 
 const EquipmentDetails = () => {
-  const { id } = useParams();
+  const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
   const [error, setError] = useState(null);
-  const [apiTickets, setApiTickets] = useState([]);
-  const [apiDataLoaded, setApiDataLoaded] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [updatedDetails, setUpdatedDetails] = useState(null);
 
-  // Opciones de grupo muscular
-  const muscularGroupOptions = [
-    { value: "arms", label: "Brazos" },
-    { value: "legs", label: "Piernas" },
-    { value: "core", label: "Core" },
-    { value: "chest", label: "Pecho" },
-    { value: "back", label: "Espalda" },
-    { value: "shoulders", label: "Hombros" },
-    { value: "other", label: "Otros" }
-  ];
+  const [apiTickets, setApiTickets] = useState([]);
+  const [allTickets, setAllTickets] = useState([]);
+  const [apiDataLoaded, setApiDataLoaded] = useState(false);
+
+  const [machineRatings, setMachineRatings] = useState([]);
+  const [actualRating, setActualRating] = useState(0);
+  const [newRating, setNewRating] = useState(0);
+  const [valuationOn, setValuationOn] = useState(false);
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -46,6 +43,97 @@ const EquipmentDetails = () => {
     }
   };
 
+  // Machine Details
+  useEffect(() => {
+    getFromApi("equipments/detail/"+ equipmentId +"/" ) 
+    .then((response) => {
+        // console.log(response);
+        return response.json();
+    })
+    .then((data) => {
+        // console.log(data);
+        setMachineDetails(data);
+    });
+  }, [equipmentId]);
+
+  // Machine Ratings
+  useEffect(() => {
+    getFromApi("assessments/") 
+    .then((response) => {
+        // console.log(response);
+        return response.json();
+    })
+    .then((data) => {
+        // console.log(data.filter((rating) => rating.equipment === Number(equipmentId)).map((rating) => rating.stars));
+        const ratings = data.filter((rating) => rating.equipment === Number(equipmentId)).map((rating) => rating.stars);
+        // console.log(ratings);
+        setMachineRatings(ratings); 
+      }); 
+  }, [equipmentId]);
+
+  // Rating average (shown)
+  function actualRate() {
+    var value= 0;
+    for (let i = 0; i < machineRatings.length; i++) {
+      value += machineRatings[i];
+      if(i === (machineRatings.length - 1)){
+        value= (value/machineRatings.length);
+      }
+    }
+    setActualRating(value);
+  }
+
+  useEffect(() => {
+    actualRate();
+  }, [machineRatings]);
+
+  // Rating average (new - button)
+  function newRate() {
+    var value= 0;
+    machineRatings.push(Number(newRating));
+    for (let i = 0; i < machineRatings.length; i++) {
+      value += machineRatings[i];
+      if(i === (machineRatings.length - 1)){
+        value= (value/machineRatings.length);
+      }
+    }
+    setActualRating(value);
+  }
+
+  const handleCheckboxChange = async (event, ticketId) => {
+    const { checked } = event.target;
+    try {
+      const response = await getFromApi(`tickets/detail/${ticketId}/`);
+      if (response.ok) {
+        const updatedTicket = await response.json();
+        updatedTicket.status = checked; // Actualiza el estado del ticket
+        // Realiza la solicitud PUT para actualizar el estado en la base de datos
+        const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
+          "label": updatedTicket.label,
+          "description": updatedTicket.description,
+          "gym": updatedTicket.gym,
+          "equipment": updatedTicket.equipment,
+          "client": updatedTicket.client,
+          "status": updatedTicket.status,
+        });
+        if (updateResponse.ok) {
+          // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
+          setApiTickets((prevTickets) =>
+            prevTickets.map((ticket) =>
+              ticket.id === ticketId ? updatedTicket : ticket
+            )
+          );
+        } else {
+          console.error("Error updating ticket status:", updateResponse.status);
+        }
+      } else {
+        console.error("Error fetching ticket details:", response.status);
+      }
+    } catch (error) {
+      console.error("Error updating ticket status:", error);
+    }
+  };
+
   // Función para formatear la fecha
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -55,7 +143,7 @@ const EquipmentDetails = () => {
   useEffect(() => {
     const fetchMachineDetails = async () => {
       try {
-        const response = await getFromApi(`equipments/detail/${id}`);
+        const response = await getFromApi(`equipments/detail/${equipmentId}/`);
         if (response.ok) {
           const data = await response.json();
           setMachineDetails(data);
@@ -79,7 +167,7 @@ const EquipmentDetails = () => {
     };
 
     fetchMachineDetails();
-  }, [id]);
+  }, [equipmentId]);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -204,45 +292,75 @@ const EquipmentDetails = () => {
             <span>{translateMuscularGroup(machineDetails.muscular_group)}</span>
           )}
         </div>
-        <div>
-          <strong className="text-radixgreen">Número de Serie:</strong>{" "}
-          {editMode ? (
-            <input
-              type="text"
-              className="border border-gray-300 rounded px-2 py-1"
-              value={updatedDetails.serial_number}
-              onChange={(e) => handleInputChange(e, "serial_number")}
-            />
-          ) : (
-            <span>{machineDetails.serial_number}</span>
-          )}
+        <div className="mb-4">
+          <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
         </div>
-        {editMode && (
-          <div className="mt-4 text-center">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-              onClick={handleSaveChanges}
-            >
-              Guardar
-            </button>
-            <button
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-              onClick={toggleEditMode}
-            >
-              Cancelar
-            </button>
+
+        <div className="mb-4">
+          <strong className="text-radixgreen">Valoración:</strong> 
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+            <Rating rating={actualRating}/>
+            <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+              {valuationOn ? 'Volver' : 'Valorar'}
+            </Button>
+          </div>
+        </div>
+
+        {actualRating}
+
+        {valuationOn && /*isClient*/ (
+          <div>
+            <div className="mb-4">
+              <strong className="text-radixgreen">Su Valoración:</strong> 
+              <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Rating rating={newRating}/>
+
+                <TextField.Input type="number" value={newRating} onChange={(e) => {
+                  e.target.value > 5 ? e.target.value = 5 : e.target.value < 0 ? e.target.value = 0 : e.target.value;
+                  setNewRating(e.target.value);
+                }} min="0" max="5" step="0.5" className="w-16"/>
+
+
+                {machineRatings.length > 0 ? (
+                  <p className="text-radixgreen">Valoraciones: {machineRatings.length}  {machineRatings}</p>
+                ) : (
+                  <p className="text-radixgreen">Sin valoraciones</p>
+                )}
+
+                <Button onClick={() => {newRate(); setValuationOn(false); }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                  Actualizar valoración
+                </Button>
+
+                {/* <Button onClick={async () => {
+                  const assessments = await getFromApi('assessments');
+                  const existingAssessment = assessments.find(assessment => assessment.client === clientId);
+
+                  if (existingAssessment) {
+                    putToApi('assessments/update/'+ existingAssessment.id, {
+                      id: existingAssessment.id,
+                      stars: newRating,
+                      equipment: Number(equipmentId),
+                      client: clientId
+                    });
+                  } else {
+                    postToApi('assessments/create', {
+                      stars: newRating,
+                      equipment: Number(equipmentId),
+                      client: client.id
+                    });
+                  }
+                  newRate();
+                  setValuationOn(false);
+                }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                  Enviar Valoración
+                </Button>  */}
+                
+              </div>      
+            </div>
           </div>
         )}
-        {!editMode && (
-          <div className="mt-4 text-center">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={toggleEditMode}
-            >
-              Editar
-            </button>
-          </div>
-        )}
+
+
       </div>
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-semibold mb-4">
@@ -262,17 +380,23 @@ const EquipmentDetails = () => {
                     <p className="text-radixgreen font-bold mb-1">Fecha: <span className="text-black">{formatDate(ticket.date)}</span></p>
                   </div>
                   <div className="ml-auto">
-                    {ticket.status ? (
-                      <span className="text-green-500 font-bold">Resuelto</span>
-                    ) : (
-                      <span className="text-red-500 font-bold">No resuelto</span>
-                    )}
+                    <input
+                        type="checkbox"
+                        checked={ticket.status}
+                        onChange={(e) => handleCheckboxChange(e, ticket.id)}
+                        className="mr-2"
+                      />
+                      <p className="text-radixgreen font-bold mb-1">
+                        <span className={ticket.status ? "text-green-500 ml-2" : "text-red-500 ml-2"}>
+                          {ticket.status ? "Resuelto" : "No Resuelto"}
+                        </span>
+                      </p>
                   </div>
                 </div>
               </li>
             ))
           ) : (
-            <p className="text-red-500">No hay tickets disponibles.</p>
+            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
           )}
         </ul>
       </div>
