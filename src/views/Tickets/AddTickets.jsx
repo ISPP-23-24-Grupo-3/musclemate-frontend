@@ -17,8 +17,8 @@ const AddTickets = () => {
         label,
         description,
         equipment: equipmentId,
-        client: user.id, // Usamos el ID de cliente del contexto de autenticación
-        status: false, // Aquí establecemos el estado como false
+        client: user.id,
+        status: false,
       });
       if (response.ok) {
         setSuccessMessage("Ticket creado exitosamente");
@@ -34,27 +34,27 @@ const AddTickets = () => {
   };
 
   return (
-    <div className="mt-8 flex justify-center">
-      <div className="max-w-300px p-10 border border-radixgreen rounded">
-        <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
-          Agregar Ticket
+    <div className="mt-8 flex justify-center mb-8"> {/* Agregué un margen inferior */}
+      <div className="max-w-xl p-6 border border-gray-300 rounded-md shadow-lg bg-green-100 w-full">
+        <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
+          Crear Ticket
         </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-6">
-            <label htmlFor="label" className="text-radixgreen">Asunto:</label>
-            <input type="text" id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="label" className="text-gray-800">Asunto:</label>
+            <input type="text" id="label" value={label} onChange={(e) => setLabel(e.target.value)} className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-radixgreen" />
           </div>
-          <div className="mb-6">
-            <label htmlFor="description" className="text-radixgreen">Descripción:</label>
-            <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+          <div>
+            <label htmlFor="description" className="text-gray-800">Descripción:</label>
+            <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-radixgreen resize-none h-40"></textarea>
           </div>
-          <div className="mb-6">
-            <label htmlFor="equipmentId" className="text-radixgreen">ID del Equipo:</label>
-            <input type="text" id="equipmentId" value={equipmentId} onChange={(e) => setEquipmentId(e.target.value)} />
+          <div>
+            <label htmlFor="equipmentId" className="text-gray-800">ID del Equipo:</label>
+            <input type="text" id="equipmentId" value={equipmentId} onChange={(e) => setEquipmentId(e.target.value)} className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-radixgreen" />
           </div>
-          {successMessage && <div className="text-green-700 mb-4">{successMessage}</div>}
-          {errorMessage && <div className="text-red-700 mb-4">{errorMessage}</div>}
-          <button type="submit" className="bg-radixgreen text-white px-4 py-2 rounded">Agregar Ticket</button>
+          {successMessage && <div className="text-green-700">{successMessage}</div>}
+          {errorMessage && <div className="text-red-700">{errorMessage}</div>}
+          <button type="submit" className="bg-radixgreen text-white px-6 py-3 rounded-md hover:bg-opacity-80 focus:outline-none">Agregar Ticket</button>
         </form>
       </div>
     </div>
