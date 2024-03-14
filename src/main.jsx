@@ -49,91 +49,52 @@ const router = createBrowserRouter([
             element: <RegisterClient />,
           },
           {
-            path: "/",
+            path: "owner",
             element: <OwnerRoute />,
             children: [
               {
-                path: "/register-user",
-                element: <RegisterUser />,
-              },
-              {
-                path: "/my-machines",
-                element: <MachineList />,
-              },
-              {
-                path: "/add-machine",
-                element: <GymMachineForm />,
-              },
-              {
-                path: "/",
-                element: <OwnerRoute />,
-                children: [
-                  {
-                    path: "/register-user",
-                    element: <RegisterUser />,
-                  },
-                  {
-                    path: "/my-machines",
-                    element: <MachineList />,
-                  },
-                  {
-                    path: "/add-machine",
-                    element: <GymMachineForm/>,
-                  },
-                  {
-                    path: "/users",
-                    element: <Users />,
-                  },
-                  {
-                    path: "/owner-home",
-                    element: <OwnerHomePage />,
-                  },
-                  {
-                    path: "/equipment-details/:equipmentId",
-                    element: <EquipmentDetails />,
-                  },
-                ],
-              },
-              {
-                path: "/tickets",
-                element: <TicketManagement />,
-              },
-              {
-                path: "/owner-home",
+                path: "home",
                 element: <OwnerHomePage />,
               },
               {
-                path: "/equipment-details/:id",
-                element: <EquipmentDetails />,
+                path: "users",
+                element: <Users />,
+              },
+              {
+                path: "users/register",
+                element: <RegisterUser />,
+              },
+              {
+                path: "users/:userId/profile",
+                element: <Profile />,
+              },
+              {
+                path: "machines",
+                element: <MachineList />,
+              },
+              {
+                path: "machines/add",
+                element: <GymMachineForm />,
+              },
+              {
+                path: "equipments/:id",
+                elemment: <EquipmentDetails />,
               },
             ],
           },
           {
-            path: "/",
+            path: "user",
             element: <UserRoute />,
             children: [
-              { path: "/routines/:id", element: <EditRoutine /> },
-              { path: "/routines/new", element: <EditRoutine /> },
-              { path: "/routines/", element: <Routines /> },
+              { path: "routines", element: <Routines /> },
+              { path: "routines/new", element: <EditRoutine /> },
+              { path: "routines/:id", element: <EditRoutine /> },
+              {
+                path: "tickets",
+                element: <TicketManagement />,
+              },
             ],
           },
-          {
-            path: "/equipment-details/:id",
-            element: <EquipmentDetails />,
-          },
-          {
-            path: "/users/:userId/profile",
-            element: <Profile />,
-          },
-        ],
-      },
-      {
-        path: "/",
-        element: <UserRoute />,
-        children: [
-          { path: "/routines/:id/edit", element: <EditRoutine /> },
-          { path: "/routines/new", element: <EditRoutine /> },
-          { path: "/routines/", element: <Routines /> },
         ],
       },
     ],
@@ -145,5 +106,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
