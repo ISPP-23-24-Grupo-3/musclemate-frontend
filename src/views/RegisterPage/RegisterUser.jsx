@@ -1,15 +1,19 @@
-import React from "react";
-import { HiUser, HiLockClosed, HiOutlineMail,HiPhone, } from "react-icons/hi";
-import { HiBuildingOffice2,HiHome,HiMiniCake,HiMiniIdentification   } from "react-icons/hi2";
+import { HiUser, HiOutlineMail, HiPhone } from "react-icons/hi";
+import {
+  HiBuildingOffice2,
+  HiHome,
+  HiMiniCake,
+  HiMiniIdentification,
+} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import { Link } from "react-router-dom";
-
-
-
 
 const UserRegister = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const onSubmit = (userInfo) => console.log(userInfo);
 
@@ -18,15 +22,13 @@ const UserRegister = () => {
     name: "El nombre de usuario tiene que ser mayor a 8 caracteres",
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
-    phone: "Tiene que ser un numero de 9 cifras"
-
+    phone: "Tiene que ser un numero de 9 cifras",
   };
 
   const patterns = {
     mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-    phoneNumber: /^\d{9}$/
+    phoneNumber: /^\d{9}$/,
   };
-
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -40,12 +42,12 @@ const UserRegister = () => {
             <label htmlFor="userName">Nombre</label>
             <input
               {...register("userName", {
-                required: messages.req
+                required: messages.req,
               })}
               name="userName"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.userName ? 'border-red-500' : 'border-radixgreen'
+                errors.userName ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "2.5rem" }}
             />
@@ -59,17 +61,16 @@ const UserRegister = () => {
             <label htmlFor="lastname">Apellidos</label>
             <input
               {...register("userName", {
-                required: messages.req
+                required: messages.req,
               })}
               name="userName"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.userName ? 'border-red-500' : 'border-radixgreen'
+                errors.userName ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "2rem" }}
             />
           </div>
-          
 
           <div className="relative flex items-center">
             <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
@@ -77,26 +78,24 @@ const UserRegister = () => {
             <input
               {...register("mail", {
                 required: messages.req,
-                pattern: { value: patterns.mail, message: messages.mail }
+                pattern: { value: patterns.mail, message: messages.mail },
               })}
               name="mail"
               type="email"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.mail ? 'border-red-500' : 'border-radixgreen'
+                errors.mail ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "0.5rem" }}
             />
           </div>
-          {errors.mail && (
-            <p className="text-red-500">{errors.mail.message}</p>
-          )}
+          {errors.mail && <p className="text-red-500">{errors.mail.message}</p>}
 
           <div className="relative flex items-center">
             <HiMiniCake className="w-6 h-6 text-radixgreen mr-3" />
             <label htmlFor="birthdate">Fecha de nacimiento</label>
             <input
               {...register("birthdate", {
-                required: messages.req
+                required: messages.req,
               })}
               name="birthdate"
               type="date"
@@ -104,27 +103,26 @@ const UserRegister = () => {
             />
           </div>
 
-
           <div className="relative flex items-center">
-              <HiMiniIdentification className="w-6 h-6 text-radixgreen mr-3" />
-              <label htmlFor="gender">Género</label>
-              <select
-                {...register("gender")}
-                name="gender"
-                className={`w-full px-4 py-3 border rounded-lg ${
-                  errors.gender ? 'border-red-500' : 'border-radixgreen'
-                } bg-white text-black`}
-                style={{ marginLeft: "3rem" }}
-              >
-                <option value="">Seleccionar...</option>
-                <option value="masculino">Masculino</option>
-                <option value="femenino">Femenino</option>
-                <option value="otro">No binario</option>
-                <option value="otro">Género fluido</option>
-              </select>
+            <HiMiniIdentification className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="gender">Género</label>
+            <select
+              {...register("gender")}
+              name="gender"
+              className={`w-full px-4 py-3 border rounded-lg ${
+                errors.gender ? "border-red-500" : "border-radixgreen"
+              } bg-white text-black`}
+              style={{ marginLeft: "3rem" }}
+            >
+              <option value="">Seleccionar...</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+              <option value="otro">No binario</option>
+              <option value="otro">Género fluido</option>
+            </select>
           </div>
           {errors.gender && (
-          <p className="text-red-500">{errors.gender.message}</p>
+            <p className="text-red-500">{errors.gender.message}</p>
           )}
 
           <div className="relative flex items-center">
@@ -133,18 +131,21 @@ const UserRegister = () => {
             <input
               {...register("phone", {
                 required: messages.req,
-                pattern: { value: patterns.phoneNumber, message: messages.phone}
+                pattern: {
+                  value: patterns.phoneNumber,
+                  message: messages.phone,
+                },
               })}
               name="phone"
               type="number"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.phone ? 'border-red-500' : 'border-radixgreen'
+                errors.phone ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "0rem" }}
             />
           </div>
           {errors.phone && (
-          <p className="text-red-500">{errors.phone.message}</p>
+            <p className="text-red-500">{errors.phone.message}</p>
           )}
 
           <div className="relative flex items-center">
@@ -152,18 +153,18 @@ const UserRegister = () => {
             <label htmlFor="address">Dirección</label>
             <input
               {...register("address", {
-                required: messages.req
+                required: messages.req,
               })}
               name="address"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.address ? 'border-red-500' : 'border-radixgreen'
+                errors.address ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "2.10rem" }}
             />
           </div>
           {errors.address && (
-          <p className="text-red-500">{errors.address.message}</p>
+            <p className="text-red-500">{errors.address.message}</p>
           )}
 
           <div className="relative flex items-center">
@@ -171,19 +172,17 @@ const UserRegister = () => {
             <label htmlFor="city">Ciudad</label>
             <input
               {...register("city", {
-                required: messages.req
+                required: messages.req,
               })}
               name="city"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.city ? 'border-red-500' : 'border-radixgreen'
+                errors.city ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "3.10rem" }}
             />
           </div>
-          {errors.city && (
-          <p className="text-red-500">{errors.city.message}</p>
-          )}
+          {errors.city && <p className="text-red-500">{errors.city.message}</p>}
 
           <Button
             type="submit"

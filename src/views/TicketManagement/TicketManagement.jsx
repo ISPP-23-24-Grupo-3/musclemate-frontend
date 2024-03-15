@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
 
@@ -66,12 +66,12 @@ const TicketManagement = () => {
         updatedTicket.status = checked; // Actualiza el estado del ticket
         // Realiza la solicitud PUT para actualizar el estado en la base de datos
         const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
-          "label": updatedTicket.label,
-          "description": updatedTicket.description,
-          "gym": updatedTicket.gym,
-          "equipment": updatedTicket.equipment,
-          "client": updatedTicket.client,
-          "status": updatedTicket.status,
+          label: updatedTicket.label,
+          description: updatedTicket.description,
+          gym: updatedTicket.gym,
+          equipment: updatedTicket.equipment,
+          client: updatedTicket.client,
+          status: updatedTicket.status,
         });
         if (updateResponse.ok) {
           // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
@@ -90,7 +90,6 @@ const TicketManagement = () => {
       console.error("Error updating ticket status:", error);
     }
   };
-  
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -118,7 +117,9 @@ const TicketManagement = () => {
             >
               <div className="flex items-center mb-2">
                 <HiTicket
-                  className={`text-${ticket.status ? "green" : "red"}-500 w-6 h-6 mr-2 cursor-pointer`}
+                  className={`text-${
+                    ticket.status ? "green" : "red"
+                  }-500 w-6 h-6 mr-2 cursor-pointer`}
                   onClick={() => toggleStatus(ticket.id)}
                 />
                 <div>
@@ -148,9 +149,7 @@ const TicketManagement = () => {
                     <div>
                       <p className="text-radixgreen font-bold mb-1">
                         Cliente:{" "}
-                        <span className="text-black">
-                          {ticket.client.name}
-                        </span>
+                        <span className="text-black">{ticket.client.name}</span>
                       </p>
                     </div>
                   </div>
@@ -161,15 +160,15 @@ const TicketManagement = () => {
                   <div>
                     <p className="text-radixgreen font-bold mb-1">
                       Correo:{" "}
-                      <span className="text-black">
-                        {ticket.client.email}
-                      </span>
+                      <span className="text-black">{ticket.client.email}</span>
                     </p>
                   </div>
                   <div className="flex items-center">
                     <p className="text-radixgreen font-bold mb-1 mr-4">
                       Fecha:{" "}
-                      <span className="text-black">{formatDate(ticket.date)}</span>
+                      <span className="text-black">
+                        {formatDate(ticket.date)}
+                      </span>
                     </p>
                     <input
                       type="checkbox"
@@ -178,7 +177,13 @@ const TicketManagement = () => {
                       className="mr-2"
                     />
                     <p className="text-radixgreen font-bold mb-1">
-                      <span className={ticket.status ? "text-green-500 ml-2" : "text-red-500 ml-2"}>
+                      <span
+                        className={
+                          ticket.status
+                            ? "text-green-500 ml-2"
+                            : "text-red-500 ml-2"
+                        }
+                      >
                         {ticket.status ? "Resuelto" : "No Resuelto"}
                       </span>
                     </p>
