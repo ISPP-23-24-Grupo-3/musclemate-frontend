@@ -23,7 +23,7 @@ const Profile = () => {
     }, [userId]);
 
     useEffect(() => {
-        getFromApi("gyms/"+ user?.gym + "/") 
+        getFromApi("gyms/detail/"+ user?.gym + "/") 
         .then((response) => {
             return response.json();
         })
@@ -38,7 +38,7 @@ const Profile = () => {
             <div className="grid grid-cols-2 gap-4 mt-4 mb-4">
                 <div className="flex justify-center items-center bg-radixgreen/30 border-2 border-radixgreen rounded-3xl py-2 px-5 pt-8 flex-col">
                     <div>
-                        <img className="w-80 h-80" src={user ? user.photo : "https://i.imgur.com/Y23W1X9.png"}
+                        <img className="w-80 h-80" src={user ? user?.photo : "https://i.imgur.com/Y23W1X9.png"}
                          onError={(e) => {e.target.onerror = null; e.target.src="https://i.imgur.com/Y23W1X9.png"}}/>
                     </div>
                     <p className="text-center text-radixgreen text-2xl font-bold mt-5 mb-3">{user ? user.user : "Cargando..."}</p>

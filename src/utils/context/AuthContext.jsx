@@ -7,47 +7,45 @@ const AuthContext = createContext();
 
 export default AuthContext;
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-export const AuthProvider = ({ children }) => {
-  let [authTokens, setAuthTokens] = useState(() =>
-    localStorage.getItem("authTokens")
-      ? JSON.parse(localStorage.getItem("authTokens"))
-      : null
-  );
-  let [user, setUser] = useState(() =>
-    localStorage.getItem("authTokens")
-      ? jwtDecode(localStorage.getItem("authTokens"))
-      : null
-  );
+export const AuthProvider = () => {
+    let [authTokens, setAuthTokens] = useState(()=> localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
+    let [user, setUser] = useState(()=> localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null)
+    let [loading, setLoading] = useState(true)
 
-  const navigate = useNavigate();
+    const navigate = useNavigate()
 
-  let loginUser = async (e) => {
-    e.preventDefault();
-    let response = await fetch(`${VITE_BACKEND_URL}/token/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: e.target.username.value,
-        password: e.target.password.value,
-      }),
-    });
-    let data = await response.json();
+    let loginUser = async (e )=> {
+        e.preventDefault()
+        let response = await fetch(`${VITE_BACKEND_URL}/token/`, {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                'username': e.target.username.value,
+                'password': e.target.password.value
+            })
+        })
+        let data = await response.json()
 
-    if (response.status === 200) {
-      setAuthTokens(data);
-      setUser(jwtDecode(data.access));
-      localStorage.setItem("authTokens", JSON.stringify(data));
-      if (user.rol === "owner") {
-        navigate("/");
-      } else {
-        navigate("/");
-      }
-    } else {
-      alert("Something went wrong!");
+        if(response.status === 200){
+            setAuthTokens(data)
+            localStorage.setItem('authTokens', JSON.stringify(data))
+            setUser(jwtDecode(data.access))
+            
+            
+        }else{
+            
+            alert('Something went wrong!')
+        }
+
+        if (jwtDecode(data.access).rol === 'owner'){
+            navigate('/owner/home')
+        }else{
+            navigate('/')
+        }
     }
   };
 
@@ -58,47 +56,62 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  let updateToken = async () => {
-    let response = await fetch(`${VITE_BACKEND_URL}/token/refresh/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        refresh: authTokens.refresh,
-      }),
-    });
+    let updateToken = async ()=> {
 
-    let data = await response.json();
+        let response = await fetch(`${VITE_BACKEND_URL}/token/refresh/`, {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                'refresh': authTokens?.refresh
+            })
+        })
 
-    if (response.status === 200) {
-      setAuthTokens(data);
-      setUser(jwtDecode(data.access));
-      localStorage.setItem("authTokens", JSON.stringify(data));
-    } else {
-      logoutUser();
+        let data = await response.json()
+        
+        if (response.status === 200){
+            setAuthTokens(data)
+            setUser(jwtDecode(data.access))
+            localStorage.setItem('authTokens', JSON.stringify(data))
+        }else{
+            logoutUser()
+        }
+
+        if(loading){
+            setLoading(false)
+        }
     }
-  };
 
-  let contextData = {
-    user: user,
-    authTokens: authTokens,
-    loginUser: loginUser,
-    logoutUser: logoutUser,
-  };
+    let contextData = {
+        user:user,
+        authTokens:authTokens,
+        loginUser:loginUser,
+        logoutUser:logoutUser,
+    }
 
-  useEffect(() => {
-    let fourMinutes = 1000 * 60 * 4;
 
-    let interval = setInterval(() => {
-      if (authTokens) {
-        updateToken();
-      }
-    }, fourMinutes);
-    return () => clearInterval(interval);
-  }, [authTokens]);
+    useEffect(()=> {
 
-  return (
-    <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>
-  );
-};
+        if(loading){
+            updateToken()
+        }
+
+
+        let fourMinutes = 1000 * 60 * 4
+
+        let interval =  setInterval(()=> {
+            if(authTokens){
+                updateToken()
+            }
+        }, fourMinutes)
+        return ()=> clearInterval(interval)
+
+    }, [authTokens, loading])
+
+    return(
+        <AuthContext.Provider value={contextData} >
+            {loading ? null : <Outlet />}
+        </AuthContext.Provider>
+    )
+}
