@@ -47,7 +47,6 @@ export const AuthProvider = () => {
             navigate('/')
         }
     }
-  };
 
   let logoutUser = () => {
     setAuthTokens(null);
