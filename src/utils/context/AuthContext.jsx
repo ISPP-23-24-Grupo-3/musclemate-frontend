@@ -13,6 +13,7 @@ const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 export const AuthProvider = () => {
     let [authTokens, setAuthTokens] = useState(()=> localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
     let [user, setUser] = useState(()=> localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null)
+    let [loading, setLoading] = useState(true)
 
     const navigate = useNavigate()
 
@@ -32,16 +33,19 @@ export const AuthProvider = () => {
 
         if(response.status === 200){
             setAuthTokens(data)
-            setUser(jwtDecode(data.access))
             localStorage.setItem('authTokens', JSON.stringify(data))
-            if (user.rol === 'owner'){
-                navigate('/owner-home')
-            }else{
-                navigate('/')
-            }
+            setUser(jwtDecode(data.access))
+            
+            
         }else{
             
             alert('Something went wrong!')
+        }
+
+        if (jwtDecode(data.access).rol === 'owner'){
+            navigate('/owner/home')
+        }else{
+            navigate('/')
         }
     }
 
@@ -62,7 +66,7 @@ export const AuthProvider = () => {
                 'Content-Type':'application/json'
             },
             body: JSON.stringify({
-                'refresh': authTokens.refresh
+                'refresh': authTokens?.refresh
             })
         })
 
@@ -74,6 +78,10 @@ export const AuthProvider = () => {
             localStorage.setItem('authTokens', JSON.stringify(data))
         }else{
             logoutUser()
+        }
+
+        if(loading){
+            setLoading(false)
         }
     }
 
@@ -87,6 +95,11 @@ export const AuthProvider = () => {
 
     useEffect(()=> {
 
+        if(loading){
+            updateToken()
+        }
+
+
         let fourMinutes = 1000 * 60 * 4
 
         let interval =  setInterval(()=> {
@@ -96,11 +109,11 @@ export const AuthProvider = () => {
         }, fourMinutes)
         return ()=> clearInterval(interval)
 
-    }, [authTokens])
+    }, [authTokens, loading])
 
     return(
         <AuthContext.Provider value={contextData} >
-            <Outlet />
+            {loading ? null : <Outlet />}
         </AuthContext.Provider>
     )
 }
