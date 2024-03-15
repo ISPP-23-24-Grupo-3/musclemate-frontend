@@ -99,7 +99,7 @@ const router = createBrowserRouter([
                 element: <TicketManagement />,
               },
               {
-                path: "/owner-home",
+                path: "/owner/home",
                 element: <OwnerHomePage />,
               },
               {
