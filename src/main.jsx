@@ -21,6 +21,7 @@ import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
+import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
                 element: <GymMachineForm />,
               },
               {
+                path: "/my-gyms", // Ruta para la página "My Gyms"
+                element: <MyGymsOwner />,
+              },
+              {
                 path: "/",
                 element: <OwnerRoute />,
                 children: [
@@ -99,7 +104,7 @@ const router = createBrowserRouter([
                 element: <TicketManagement />,
               },
               {
-                path: "/owner-home",
+                path: "/owner/home",
                 element: <OwnerHomePage />,
               },
               {
