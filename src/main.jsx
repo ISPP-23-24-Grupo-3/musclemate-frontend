@@ -22,6 +22,7 @@ import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
 import ErrorPage from "./ErrorPage";
+import { AuthProvider } from "./utils/context/AuthContext";
 
 const ownerRoutes = [
   {
@@ -65,34 +66,41 @@ const userRoutes = [
 ];
 
 const router = createBrowserRouter([
+
   {
-    element: <MainLayout />,
+    path: "/",
+    element: <AuthProvider />,
     children: [
       {
-        path: "/",
-        element: <App />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register-client",
-        element: <RegisterClient />,
-      },
-      {
-        path: "/owner",
-        element: <OwnerRoute />,
-        children: ownerRoutes,
-      },
-      {
-        path: "/user",
-        element: <UserRoute />,
-        children: userRoutes,
-      },
-    ],
-    errorElement: <ErrorPage />,
-  },
+      path: "/",
+      element: <MainLayout />,
+      children: [
+        {
+          path: "/",
+          element: <App />,
+        },
+        {
+          path: "/login",
+          element: <Login />,
+        },
+        {
+          path: "/register-client",
+          element: <RegisterClient />,
+        },
+        {
+          path: "/owner",
+          element: <OwnerRoute />,
+          children: ownerRoutes,
+        },
+        {
+          path: "/user",
+          element: <UserRoute />,
+          children: userRoutes,
+        },
+      ],
+      errorElement: <ErrorPage />,
+    },],
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
