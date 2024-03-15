@@ -2,7 +2,6 @@ import {
   Button,
   IconButton,
   Card,
-  Dialog,
   Flex,
   Heading,
   Text,
@@ -177,7 +176,7 @@ WorkoutList.propTypes = {
       sets: PropTypes.number,
       reps: PropTypes.number,
       weigth: PropTypes.number,
-    }),
+    })
   ),
 };
 
@@ -198,12 +197,12 @@ const EditableWorkout = ({
       .then((postedWorkout) =>
         editWorkout(
           workouts.map((w) =>
-            w.temp_id == temp_workout.temp_id ? postedWorkout : w,
-          ),
-        ),
+            w.temp_id == temp_workout.temp_id ? postedWorkout : w
+          )
+        )
       )
       .catch(
-        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id)),
+        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id))
       );
   };
 
