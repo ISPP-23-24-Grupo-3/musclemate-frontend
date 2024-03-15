@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
