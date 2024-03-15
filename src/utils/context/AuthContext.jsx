@@ -13,7 +13,7 @@ const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 export const AuthProvider = () => {
     let [authTokens, setAuthTokens] = useState(()=> localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
     let [user, setUser] = useState(()=> localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null)
-    let [loading, setLoading] = useState(false)
+    let [loading, setLoading] = useState(true)
 
     const navigate = useNavigate()
 
@@ -43,7 +43,7 @@ export const AuthProvider = () => {
         }
 
         if (jwtDecode(data.access).rol === 'owner'){
-            navigate('/owner-home')
+            navigate('/owner/home')
         }else{
             navigate('/')
         }
