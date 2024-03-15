@@ -10,7 +10,7 @@ const Header = () => {
         <header className="flex flex-col md:flex-row items-center justify-between border-b-2 border-black">
 
             {user?.rol === 'owner' ? (
-                <Link to="/owner-home">
+                <Link to="/owner/home">
                 <Flex align="center" className="md:m-4">
                     <img src="/pwa-64x64.png" alt="Logo" className="mr-4" />
                     <h1 className="text-xl font-bold">MuscleMate</h1>

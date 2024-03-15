@@ -9,7 +9,7 @@ export default AuthContext;
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-export const AuthProvider = () => {
+export const AuthProvider = ({ children }) => {
     let [authTokens, setAuthTokens] = useState(()=> localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
     let [user, setUser] = useState(()=> localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null)
     let [loading, setLoading] = useState(true)
@@ -110,7 +110,7 @@ export const AuthProvider = () => {
 
     return(
         <AuthContext.Provider value={contextData} >
-            {loading ? null : <Outlet />}
+            { loading ? null : children }
         </AuthContext.Provider>
     )
 }
