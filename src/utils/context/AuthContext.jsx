@@ -43,8 +43,8 @@ export const AuthProvider = ({ children }) => {
 
         if (jwtDecode(data.access).rol === 'owner'){
             navigate('/owner/home')
-        }else{
-            navigate('/')
+        }else if(jwtDecode(data.access).rol === 'client'){
+            navigate('/user/home')
         }
     }
 

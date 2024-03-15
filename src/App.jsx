@@ -1,8 +1,24 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import "./App.css";
 import { Button, Flex } from "@radix-ui/themes";
+import { useContext } from "react";
+import AuthContext from "./utils/context/AuthContext";
 
 function App() {
+
+  const {user} = useContext(AuthContext)
+
+  if(user?.rol === "owner"){
+    return (
+      <Navigate to="/owner/home" />
+    )
+  }
+  if(user?.rol === "client"){
+    return (
+      <Navigate to="/user/home" />
+    )
+  }
+
   return (
     <>
       <Flex justify="center" align="center">

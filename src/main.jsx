@@ -22,6 +22,7 @@ import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
 import ErrorPage from "./ErrorPage";
+import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 
 const ownerRoutes = [
   {
@@ -59,6 +60,7 @@ const ownerRoutes = [
 ];
 
 const userRoutes = [
+  { path: "home", element: <ClientHomePage /> },
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
