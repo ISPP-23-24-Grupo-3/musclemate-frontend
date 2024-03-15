@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 
-const GymMachineForm = () => {
+export default function EquipmentForm() {
   const {
     register,
     handleSubmit,
@@ -134,6 +134,4 @@ const GymMachineForm = () => {
       </div>
     </div>
   );
-};
-
-export default GymMachineForm;
+}

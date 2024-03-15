@@ -6,7 +6,7 @@ import { Button, TextField } from "@radix-ui/themes";
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 
-const EquipmentDetails = () => {
+export default function EquipmentDetails() {
   const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
   const [gymName, setGymName] = useState(null);
@@ -410,6 +410,4 @@ const EquipmentDetails = () => {
       </div>
     </div>
   );
-};
-
-export default EquipmentDetails;
+}

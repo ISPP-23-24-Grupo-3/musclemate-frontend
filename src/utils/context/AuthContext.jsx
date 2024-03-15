@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -9,7 +9,7 @@ export default AuthContext;
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export const AuthProvider = () => {
+export const AuthProvider = ({ children }) => {
   let [authTokens, setAuthTokens] = useState(() =>
     localStorage.getItem("authTokens")
       ? JSON.parse(localStorage.getItem("authTokens"))
@@ -99,8 +99,6 @@ export const AuthProvider = () => {
   }, [authTokens]);
 
   return (
-    <AuthContext.Provider value={contextData}>
-      <Outlet />
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>
   );
 };

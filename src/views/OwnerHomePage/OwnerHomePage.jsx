@@ -18,22 +18,22 @@ export default function OwnerHomePage() {
       </Flex>
 
       <Flex direction="column" justify="center" align="center" gap="4">
-        <Link to="/my-machines">
+        <Link to="../equipments">
           <Button size="4" variant="classic" className="mt-4">
             Mis Máquinas
           </Button>
         </Link>
-        <Link to="/register-client">
+        <Link to="../users/register">
           <Button size="4" variant="classic" className="mt-4">
             Registrar Cliente
           </Button>
         </Link>
-        <Link to="/users">
+        <Link to="../users">
           <Button size="4" variant="classic" className="mt-4">
             Usuarios
           </Button>
         </Link>
-        <Link to="/tickets">
+        <Link to="../tickets">
           <Button size="4" variant="classic" className="mt-4">
             Ver Tickets
           </Button>
