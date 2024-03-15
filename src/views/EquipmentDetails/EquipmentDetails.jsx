@@ -15,11 +15,24 @@ const EquipmentDetails = () => {
   const [apiTickets, setApiTickets] = useState([]);
   const [allTickets, setAllTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
-
   const [machineRatings, setMachineRatings] = useState([]);
   const [actualRating, setActualRating] = useState(0);
   const [newRating, setNewRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
+  const [updatedDetails, setUpdatedDetails] = useState(null);
+
+  // Opciones de grupo muscular
+  const muscularGroupOptions = [
+    { value: "arms", label: "Brazos" },
+    { value: "legs", label: "Piernas" },
+    { value: "core", label: "Core" },
+    { value: "chest", label: "Pecho" },
+    { value: "back", label: "Espalda" },
+    { value: "shoulders", label: "Hombros" },
+    { value: "other", label: "Otros" }
+  ];
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -191,6 +204,35 @@ const EquipmentDetails = () => {
     }
   }, [machineDetails]);
 
+  const handleInputChange = (e, field) => {
+    setUpdatedDetails({
+      ...updatedDetails,
+      [field]: e.target.value
+    });
+  };
+
+  const toggleEditMode = () => {
+    if (!editMode) {
+      setUpdatedDetails(machineDetails);
+    }
+    setEditMode(!editMode);
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await putToApi(`equipments/update/${equipmentId}/`, updatedDetails);
+      if (response.ok) {
+        setMachineDetails(updatedDetails);
+        setEditMode(false);
+      } else {
+        const data = await response.json();
+        setError(data.detail || "Error al guardar los cambios.");
+      }
+    } catch (error) {
+      setError("Error al guardar los cambios.");
+    }
+  };
+
   if (error) {
     return <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">{error}</div>;
   }
@@ -206,24 +248,76 @@ const EquipmentDetails = () => {
           Detalles de la Máquina de Gimnasio
         </h2>
         <div className="mb-4">
-          <strong className="text-radixgreen">Nombre:</strong> {machineDetails.name}
+          <strong className="text-radixgreen">Nombre:</strong>{" "}
+          {editMode ? (
+            <input
+              type="text"
+              className="border border-gray-300 rounded px-2 py-1"
+              value={updatedDetails.name}
+              onChange={(e) => handleInputChange(e, "name")}
+            />
+          ) : (
+            <span>{machineDetails.name}</span>
+          )}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Descripción:</strong> {machineDetails.description}
+          <strong className="text-radixgreen">Descripción:</strong>{" "}
+          {editMode ? (
+            <textarea
+              className="border border-gray-300 rounded px-2 py-1"
+              value={updatedDetails.description}
+              onChange={(e) => handleInputChange(e, "description")}
+            />
+          ) : (
+            <span>{machineDetails.description}</span>
+          )}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
+          <strong className="text-radixgreen">Marca:</strong>{" "}
+          {editMode ? (
+            <input
+              type="text"
+              className="border border-gray-300 rounded px-2 py-1"
+              value={updatedDetails.brand}
+              onChange={(e) => handleInputChange(e, "brand")}
+            />
+          ) : (
+            <span>{machineDetails.brand}</span>
+          )}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Gimnasio:</strong> {gymName || 'No disponible'}
+          <strong className="text-radixgreen">Gimnasio:</strong>{" "}
+          <span>{gymName || 'No disponible'}</span>
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
+          <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
+          {editMode ? (
+            <select
+              className="border border-gray-300 rounded px-2 py-1"
+              value={updatedDetails.muscular_group}
+              onChange={(e) => handleInputChange(e, "muscular_group")}
+            >
+              {muscularGroupOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          ) : (
+            <span>{translateMuscularGroup(machineDetails.muscular_group)}</span>
+          )}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
+          <strong className="text-radixgreen">Número de Serie:</strong>{" "}
+          {editMode ? (
+            <input
+              type="text"
+              className="border border-gray-300 rounded px-2 py-1"
+              value={updatedDetails.serial_number}
+              onChange={(e) => handleInputChange(e, "serial_number")}
+            />
+          ) : (
+            <span>{machineDetails.serial_number}</span>
+          )}
         </div>
-
         <div className="mb-4">
           <strong className="text-radixgreen">Valoración:</strong> 
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
@@ -288,7 +382,32 @@ const EquipmentDetails = () => {
           </div>
         )}
 
-
+        {editMode && (
+          <div className="mt-4 text-center">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+              onClick={handleSaveChanges}
+            >
+              Guardar
+            </button>
+            <button
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              onClick={toggleEditMode}
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+        {!editMode && (
+          <div className="mt-4 text-center">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={toggleEditMode}
+            >
+              Editar
+            </button>
+          </div>
+        )}
       </div>
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-semibold mb-4">
