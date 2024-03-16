@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
-import { createContext, useState, useEffect } from 'react'
+import { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Outlet, useNavigate } from 'react-router-dom';
-import { postToApi } from '../functions/api';
+import { Outlet, useNavigate } from "react-router-dom";
 
-const AuthContext = createContext()
+const AuthContext = createContext();
 
 export default AuthContext;
 
@@ -49,14 +48,12 @@ export const AuthProvider = () => {
         }
     }
 
-
-    let logoutUser = () => {
-        setAuthTokens(null)
-        setUser(null)
-        localStorage.removeItem('authTokens')
-        navigate('/login')
-    }
-
+  let logoutUser = () => {
+    setAuthTokens(null);
+    setUser(null);
+    localStorage.removeItem("authTokens");
+    navigate("/login");
+  };
 
     let updateToken = async ()=> {
 

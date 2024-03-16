@@ -1,10 +1,9 @@
-import { Button, Container, Flex, Heading } from '@radix-ui/themes'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Button, Flex, Heading } from "@radix-ui/themes";
+import { Link } from "react-router-dom";
 
 export default function OwnerHomePage() {
   return (
-    <Container>
+    <>
       <Flex align="center" justify="center" direction="row">
         <Heading
           size="6"
@@ -13,41 +12,38 @@ export default function OwnerHomePage() {
           Bienvenido a
         </Heading>
         <img src="/pwa-64x64.png" alt="Logo" className="ml-2 mr-1 mt-3" />
-        <Heading
-          size="6"
-          className="!mt-8 !mb-3 text-center"
-        >
+        <Heading size="6" className="!mt-8 !mb-3 text-center">
           MuscleMate
         </Heading>
       </Flex>
 
       <Flex direction="column" justify="center" align="center" gap="4">
-        <Link to="/my-machines">
+        <Link to="../equipments">
           <Button size="4" variant="classic" className="mt-4">
             Mis Máquinas
           </Button>
         </Link>
-        <Link to="/register-client">
+        <Link to="../users/register">
           <Button size="4" variant="classic" className="mt-4">
             Registrar Cliente
           </Button>
         </Link>
-        <Link to="/users">
+        <Link to="../users">
           <Button size="4" variant="classic" className="mt-4">
             Usuarios
           </Button>
         </Link>
-        <Link to="/tickets">
+        <Link to="../tickets">
           <Button size="4" variant="classic" className="mt-4">
             Ver Tickets
           </Button>
         </Link>
-        <Link to="/my-gyms"> {/* Agregamos el enlace para el botón "Mis Gimnasios" */}
+        <Link to="/my-gyms">
           <Button size="4" variant="classic" className="mt-4">
             Mis Gimnasios
           </Button>
         </Link>
       </Flex>
-    </Container>
-  )
+    </>
+  );
 }

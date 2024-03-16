@@ -99,7 +99,7 @@ const Users = () => {
           </Popover.Root>
         </div>
 
-        <Link to={`/users/createUser`} className="flex flex-col">
+        <Link to="register" className="flex flex-col">
           <Button size="3">
             <IoMdAddCircleOutline className="size-6" />
             Añadir nuevo usuario
@@ -109,7 +109,7 @@ const Users = () => {
         {filteredUsers.map((users) => {
           
           return (
-            <Link to={`/users/${users.id}/profile`} key={users.id} className="flex flex-col">
+            <Link to={`${users.id}/profile`} key={users.id} className="flex flex-col">
             <Button key={users.id} variant="soft" size="3"
               className="flex !justify-between !h-fit !p-2 !px-4">
               <div className="flex flex-col">
