@@ -1,6 +1,8 @@
+
 import React, { createContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { Outlet, useNavigate } from 'react-router-dom';
+
 
 const AuthContext = createContext();
 
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }) => {
         navigate('/login');
     };
 
+
     let updateToken = async () => {
         let response = await fetch(`${VITE_BACKEND_URL}/token/refresh/`, {
             method: 'POST',
@@ -95,3 +98,4 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
