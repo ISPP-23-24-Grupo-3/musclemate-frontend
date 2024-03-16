@@ -23,6 +23,7 @@ import TicketManagement from "./views/TicketManagement/TicketManagement";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
 import ErrorPage from "./ErrorPage";
 import { AuthProvider } from "./utils/context/AuthContext";
+import AddTickets from "./views/Tickets/AddTickets"; // Importa la vista AddTickets
 
 const ownerRoutes = [
   {
@@ -63,6 +64,7 @@ const userRoutes = [
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
+  { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
 ];
 
 const router = createBrowserRouter([
