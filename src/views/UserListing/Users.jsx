@@ -16,7 +16,7 @@ const Users = () => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().startsWith(search.toLowerCase()),
+      user.name.toLowerCase().includes(search.toLowerCase()) || user.lastName.toLowerCase().includes(search.toLowerCase()),
     ).filter((user) => filters!=0 ? filters.some((f) => (user.register ? 'Activa' : 'Caducada') === f) : true)
   
 
