@@ -16,7 +16,7 @@ const Users = () => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().startsWith(search.toLowerCase()),
+      user.name.toLowerCase().includes(search.toLowerCase()) || user.lastName.toLowerCase().includes(search.toLowerCase()),
     ).filter((user) => filters!=0 ? filters.some((f) => (user.register ? 'Activa' : 'Caducada') === f) : true)
   
 
@@ -46,7 +46,7 @@ const Users = () => {
         Usuarios
       </Heading>
       
-      <div className="flex flex-col space-y-3">
+      <div className="flex flex-col space-y-3 md:m-0 m-5">
         <div className="flex gap-3 flex-col md:flex-row">
           <TextField.Root className="flex-1">
             <TextField.Slot>

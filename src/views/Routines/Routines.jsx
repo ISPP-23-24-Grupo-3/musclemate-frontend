@@ -52,7 +52,7 @@ export const Routines = () => {
   }, [user.username]);
 
   return (
-    <Section>
+    <Section className="md:m-0 m-5">
       <div className="flex mb-3 justify-between">
         <Heading size="8" className="text-radixgreen text-center md:text-left">
           Mis Rutinas
