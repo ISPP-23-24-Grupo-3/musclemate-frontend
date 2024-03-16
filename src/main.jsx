@@ -60,7 +60,7 @@ const ownerRoutes = [
     element: <TicketManagement />,
   },
   {
-    path: "/my-gyms",
+    path: "my-gyms",
     element: <MyGymsOwner />,
   },
 ];
