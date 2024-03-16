@@ -31,7 +31,7 @@ const UserRegister = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen md:m-0 m-5">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Registro de nuevo usuario

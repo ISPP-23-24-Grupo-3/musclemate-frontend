@@ -57,6 +57,11 @@ const Header = () => {
                             Rutinas
                         </Button>
                     </Link>
+                    <Link to="/user/add-tickets">
+                        <Button size="4" variant="ghost" color="green">
+                            Crear ticket
+                        </Button>
+                    </Link>
                     </>
                 ) : null}      
             </div>

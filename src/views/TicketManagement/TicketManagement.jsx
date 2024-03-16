@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
+import { Heading, TextField } from "@radix-ui/themes";
+import { IoMdSearch } from "react-icons/io";
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -97,16 +99,25 @@ const TicketManagement = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-8">
-      <h2 className="text-2xl font-semibold mb-4">Lista de Incidencias</h2>
+    <div className="max-w-lg md:mx-auto md:mt-8 m-5">
+      <Heading
+        size="8"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+      >
+        Lista de Incidencias
+      </Heading>
       <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por nombre de máquina o gimnasio..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 p-2 rounded-md w-full"
-        />
+        <TextField.Root className="flex-1">
+          <TextField.Slot>
+            <IoMdSearch />
+          </TextField.Slot>
+          <TextField.Input
+            type="text"
+            placeholder="Buscar por nombre de máquina o gimnasio..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          ></TextField.Input>
+        </TextField.Root>
       </div>
       <ul>
         {apiDataLoaded && filteredTickets.length > 0 ? (

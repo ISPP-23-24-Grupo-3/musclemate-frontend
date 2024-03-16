@@ -36,7 +36,7 @@ const ClientRegister = () => {
   };
 
   return (
-    <div className="flex flex-col mt-3 md:flex-row justify-center items-center min-h-screen">
+    <div className="flex flex-col mt-3 md:flex-row justify-center items-center min-h-screen md:m-0 m-5">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl mb-8 md:mb-0 md:mr-8">
         <div className="w-full">
           <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
