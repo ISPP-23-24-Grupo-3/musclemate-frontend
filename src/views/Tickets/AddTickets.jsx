@@ -37,7 +37,7 @@ const AddTickets = () => {
   useEffect(() => {
     const fetchEquipmentOptions = async () => {
       try {
-        const response = await getFromApi("equipments/gym/");
+        const response = await getFromApi("equipments/");
         if (response.ok) {
           const data = await response.json();
           setEquipmentOptions(data.map(equipment => ({
