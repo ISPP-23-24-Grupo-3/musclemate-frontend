@@ -35,8 +35,8 @@ const Profile = () => {
 
     return (
         <>
-            <div className="grid grid-cols-2 gap-4 mt-4 mb-4">
-                <div className="flex justify-center items-center bg-radixgreen/30 border-2 border-radixgreen rounded-3xl py-2 px-5 pt-8 flex-col">
+            <div className="grid md:grid-cols-2 md:gap-4 md:mt-4 md:mb-4">
+                <div className="flex justify-center md:m-0 m-5 items-center bg-radixgreen/30 border-2 border-radixgreen rounded-3xl py-2 md:px-5 pt-8 flex-col">
                     <div>
                         <img className="w-80 h-80" src="https://i.imgur.com/Y23W1X9.png" />
                     </div>
@@ -51,7 +51,7 @@ const Profile = () => {
                         <p className="text-radixgreen text-lg font-bold mt-5">{user ? user.zipCode : "Cargando..."}</p>
                     )}
                 </div>
-                <div className="flex justify-center items-left flex-col pl-12">
+                <div className="flex justify-center items-left flex-col md:pl-12 md:m-0 m-5">
                     <div>
                         <p className="text-radixgreen text-3xl font-bold mt-5 mb-2">Información del Usuario</p>
                         <hr className="border-radixgreen"/>

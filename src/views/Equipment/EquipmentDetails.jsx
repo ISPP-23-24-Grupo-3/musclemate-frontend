@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getFromApi, putToApi } from "../../utils/functions/api";
-import { Button, TextField } from "@radix-ui/themes";
+import { Button, Heading, TextField } from "@radix-ui/themes";
 
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
@@ -254,10 +254,13 @@ export default function EquipmentDetails() {
 
   return (
     <div className="mt-8 max-w-xl mx-auto">
-      <div className="p-10 border border-radixgreen rounded">
-        <h2 className="mb-6 text-radixgreen font-bold text-3xl text-center">
-          Detalles de la Máquina de Gimnasio
-        </h2>
+      <div className="p-10 border border-radixgreen rounded md:m-0 m-5">
+      <Heading
+        size="7"
+        className="text-radixgreen !mb-3 text-center"
+      >
+        Detalles de la Máquina
+      </Heading>
         <div className="mb-4">
           <strong className="text-radixgreen">Nombre:</strong>{" "}
           {editMode ? (
@@ -453,8 +456,13 @@ export default function EquipmentDetails() {
           </div>
         )}
       </div>
-      <div className="mt-8 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Tickets</h2>
+      <div className="mt-8 text-center md:m-0 m-5">
+      <Heading
+        size="7"
+        className="text-radixgreen !mt-8 !mb-3 text-center"
+      >
+        Tickets
+      </Heading>
         <ul>
           {apiDataLoaded && apiTickets.length > 0 ? (
             apiTickets.map((ticket) => (

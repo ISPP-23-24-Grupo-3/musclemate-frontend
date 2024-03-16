@@ -17,7 +17,7 @@ export default function OwnerHomePage() {
         </Heading>
       </Flex>
 
-      <Flex direction="column" justify="center" align="center" gap="4">
+      <Flex direction="column" justify="center" align="center" gap="4" className="mb-5">
         <Link to="../equipments">
           <Button size="4" variant="classic" className="mt-4">
             Mis Máquinas

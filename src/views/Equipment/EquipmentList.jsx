@@ -113,7 +113,7 @@ export default function MachineList() {
       >
         Mis Máquinas
       </Heading>
-      <div className="flex flex-col space-y-3">
+      <div className="flex flex-col space-y-3 md:m-0 m-5">
         <div className="flex gap-3 flex-col md:flex-row">
           <TextField.Root className="flex-1">
             <TextField.Slot>

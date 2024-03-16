@@ -23,7 +23,8 @@ import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
 import ErrorPage from "./ErrorPage";
-import { AuthProvider } from "./utils/context/AuthContext";
+import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
+import AddTickets from "./views/Tickets/AddTickets";
 
 const ownerRoutes = [
   {
@@ -61,48 +62,44 @@ const ownerRoutes = [
 ];
 
 const userRoutes = [
+  { path: "home", element: <ClientHomePage /> },
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments-client/:equipmentId", element: <EquipmentDetailsClient /> },
+  { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
 ];
 
 const router = createBrowserRouter([
-
   {
     path: "/",
-    element: <AuthProvider />,
+    element: <MainLayout />,
     children: [
       {
-      path: "/",
-      element: <MainLayout />,
-      children: [
-        {
-          path: "/",
-          element: <App />,
-        },
-        {
-          path: "/login",
-          element: <Login />,
-        },
-        {
-          path: "/register-client",
-          element: <RegisterClient />,
-        },
-        {
-          path: "/owner",
-          element: <OwnerRoute />,
-          children: ownerRoutes,
-        },
-        {
-          path: "/user",
-          element: <UserRoute />,
-          children: userRoutes,
-        },
-      ],
-      errorElement: <ErrorPage />,
-    },],
-  }
+        path: "/",
+        element: <App />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register-client",
+        element: <RegisterClient />,
+      },
+      {
+        path: "/owner",
+        element: <OwnerRoute />,
+        children: ownerRoutes,
+      },
+      {
+        path: "/user",
+        element: <UserRoute />,
+        children: userRoutes,
+      },
+    ],
+    errorElement: <ErrorPage />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
