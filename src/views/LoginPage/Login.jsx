@@ -1,16 +1,20 @@
 import React, { useState, useContext } from "react";
 import { HiUser, HiLockClosed } from "react-icons/hi"; 
 import { Button } from "@radix-ui/themes";
+import { RingLoader } from "react-spinners"; // Importa el componente del spinner
 import AuthContext from "../../utils/context/AuthContext";
 
 const UserLogin = () => {
   const { loginUser, error } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Estado para controlar el spinner
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    loginUser({ username, password });
+    setLoading(true); // Activar el spinner una vez que se hace clic en el botón
+    await loginUser({ username, password });
+    setLoading(false); // Desactivar el spinner después de que se complete el inicio de sesión
   };
 
   return (
@@ -51,9 +55,14 @@ const UserLogin = () => {
             variant="solid"
             color="green"
             className="w-full mt-2"
+            disabled={loading} // Deshabilitar el botón mientras se carga
+            style={{ cursor: loading ? 'wait' : 'pointer' }} // Cambiar el cursor mientras se carga
           >
-            Iniciar Sesión
+            {loading ? "Cargando..." : "Iniciar Sesión"} {/* Cambiar el texto del botón según el estado de carga */}
           </Button>
+          {loading && ( // Muestra el spinner solo si loading es true
+            <RingLoader color="#36D7B7" loading={loading} size={50} />
+          )}
         </form>
       </div>
       <div className="w-full md:w-1/2">
