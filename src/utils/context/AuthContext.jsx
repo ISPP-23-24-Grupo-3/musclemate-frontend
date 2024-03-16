@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const AuthContext = createContext();
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
         setAuthTokens(null);
         setUser(null);
         localStorage.removeItem('authTokens');
-        navigate('/login');
+        navigate('/');
     };
 
 
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{ user, authTokens, loginUser, logoutUser, error }}>
-            {loading ? null : <Outlet />}
+            { loading ? null : children }
         </AuthContext.Provider>
     );
 };

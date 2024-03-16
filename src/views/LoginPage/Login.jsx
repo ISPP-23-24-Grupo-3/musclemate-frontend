@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { HiUser, HiLockClosed } from "react-icons/hi"; 
-import { Button } from "@radix-ui/themes";
+import { Button, Flex } from "@radix-ui/themes";
 import { RingLoader } from "react-spinners"; // Importa el componente del spinner
 import AuthContext from "../../utils/context/AuthContext";
 
@@ -60,8 +60,11 @@ const UserLogin = () => {
           >
             {loading ? "Cargando..." : "Iniciar Sesión"} {/* Cambiar el texto del botón según el estado de carga */}
           </Button>
-          {loading && ( // Muestra el spinner solo si loading es true
-            <RingLoader color="#36D7B7" loading={loading} size={50} />
+          {loading && ( 
+            // Muestra el spinner solo si loading es true
+            <Flex justify="center" className="mt-2">
+            <RingLoader color="#30A46C" loading={loading} size={30}/>
+            </Flex>
           )}
         </form>
       </div>
