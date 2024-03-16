@@ -7,7 +7,7 @@ const Header = () => {
   const { authTokens, logoutUser } = useContext(AuthContext);
 
   const handleLogout = () => {
-    logoutUser(); // Llama a la función logoutUser del contexto de autenticación
+    logoutUser(); 
   };
 
   return (
