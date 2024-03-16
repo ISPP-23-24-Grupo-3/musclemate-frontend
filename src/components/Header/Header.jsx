@@ -34,6 +34,11 @@ const Header = () => {
             <div className="flex flex-col mb-3 md:mb-0 md:flex-row gap-5 md:gap-10 items-center md:ml-3">
                 {user?.rol === "owner" ? (
                     <>
+                    <Link to="/owner/my-gyms">
+                        <Button size="4" variant="ghost" color="green">
+                            Mis gimnasios
+                        </Button>
+                    </Link>
                     <Link to="/owner/equipments">
                         <Button size="4" variant="ghost" color="green">
                             Mis máquinas
