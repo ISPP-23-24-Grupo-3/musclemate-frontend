@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import {
-  Box,
   Button,
   Flex,
   Heading,
@@ -9,7 +8,6 @@ import {
   IconButton,
   TextField,
 } from "@radix-ui/themes";
-import { FaPencil } from "react-icons/fa6";
 import { CgGym } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { useNavigate } from "react-router";
@@ -25,7 +23,6 @@ export const Routines = () => {
   const [routines, setRoutines] = useState([]);
   const { user } = useContext(AuthContext);
   const [client, setClient] = useState({});
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRoutines = async (cl) => {
@@ -38,7 +35,7 @@ export const Routines = () => {
       const response = await getFromApi("clients/");
       const clients = await response.json();
       const foundClient = clients.find(
-        (client) => client.user == user.username,
+        (client) => client.user == user.username
       );
       setClient(foundClient);
       return foundClient;
@@ -49,13 +46,13 @@ export const Routines = () => {
       .then((r) => setRoutines(r))
       .catch(() => {
         setError(
-          "There was a problem while searching your routines. Please stand by.",
+          "There was a problem while searching your routines. Please stand by."
         );
       });
   }, [user.username]);
 
   return (
-    <Section>
+    <Section className="md:m-0 m-5">
       <div className="flex mb-3 justify-between">
         <Heading size="8" className="text-radixgreen text-center md:text-left">
           Mis Rutinas
@@ -144,8 +141,8 @@ const RoutineForm = ({ set_routines, routines, client }) => {
       .then((posted_routine) => {
         set_routines((c_routines) =>
           c_routines.map((r) =>
-            r.temp_id == tempObject.temp_id ? posted_routine : r,
-          ),
+            r.temp_id == tempObject.temp_id ? posted_routine : r
+          )
         );
       })
       .catch((e) => {
@@ -198,6 +195,6 @@ ListRoutines.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
-    }),
+    })
   ).isRequired,
 };

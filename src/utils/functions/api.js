@@ -6,7 +6,7 @@ export function getFromApi(url) {
   return fetch(`${BASE_URL}/${url}`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens')).access}`,
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
     },
   });
 }
@@ -16,7 +16,7 @@ export function postToApi(url, data) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens')).access}`,
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
     },
     body: JSON.stringify(data),
   });
@@ -27,7 +27,7 @@ export function putToApi(url, data) {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens')).access}`,
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
     },
     body: JSON.stringify(data),
   });
@@ -38,7 +38,7 @@ export function deleteFromApi(url) {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens')).access}`,
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
     },
   });
 }

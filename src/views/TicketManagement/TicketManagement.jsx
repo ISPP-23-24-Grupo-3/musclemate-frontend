@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
+import { Heading, TextField } from "@radix-ui/themes";
+import { IoMdSearch } from "react-icons/io";
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -66,12 +68,12 @@ const TicketManagement = () => {
         updatedTicket.status = checked; // Actualiza el estado del ticket
         // Realiza la solicitud PUT para actualizar el estado en la base de datos
         const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
-          "label": updatedTicket.label,
-          "description": updatedTicket.description,
-          "gym": updatedTicket.gym,
-          "equipment": updatedTicket.equipment,
-          "client": updatedTicket.client,
-          "status": updatedTicket.status,
+          label: updatedTicket.label,
+          description: updatedTicket.description,
+          gym: updatedTicket.gym,
+          equipment: updatedTicket.equipment,
+          client: updatedTicket.client,
+          status: updatedTicket.status,
         });
         if (updateResponse.ok) {
           // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
@@ -90,7 +92,6 @@ const TicketManagement = () => {
       console.error("Error updating ticket status:", error);
     }
   };
-  
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -98,16 +99,25 @@ const TicketManagement = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-8">
-      <h2 className="text-2xl font-semibold mb-4">Lista de Incidencias</h2>
+    <div className="max-w-lg md:mx-auto md:mt-8 m-5">
+      <Heading
+        size="8"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+      >
+        Lista de Incidencias
+      </Heading>
       <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por nombre de máquina o gimnasio..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 p-2 rounded-md w-full"
-        />
+        <TextField.Root className="flex-1">
+          <TextField.Slot>
+            <IoMdSearch />
+          </TextField.Slot>
+          <TextField.Input
+            type="text"
+            placeholder="Buscar por nombre de máquina o gimnasio..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          ></TextField.Input>
+        </TextField.Root>
       </div>
       <ul>
         {apiDataLoaded && filteredTickets.length > 0 ? (
@@ -118,7 +128,9 @@ const TicketManagement = () => {
             >
               <div className="flex items-center mb-2">
                 <HiTicket
-                  className={`text-${ticket.status ? "green" : "red"}-500 w-6 h-6 mr-2 cursor-pointer`}
+                  className={`text-${
+                    ticket.status ? "green" : "red"
+                  }-500 w-6 h-6 mr-2 cursor-pointer`}
                   onClick={() => toggleStatus(ticket.id)}
                 />
                 <div>
@@ -148,9 +160,7 @@ const TicketManagement = () => {
                     <div>
                       <p className="text-radixgreen font-bold mb-1">
                         Cliente:{" "}
-                        <span className="text-black">
-                          {ticket.client.name}
-                        </span>
+                        <span className="text-black">{ticket.client.name}</span>
                       </p>
                     </div>
                   </div>
@@ -161,15 +171,15 @@ const TicketManagement = () => {
                   <div>
                     <p className="text-radixgreen font-bold mb-1">
                       Correo:{" "}
-                      <span className="text-black">
-                        {ticket.client.email}
-                      </span>
+                      <span className="text-black">{ticket.client.email}</span>
                     </p>
                   </div>
                   <div className="flex items-center">
                     <p className="text-radixgreen font-bold mb-1 mr-4">
                       Fecha:{" "}
-                      <span className="text-black">{formatDate(ticket.date)}</span>
+                      <span className="text-black">
+                        {formatDate(ticket.date)}
+                      </span>
                     </p>
                     <input
                       type="checkbox"
@@ -178,7 +188,13 @@ const TicketManagement = () => {
                       className="mr-2"
                     />
                     <p className="text-radixgreen font-bold mb-1">
-                      <span className={ticket.status ? "text-green-500 ml-2" : "text-red-500 ml-2"}>
+                      <span
+                        className={
+                          ticket.status
+                            ? "text-green-500 ml-2"
+                            : "text-red-500 ml-2"
+                        }
+                      >
                         {ticket.status ? "Resuelto" : "No Resuelto"}
                       </span>
                     </p>

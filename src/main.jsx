@@ -1,142 +1,102 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Login from "./views/LoginPage/Login";
-import { Routines } from "./views/Routines/Routines";
 
-import RegisterUser from "./views/RegisterPage/RegisterUser";
+import Login from "./views/LoginPage/Login";
 import RegisterClient from "./views/RegisterPage/RegisterClient";
-import GymMachineForm from "./views/MachineList/AddMachine";
+import App from "./App";
+import MainLayout from "./views/MainLayout/MainLayout";
+import { Theme } from "@radix-ui/themes";
 import "./index.css";
 import "@radix-ui/themes/styles.css";
-import { Theme } from "@radix-ui/themes";
-import App from "./App";
-import Users from "./views/UserListing/Users";
-import "@radix-ui/themes/styles.css";
-import MachineList from "./views/MachineList/MachineList";
-import MainLayout from "./views/MainLayout/MainLayout";
-import { EditRoutine } from "./views/Routines/EditRoutine";
-import { AuthProvider } from "./utils/context/AuthContext";
-import OwnerRoute from "./components/OwnerRoute";
 import UserRoute from "./components/UserRoute";
+import OwnerRoute from "./components/OwnerRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
-import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
-
-import TicketManagement from "./views/TicketManagement/TicketManagement";
-
+import Users from "./views/UserListing/Users";
 import Profile from "./views/UserListing/Profile";
+import EquipmentList from "./views/Equipment/EquipmentList";
+import EquipmentForm from "./views/Equipment/EquipmentForm";
+import EquipmentDetails from "./views/Equipment/EquipmentDetails";
+import { Routines } from "./views/Routines/Routines";
+import { EditRoutine } from "./views/Routines/EditRoutine";
+import TicketManagement from "./views/TicketManagement/TicketManagement";
+import RegisterUser from "./views/RegisterPage/RegisterUser";
+import ErrorPage from "./ErrorPage";
+import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
+import AddTickets from "./views/Tickets/AddTickets";
 
+const ownerRoutes = [
+  {
+    path: "home",
+    element: <OwnerHomePage />,
+  },
+  {
+    path: "users",
+    element: <Users />,
+  },
+  {
+    path: "users/register",
+    element: <RegisterUser />,
+  },
+  {
+    path: "users/:userId/profile",
+    element: <Profile />,
+  },
+  {
+    path: "equipments",
+    element: <EquipmentList />,
+  },
+  {
+    path: "equipments/add",
+    element: <EquipmentForm />,
+  },
+  {
+    path: "equipments/:equipmentId",
+    element: <EquipmentDetails />,
+  },
+  {
+    path: "tickets",
+    element: <TicketManagement />,
+  },
+];
+
+const userRoutes = [
+  { path: "home", element: <ClientHomePage /> },
+  { path: "routines", element: <Routines /> },
+  { path: "routines/add", element: <EditRoutine /> },
+  { path: "routines/:id", element: <EditRoutine /> },
+  { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
+];
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AuthProvider />,
+    element: <MainLayout />,
     children: [
       {
         path: "/",
-        element: <MainLayout />,
-        children: [
-          {
-            path: "/",
-            element: <App />,
-          },
-          {
-            path: "/login",
-            element: <Login />,
-          },
-          {
-            path: "/register-client",
-            element: <RegisterClient />,
-          },
-          {
-            path: "/",
-            element: <OwnerRoute />,
-            children: [
-              {
-                path: "/register-user",
-                element: <RegisterUser />,
-              },
-              {
-                path: "/my-machines",
-                element: <MachineList />,
-              },
-              {
-                path: "/add-machine",
-                element: <GymMachineForm />,
-              },
-              {
-                path: "/",
-                element: <OwnerRoute />,
-                children: [
-                  {
-                    path: "/register-user",
-                    element: <RegisterUser />,
-                  },
-                  {
-                    path: "/my-machines",
-                    element: <MachineList />,
-                  },
-                  {
-                    path: "/add-machine",
-                    element: <GymMachineForm/>,
-                  },
-                  {
-                    path: "/users",
-                    element: <Users />,
-                  },
-                  {
-                    path: "/owner-home",
-                    element: <OwnerHomePage />,
-                  },
-                  {
-                    path: "/equipment-details/:equipmentId",
-                    element: <EquipmentDetails />,
-                  },
-                ],
-              },
-              {
-                path: "/tickets",
-                element: <TicketManagement />,
-              },
-              {
-                path: "/owner-home",
-                element: <OwnerHomePage />,
-              },
-              {
-                path: "/equipment-details/:id",
-                element: <EquipmentDetails />,
-              },
-            ],
-          },
-          {
-            path: "/",
-            element: <UserRoute />,
-            children: [
-              { path: "/routines/:id", element: <EditRoutine /> },
-              { path: "/routines/new", element: <EditRoutine /> },
-              { path: "/routines/", element: <Routines /> },
-            ],
-          },
-          {
-            path: "/equipment-details/:id",
-            element: <EquipmentDetails />,
-          },
-          {
-            path: "/users/:userId/profile",
-            element: <Profile />,
-          },
-        ],
+        element: <App />,
       },
       {
-        path: "/",
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register-client",
+        element: <RegisterClient />,
+      },
+      {
+        path: "/owner",
+        element: <OwnerRoute />,
+        children: ownerRoutes,
+      },
+      {
+        path: "/user",
         element: <UserRoute />,
-        children: [
-          { path: "/routines/:id/edit", element: <EditRoutine /> },
-          { path: "/routines/new", element: <EditRoutine /> },
-          { path: "/routines/", element: <Routines /> },
-        ],
+        children: userRoutes,
       },
     ],
+    errorElement: <ErrorPage />,
   },
 ]);
 
@@ -145,5 +105,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
