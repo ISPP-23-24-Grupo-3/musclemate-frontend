@@ -4,14 +4,14 @@ import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
 import { Button, TextField } from "@radix-ui/themes";
 
 import Rating from "../../components/Rating";
-import AuthContext from "../../utils/context/AuthContext";
 
 import { HiTicket } from "react-icons/hi";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
+import AuthContext from "../../utils/context/AuthContext"; "../../utils/context/AuthContext";
+
 const EquipmentDetailsClient = () => {
-  let {loginUser} = useContext(AuthContext)
-  const [user, setUser] = useState(null);
+  const { user } = useContext(AuthContext);
 
   const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
@@ -20,14 +20,12 @@ const EquipmentDetailsClient = () => {
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
-  const [machineRatings, setMachineRatings] = useState([]);
   const [actualRating, setActualRating] = useState(0);
-  const [newRating, setNewRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
 
   const [hasValoration, setHasValoration] = useState(false);
-  const [valorationId, setValorationId] = useState(null);
   const [isClient, setIsClient] = useState(false);
+  const [clientUsername, setClientUsername] = useState(null);
   const [clientId, setClientId] = useState(null);
 
   // Traducción de los grupos musculares
@@ -52,6 +50,29 @@ const EquipmentDetailsClient = () => {
     }
   };
 
+  // Datos del Usuario
+  useEffect(() => {
+    if(user?.rol === "client"){
+      setIsClient(true);
+      setClientId(user.user_id);
+      setClientUsername(user.username);
+    }
+  }, [user]);
+
+  // Machine Ratings
+  useEffect(() => {
+    getFromApi(`assessments/detail/${clientId}`)
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const hasValor= data.some((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.stars);
+      setHasValoration(hasValor);
+      const valor= data.filter((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.stars);
+      setActualRating(valor);
+    });
+  }, [clientId]);
+
   // Machine Details
   useEffect(() => {
     getFromApi("equipments/detail/"+ equipmentId +"/" ) 
@@ -65,88 +86,11 @@ const EquipmentDetailsClient = () => {
     });
   }, [equipmentId]);
 
-  // Machine Ratings
-  useEffect(() => {
-    getFromApi("assessments/") 
-    .then((response) => {
-        // console.log(response);
-        return response.json();
-    })
-    .then((data) => {
-        const aux = data.find((rating) => rating.equipment === Number(equipmentId) && rating.client === Number(clientId));
-        const id = aux ? aux.id : null;
-        // console.log(id);
-        
-        const valor = data.some((rating) => rating.equipment === Number(equipmentId) && rating.client === Number(clientId))
-        // console.log(valor);
-
-        const ratings = data.filter((rating) => rating.equipment === Number(equipmentId)).map((rating) => rating.stars);
-        // console.log(ratings);
-        setValorationId(id);
-        setMachineRatings(ratings);
-        setHasValoration(valor);
-      }); 
-  }, [equipmentId]);
-
-  // Rating average (shown)
-  function actualRate() {
-    var value= 0;
-    for (let i = 0; i < machineRatings.length; i++) {
-      value += machineRatings[i];
-      if(i === (machineRatings.length - 1)){
-        value= (value/machineRatings.length);
-      }
-    }
-    setActualRating(value);
-  }
-
-  useEffect(() => {
-    actualRate();
-  }, [machineRatings]);
-
-  // Rating average (new - button)
-  function newRate() {
-    var value= 0;
-    machineRatings.push(Number(newRating));
-    for (let i = 0; i < machineRatings.length; i++) {
-      value += machineRatings[i];
-      if(i === (machineRatings.length - 1)){
-        value= (value/machineRatings.length);
-      }
-    }
-    setActualRating(value);
-  }
-
   // Función para formatear la fecha
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
-  // Función para obtener el usuario logueado
-  useEffect(() => {
-    getFromApi("users/") 
-    .then((response) => {
-        // console.log(response);
-        return response.json();
-    })
-    .then((data) => {
-        console.log(data);
-        const usuario= data.find((user) => user.username === loginUser);
-        console.log(usuario);
-        setUser(usuario);
-    });
-  }, [loginUser]);
-
-  useEffect(() => {
-    if(user?.rol === "client"){
-      setIsClient(true);
-      setClientId(user.id);
-    } else {
-      setIsClient(false);
-    }
-  }, [user]);
-
 
   useEffect(() => {
     const fetchMachineDetails = async () => {
@@ -158,7 +102,7 @@ const EquipmentDetailsClient = () => {
           // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
           if (data.gym) {
             const gymId = data.gym;
-            const gymResponse = await getFromApi(`gyms/${gymId}/`);
+            const gymResponse = await getFromApi(`gyms/detail/${gymId}/`);
             if (gymResponse.ok) {
               const gymData = await gymResponse.json();
               setGymName(gymData.name);
@@ -233,7 +177,7 @@ const EquipmentDetailsClient = () => {
         </div>
 
         <div className="mb-4">
-          <strong className="text-radixgreen">Valoración:</strong> 
+          <strong className="text-radixgreen">Tu Valoración:</strong> 
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
             <Rating rating={actualRating}/>
             <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
@@ -249,36 +193,34 @@ const EquipmentDetailsClient = () => {
             <div className="mb-4">
               <strong className="text-radixgreen">Su Valoración:</strong> 
               <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Rating rating={newRating}/>
+                <Rating rating={actualRating}/>
 
-                <TextField.Input type="number" value={newRating} onChange={(e) => {
+                <TextField.Input type="number" value={actualRating} onChange={(e) => {
                   e.target.value > 5 ? e.target.value = 5 : e.target.value < 0 ? e.target.value = 0 : e.target.value;
-                  setNewRating(e.target.value);
+                  setActualRating(e.target.value);
                 }} min="0" max="5" step="0.5" className="w-16" />
 
-                <Button onClick={() => {newRate(); setValuationOn(false); setNewRating(0)}} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+                <Button onClick={() => {setValuationOn(false);}} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
                   Actualizar valoración
                 </Button>
 
                 {/* <Button onClick={async () => {
 
-                  if (hasValoration) {              HAY QUE CAMBIAR EL ID ESTE
+                  if (hasValoration) {              
                     putToApi('assessments/update/'+ valorationId, {
-                      stars: newRating,
+                      stars: actualRating,
                       equipment: Number(equipmentId),
-                      client: clientId
+                      client: Number(clientId)
                     });
                   } else {
                     postToApi('assessments/create', {
                       id: Math.floor(Math.random() * 1000000),
-                      stars: newRating,
+                      stars: actualRating,
                       equipment: Number(equipmentId),
-                      client: clientId
+                      client: Number(clientId)
                     });
                   }
-                  newRate();
                   setValuationOn(false);
-                  setNewRating(0);
                 }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
                   Actualizar Valoración
                 </Button>  */}

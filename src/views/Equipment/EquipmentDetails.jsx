@@ -164,7 +164,7 @@ export default function EquipmentDetails() {
           // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
           if (data.gym) {
             const gymId = data.gym;
-            const gymResponse = await getFromApi(`gyms/${gymId}/`);
+            const gymResponse = await getFromApi(`gyms/detail/${gymId}/`);
             if (gymResponse.ok) {
               const gymData = await gymResponse.json();
               setGymName(gymData.name);

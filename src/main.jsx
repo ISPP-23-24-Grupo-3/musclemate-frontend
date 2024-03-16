@@ -17,7 +17,7 @@ import Profile from "./views/UserListing/Profile";
 import EquipmentList from "./views/Equipment/EquipmentList";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
-import EquipmentDetailsClient from "./views/EquipmentDetails/EquipmentDetailsClient";
+import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
 import { Routines } from "./views/Routines/Routines";
 import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
