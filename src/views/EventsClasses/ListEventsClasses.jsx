@@ -64,11 +64,16 @@ const EventList = () => {
           : true
     )
     .filter(
-      (event) =>
-        filters.date !== ''
-          ? new Date(event.date).toDateString() === filters.date
-          : true
-    )
+      (event) =>{
+        if(filters.date !== ''){
+          const filterDate = new Date(filters.date);
+          const eventDate = new Date(event.date);
+          return filterDate.toDateString()==eventDate.toDateString();
+
+        }else{
+          return true;
+        }
+      })
     .sort((a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sortingReverse ? -1 : 1));
 
   return (
