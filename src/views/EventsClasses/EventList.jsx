@@ -5,6 +5,8 @@ import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { HiOutlineFilter } from 'react-icons/hi';
 import { Button, Popover, TextField, Heading } from '@radix-ui/themes';
 import * as Separator from '@radix-ui/react-separator';
+import { Link } from 'react-router-dom'; // Importamos Link de react-router-dom
+import { getFromApi } from "../../utils/functions/api";
 
 const INTENSITIES = ['Low', 'Medium', 'High'];
 
@@ -20,6 +22,10 @@ const EventList = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
+    getEvents();
+  }, []);
+
+  function getEvents() {
     // Simulación de datos de eventos
     const sampleEvents = [
       { id: 1, name: 'Evento 1', date: '2024-03-17', capacity: 20, instructor: 'Instructor A', intensity: 'High' },
@@ -27,7 +33,7 @@ const EventList = () => {
       { id: 3, name: 'Evento 3', date: '2024-03-19', capacity: 25, instructor: 'Instructor C', intensity: 'Low' },
     ];
     setEvents(sampleEvents);
-  }, []);
+  }
 
   const SORTING_FUNCTIONS = {
     capacity: (a, b) => b.capacity - a.capacity,
@@ -170,7 +176,7 @@ const EventList = () => {
         </div>
 
         {filteredEventList.map((event) => (
-          <div key={event.id}>
+          <Link to={`/event-details/${event.id}`} key={event.id}>
             <Button
               size="3"
               onClick={() => handleEventClick(event.id)}
@@ -186,12 +192,11 @@ const EventList = () => {
                 <span>Intensidad: {event.intensity}</span>
               </div>
             </Button>
-        </div>
+          </Link>
         ))}
         {selectedEvent && (
           <Popover.Root onOpenChange={(isOpen) => isOpen && setSelectedEvent(null)}>
             <Popover.Anchor>
-              {/* Agrega contenido aquí para activar el popover */}
               <button>Mostrar detalles</button>
             </Popover.Anchor>
             <Popover.Content>
