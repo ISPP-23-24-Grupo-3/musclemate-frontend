@@ -8,14 +8,19 @@ import {
   IconButton,
   TextField,
 } from "@radix-ui/themes";
-import { CgGym, CgSpinner } from "react-icons/cg";
+import { CgGym, CgSpinner, CgTrash } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { LuPencil } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { getFromApi, postToApi } from "../../utils/functions/api";
+import {
+  getFromApi,
+  postToApi,
+  deleteFromApi,
+} from "../../utils/functions/api";
 
 export const Routines = () => {
   const [error, setError] = useState("");
@@ -50,16 +55,30 @@ export const Routines = () => {
       {error ? (
         <Error message={error} size="3" />
       ) : (
-        <ListRoutines routines={routines} />
+        <ListRoutines routines={routines} set_routines={setRoutines} />
       )}
     </Section>
   );
 };
 
-const ListRoutines = ({ routines }) => {
+const ListRoutines = ({ routines, set_routines }) => {
   const navigate = useNavigate();
   const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
   const startRoutine = (routine) => navigate("start/" + routine.id);
+
+  const deleteRoutine = (routine) => {
+    if (
+      window.confirm(
+        `¿Estás seguro de que deseas borrar la rutina "${routine.name}"?`,
+      )
+    ) {
+      deleteFromApi(`routines/delete/${routine.id}/`).then(
+        set_routines((c_routines) =>
+          c_routines.filter((r) => r.name !== routine.name),
+        ).catch(() => {}),
+      );
+    }
+  };
 
   if (routines.length === 0) {
     return (
@@ -69,12 +88,10 @@ const ListRoutines = ({ routines }) => {
   return (
     <Flex gap="4" direction="column">
       {routines.map((routine) => (
-        <Button
+        <div
           key={routine.id}
-          variant="soft"
           size="4"
-          className="bg-radixgreen/10 !items-center !p-7 !justify-between "
-          onClick={() => editRoutine(routine)}
+          className="flex bg-radixgreen/10 items-center p-4 justify-between rounded-lg"
         >
           <span className="flex gap-3 items-center">
             <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
@@ -82,14 +99,34 @@ const ListRoutines = ({ routines }) => {
             </Text>
             {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
           </span>
-          <IconButton
-            size="3"
-            radius="full"
-            onClick={() => startRoutine(routine)}
-          >
-            <CgGym className="size-6 rotate-30" />
-          </IconButton>
-        </Button>
+          <span className="flex gap-3">
+            <IconButton
+              size="3"
+              radius="full"
+              onClick={() => startRoutine(routine)}
+            >
+              <CgGym className="size-6 rotate-30" />
+            </IconButton>
+            <IconButton
+              size="3"
+              radius="full"
+              onClick={() => editRoutine(routine)}
+            >
+              <LuPencil className="size-5" />
+            </IconButton>
+            <IconButton
+              size="3"
+              radius="full"
+              color="red"
+              onClick={(e) => {
+                deleteRoutine(routine);
+                e.stopPropagation();
+              }}
+            >
+              <CgTrash className="size-6" />
+            </IconButton>
+          </span>
+        </div>
       ))}
     </Flex>
   );
