@@ -8,13 +8,12 @@ import {
   IconButton,
   TextField,
 } from "@radix-ui/themes";
-import { CgGym } from "react-icons/cg";
+import { CgGym, CgSpinner } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
-import AuthContext from "../../utils/context/AuthContext";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 
@@ -77,9 +76,12 @@ const ListRoutines = ({ routines }) => {
           className="bg-radixgreen/10 !items-center !p-7 !justify-between "
           onClick={() => editRoutine(routine)}
         >
-          <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
-            {routine.name}
-          </Text>
+          <span className="flex gap-3 items-center">
+            <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
+              {routine.name}
+            </Text>
+            {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
+          </span>
           <IconButton
             size="3"
             radius="full"
