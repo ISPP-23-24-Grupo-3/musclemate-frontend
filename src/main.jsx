@@ -46,10 +46,6 @@ const router = createBrowserRouter([
                 element: <RegisterClient/>,
               },
               {
-                path: "/events",
-                element: <EventList/>
-              },
-              {
                 path: "/",
                 element: <OwnerRoute />,
                 children: [
@@ -86,6 +82,7 @@ const router = createBrowserRouter([
                   { path: "/routines/:id/edit", element: <EditRoutine /> },
                   { path: "/routines/new", element: <EditRoutine /> },
                   { path: "/routines/", element: <Routines /> },
+                  { path: "/events/", element: <EventList /> },
                 ],
               },
               {
