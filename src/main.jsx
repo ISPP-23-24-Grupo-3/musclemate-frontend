@@ -22,6 +22,7 @@ import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
 import Profile from "./views/UserListing/Profile";
+import EventList from "./views/EventsClasses/ListEventsClasses";
 
 const router = createBrowserRouter([
       {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
               {
                 path: "/register-client",
                 element: <RegisterClient/>,
+              },
+              {
+                path: "/events",
+                element: <EventList/>
               },
               {
                 path: "/",
