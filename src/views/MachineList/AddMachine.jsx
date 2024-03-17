@@ -1,55 +1,52 @@
 import React ,{useState, useEffect,useContext} from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import { AuthContext } from './AuthContext';
+import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
+import { useNavigate } from "react-router";
 
 const GymMachineForm = () => {
 
+
+
   const { user } = useContext(AuthContext);
-  const [clientDetails, setClientDetails] = useState(null);
   const [gyms, setGyms] = useState(null)
-  const [selectGym, setSelectGym] =useState(null);
   const [machines, setMachines] = useState(null);
+  const [selectedGym, setSelectedGym] = useState(null);
+  const navigate = useNavigate()
+
+
+  async function getGyms() {
+  
+          const responseGym = await getFromApi('gyms/');
+          return responseGym.json();
+         
+  }
 
   useEffect(() => {
-    const clientDetails = async () => {
-      try {
-        if (user && user.id) {
-          const response = await getFromApi(`owners/`);
-          if (!response.ok) {
-            throw new Error('Network response was not ok.');
-          }
-          const data = await response.json();
-          const owner = data.find(o=>o.user==user.username)
-          const responseGym = await getFromApi('gyms/');
-          const dataGym = await responseGym.json();
-          const gyms = dataGym.filter(g=>g.owner==owner.id);
-          setGyms(gyms);
-        }
-      } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-      }
-    };
-    clientDetails();
-    }, [user]);
+    getGyms().then(gyms => setGyms(gyms)).catch(error => console.log(error));
+    }, []);
 
+
+ 
+  
+  /*
   useEffect(() => {
     const selectedGym = async() => {
       try{
         const machinesGym = await getFromApi(`equipments/`);
         const machineResponse = await machinesGym.json();
-        const machinesGyms = machineResponse.filter(m=>m.gym==selectGym)
+        const machinesGyms = machineResponse.filter(m=>m.gym==selectedGym)
         setMachines(machinesGyms);
       }catch(error) {
         console.error('There was a problem with the fetch operation:', error);
       }
     };
     selectedGym();
-    },[selectGym]);
+    },[selectedGym]);
+*/
 
-
-  const { register, handleSubmit, formState: { errors } } = useForm( {values: {gym: selectGym,}},);
+  const { register, handleSubmit, formState: { errors } } = useForm( {values: {gym: selectedGym}},);
 
   const onSubmit = async (machineInfo) => {
     try {
@@ -61,6 +58,7 @@ const GymMachineForm = () => {
       }
   
       console.log('Máquina agregada exitosamente');
+      navigate('/loquesea')
     } catch (error) {
       console.error('Hubo un error al agregar la máquina:', error);
     }
@@ -115,10 +113,10 @@ const GymMachineForm = () => {
           )}
 
           <div className="flex items-center mb-4">
-            <label htmlFor="reference" className="mr-3">Número de referencia</label>
+            <label htmlFor="serial_number" className="mr-3">Número de referencia</label>
             <input
-              {...register("reference", { required: messages.req })}
-              name="reference"
+              {...register("serial_number", { required: messages.req })}
+              name="serial_number"
               type="text"
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.reference ? 'border-red-500' : 'border-radixgreen'
@@ -146,16 +144,26 @@ const GymMachineForm = () => {
           )}
 
           <div className="flex items-center mb-4">
-            <label htmlFor="muscularGroup" className="mr-3">Grupo muscular</label>
-            <input
-              {...register("muscularGroup", { required: messages.req })}
-              name="muscularGroup"
+            <label htmlFor="muscular_group" className="mr-3">Grupo muscular</label>
+            <select
+              {...register("muscular_group", { required: messages.req })}
+              name="muscular_group"
               type="text"
               className={`flex-1 px-4 py-3 border rounded-lg ${
                 errors.muscularGroup ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
               style={{ marginLeft: "3rem" }}
-            />
+              
+            >
+            <option value="">Selecciona un grupo muscular</option>
+            <option value="arms">Brazos</option>
+            <option value="legs">Piernas</option>
+            <option value="core">Abdominales</option>
+            <option value="chest">Pecho</option>
+            <option value="back">Espalda</option>
+            <option value="shoulders">Hombros</option>
+            <option value="other">Otros</option>
+            </select>
           </div>
           {errors.muscularGroup && (
             <p className="text-red-500">{errors.muscularGroup.message}</p>
@@ -171,9 +179,8 @@ const GymMachineForm = () => {
             } bg-white text-black`}
           >
             <option value="">Seleccionar gimnasio</option>
-            {clientDetails && (
-              <option value={clientDetails.gym}>{clientDetails.gym_name}</option>
-            )}
+            {gyms && gyms.map(gym=><option key={gym.id} value={gym.id}>{gym.name}</option>)}
+            
           </select>
         </div>
         {errors.gym && (
@@ -193,6 +200,6 @@ const GymMachineForm = () => {
       </div>
     </div>
   );
-};
+        };
 
 export default GymMachineForm;
