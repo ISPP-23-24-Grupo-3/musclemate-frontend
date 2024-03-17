@@ -7,6 +7,7 @@ import {
   Text,
   TextField,
   Section,
+  Select,
 } from "@radix-ui/themes";
 import { useContext, useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
@@ -18,8 +19,6 @@ import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
 import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
-import AuthContext from "../../utils/context/AuthContext";
-import { fetchClient } from "../../utils/functions/fetchUser";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
@@ -29,9 +28,7 @@ export const EditRoutine = () => {
   const [workouts, set_workouts] = useState([]);
   const [hide_form, set_hide_form] = useState(true);
   const [editing_name, set_editing_name] = useState(false);
-  const [client, set_client] = useState({});
-  const { user } = useContext(AuthContext);
-  console.log(client.name);
+  const [equipment, set_equipment] = useState([]);
 
   const routineId = useParams().id;
   const updateName = (name) => {
@@ -56,10 +53,15 @@ export const EditRoutine = () => {
       const fetchedRoutine = fetchedRoutines.find((r) => r.id == id);
       return fetchedRoutine;
     };
+    const fetchEquipment = async () => {
+      const response = await getFromApi(`equipments/`);
+      const fetchedEquipment = await response.json();
+      return fetchedEquipment;
+    };
 
     fetchWorkouts(routineId).then((w) => set_workouts(w));
     fetchRoutine(routineId).then((r) => setRoutine(r));
-    fetchClient(user.username).then((c) => set_client(c));
+    fetchEquipment().then((e) => set_equipment(e));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routineId]);
 
@@ -122,8 +124,8 @@ export const EditRoutine = () => {
             editWorkout={set_workouts}
             hideForm={hide_form}
             setHideForm={set_hide_form}
-            client={client}
             routine={routine}
+            equipment={equipment}
           />
           <WorkoutList workouts={workouts} />
         </Flex>
@@ -176,7 +178,7 @@ WorkoutList.propTypes = {
       sets: PropTypes.number,
       reps: PropTypes.number,
       weigth: PropTypes.number,
-    })
+    }),
   ),
 };
 
@@ -185,8 +187,8 @@ const EditableWorkout = ({
   editWorkout,
   hideForm,
   setHideForm,
-  client,
   routine,
+  equipment,
 }) => {
   const addWorkout = (workout) => {
     const temp_workout = { ...workout, temp_id: Date.now() };
@@ -197,12 +199,12 @@ const EditableWorkout = ({
       .then((postedWorkout) =>
         editWorkout(
           workouts.map((w) =>
-            w.temp_id == temp_workout.temp_id ? postedWorkout : w
-          )
-        )
+            w.temp_id == temp_workout.temp_id ? postedWorkout : w,
+          ),
+        ),
       )
       .catch(
-        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id))
+        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id)),
       );
   };
 
@@ -220,8 +222,7 @@ const EditableWorkout = ({
     formState: { errors },
   } = useForm({
     values: {
-      client: client.id,
-      routine: routine.name,
+      routine: [routine.id],
     },
   });
 
@@ -280,15 +281,21 @@ const EditableWorkout = ({
                 ></TextField.Input>
               </Flex>
             </div>
-            <Flex direction="column" className="w-1/5 items-end">
+            <div className="w-1/5 items-end flex flex-col">
               <Text weight="bold">Máquina</Text>
-              <TextField.Input
-                name="machine"
-                color={errors.machine && "red"}
-                className={`${errors.name && "!border-red-500"}`}
-                {...register("machine")}
-              ></TextField.Input>
-            </Flex>
+              <Select.Root>
+                <Select.Trigger placeholder="Selecciona una máquina" />
+                <Select.Content>
+                  {equipment.map((e) => (
+                    <Select.Item key={e.id} value={"" + e.id}>
+                      {e.name}
+                    </Select.Item>
+                  ))}
+                  {/* <Select.Item value="1">Prueba 1</Select.Item> */}
+                  {/* <Select.Item value="2">Prueba 2</Select.Item> */}
+                </Select.Content>
+              </Select.Root>
+            </div>
           </Flex>
           <Button className="!mt-3">Finish editing</Button>
         </Card>
