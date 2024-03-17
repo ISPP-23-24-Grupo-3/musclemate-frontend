@@ -61,6 +61,13 @@ const EventList = () => {
     setSelectedEvent(null);
   };
 
+  const clearDateFilter = () =>{
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      date: '',
+    }));
+  };
+
   const filteredEventList = events
     .filter((event) => event.name.toLowerCase().includes(search.toLowerCase()))
     .filter(
@@ -146,6 +153,7 @@ const EventList = () => {
                   Capacidad
                 </ToggleGroup.Item>
               </ToggleGroup.Root>
+              <button onClick={clearDateFilter}>Limpiar</button>
               <Separator.Root className="border-b my-3" />
               <div className="flex">
                 <span className="text-lg font-bold">Filtrar por</span>
