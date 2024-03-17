@@ -8,7 +8,7 @@ const AuthContext = createContext()
 
 export default AuthContext;
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKENDs_URL
 
 export const AuthProvider = () => {
     let [authTokens, setAuthTokens] = useState(()=> localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
