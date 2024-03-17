@@ -25,14 +25,18 @@ const EventList = () => {
     getEvents();
   }, []);
 
-  function getEvents() {
-    // Simulación de datos de eventos
-    const sampleEvents = [
-      { id: 1, name: 'Evento 1', date: '2024-03-17', capacity: 20, instructor: 'Instructor A', intensity: 'High' },
-      { id: 2, name: 'Evento 2', date: '2024-03-18', capacity: 15, instructor: 'Instructor B', intensity: 'Medium' },
-      { id: 3, name: 'Evento 3', date: '2024-03-19', capacity: 25, instructor: 'Instructor C', intensity: 'Low' },
-    ];
-    setEvents(sampleEvents);
+  async function getEvents() {
+    try {
+      const response = await getFromApi(`events/`);
+      if (response.ok) {
+        const data = await response.json();
+        setEvents(data);
+      } else {
+        console.error('Error al obtener los eventos:', response.status);
+      }
+    } catch (error) {
+      console.error('Error al obtener los eventos:', error);
+    }
   }
 
   const SORTING_FUNCTIONS = {
@@ -52,7 +56,6 @@ const EventList = () => {
     }));
 
   const handleEventClick = (eventId) => {
-    // Simulación de obtención de detalles del evento
     const selected = events.find((event) => event.id === eventId);
     setSelectedEvent(selected);
   };
