@@ -21,35 +21,22 @@ import { getFromApi, postToApi } from "../../utils/functions/api";
 export const Routines = () => {
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
-  const { user } = useContext(AuthContext);
-  const [client, setClient] = useState({});
 
   useEffect(() => {
-    const fetchRoutines = async (cl) => {
+    const fetchRoutines = async () => {
       const response = await getFromApi("routines/");
       const fetchedRoutines = await response.json();
-      return fetchedRoutines.filter((r) => r.client == cl.id);
+      return fetchedRoutines;
     };
 
-    const fetchClient = async () => {
-      const response = await getFromApi("clients/");
-      const clients = await response.json();
-      const foundClient = clients.find(
-        (client) => client.user == user.username
-      );
-      setClient(foundClient);
-      return foundClient;
-    };
-
-    fetchClient()
-      .then((cl) => fetchRoutines(cl))
+    fetchRoutines()
       .then((r) => setRoutines(r))
       .catch(() => {
         setError(
-          "There was a problem while searching your routines. Please stand by."
+          "There was a problem while searching your routines. Please stand by.",
         );
       });
-  }, [user.username]);
+  }, []);
 
   return (
     <Section className="md:m-0 m-5">
@@ -59,11 +46,7 @@ export const Routines = () => {
         </Heading>
       </div>
 
-      <RoutineForm
-        client={client}
-        set_routines={setRoutines}
-        routines={routines}
-      />
+      <RoutineForm set_routines={setRoutines} routines={routines} />
 
       {error ? (
         <Error message={error} size="3" />
@@ -76,7 +59,7 @@ export const Routines = () => {
 
 const ListRoutines = ({ routines }) => {
   const navigate = useNavigate();
-  const editRoutine = (routine) => navigate("/routines/" + routine.id);
+  const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
   const startRoutine = (routine) => navigate("start/" + routine.id);
 
   if (routines.length === 0) {
@@ -110,17 +93,13 @@ const ListRoutines = ({ routines }) => {
   );
 };
 
-const RoutineForm = ({ set_routines, routines, client }) => {
+const RoutineForm = ({ set_routines, routines }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    values: {
-      client: client.id,
-    },
-  });
+  } = useForm();
 
   const isUnique = (routineName) => {
     return (
@@ -141,8 +120,8 @@ const RoutineForm = ({ set_routines, routines, client }) => {
       .then((posted_routine) => {
         set_routines((c_routines) =>
           c_routines.map((r) =>
-            r.temp_id == tempObject.temp_id ? posted_routine : r
-          )
+            r.temp_id == tempObject.temp_id ? posted_routine : r,
+          ),
         );
       })
       .catch((e) => {
@@ -195,6 +174,6 @@ ListRoutines.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
 };
