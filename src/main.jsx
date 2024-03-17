@@ -22,7 +22,7 @@ import UserRoute from "./components/UserRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import EquipmentDetails from "./views/EquipmentDetails/EquipmentDetails";
 import Profile from "./views/UserListing/Profile";
-import EventList from "./views/EventsClasses/ListEventsClasses";
+import EventList from "./views/EventsClasses/EventList";
 
 const router = createBrowserRouter([
       {
