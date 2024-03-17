@@ -2,111 +2,154 @@ import { Badge, Button, Flex } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "../../utils/context/AuthContext";
+import { useState } from "react";
 
 const Header = () => {
 
     const {user, logoutUser} = useContext(AuthContext)
+    
+    const [open, setOpen] = useState(false)
+
+    const handleMenu = () => {
+      setOpen(!open)
+    }
+
     return (
-        <header className="flex flex-col md:flex-row items-center justify-between border-b-2 border-black">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-            {user?.rol === "owner" ? (
-          <Link to="/owner/home">
-          <Flex align="center" className="md:m-4">
-              <img src="/pwa-64x64.png" alt="Logo" className="mr-4" />
-              <h1 className="text-xl font-bold">MuscleMate</h1>
-          </Flex>
-          </Link>
-        ) : user?.rol === "client" ? (
+      <header className="shadow-md sm:px-10 bg-white font-sans min-h-[70px]">
+        <div className="flex flex-wrap items-center gap-4">
+          {user?.rol === "owner" ? (
+            <Link to="/owner/home">
+              <Flex align="center" className="md:m-4">
+                <img src="/pwa-64x64.png" alt="Logo" className="mr-4" />
+                <h1 className="text-xl font-bold">MuscleMate</h1>
+              </Flex>
+            </Link>
+          ) : user?.rol === "client" ? (
             <Link to="/user/home">
-            <Flex align="center" className="md:m-4">
+              <Flex align="center" className="md:m-4">
                 <img src="/pwa-64x64.png" alt="Logo" className="mr-4" />
                 <h1 className="text-xl font-bold">MuscleMate</h1>
-            </Flex>
+              </Flex>
             </Link>
-        ) : (
+          ) : (
             <Link to="/">
-            <Flex align="center" className="md:m-4">
+              <Flex align="center" className="md:m-4">
                 <img src="/pwa-64x64.png" alt="Logo" className="mr-4" />
                 <h1 className="text-xl font-bold">MuscleMate</h1>
-            </Flex>
+              </Flex>
             </Link>
-        )}
-            <div className="flex flex-col mb-3 md:mb-0 md:flex-row gap-5 md:gap-10 items-center md:ml-3">
-                {user?.rol === "owner" ? (
-                    <>
-                    <Link to="/owner/my-gyms">
-                        <Button size="4" variant="ghost" color="green">
-                            Mis gimnasios
-                        </Button>
-                    </Link>
-                    <Link to="/owner/equipments">
-                        <Button size="4" variant="ghost" color="green">
-                            Mis máquinas
-                        </Button>
-                    </Link>
-                    <Link to="/owner/users">
-                        <Button size="4" variant="ghost" color="green">
-                            Usuarios
-                        </Button>
-                    </Link>
-                    <Link to="/owner/tickets">
-                        <Button size="4" variant="ghost" color="green">
-                            Tickets
-                        </Button>
-                    </Link>
-                    </>
-                ) : user?.rol === "client" ? (
-                    <>
-                    <Link to="/user/routines">
-                        <Button size="4" variant="ghost" color="green">
-                            Rutinas
-                        </Button>
-                    </Link>
-                    <Link to="/user/add-tickets">
-                        <Button size="4" variant="ghost" color="green">
-                            Crear ticket
-                        </Button>
-                    </Link>
-                    </>
-                ) : null}      
-            </div>
-            </div>
-
-                
-            
-            <div className="flex flex-col md:flex-row gap-3 mb-5 md:mb-0 md:mr-4 items-center">
-                {user ? (
-                    <>
-                    <Link to="/profile">
-                        <Button size="3" variant="surface" color="green">
-                            {user.username}
-                        </Button>
-                    </Link>
-                    <Link to="/">
-                        <Button size="3" variant="solid" color="green" onClick={logoutUser}>
-                            Salir
-                        </Button>
-                    </Link>
-                    </>
-                ) : (
-                    <>
-                    <Link to="/login">
-                            <Button size="2" variant="solid" color="green">
-                                Entrar
-                            </Button>
-                        </Link><Link to="/register-client">
-                                <Button size="2" variant="surface" color="green">
-                                    Registrarse
-                                </Button>
-                            </Link>
-                            </>
-                ) }
-
-                
-                
-                
-            </div>
-        </header>
+          )}
+          <div className="flex ml-auto lg:order-1 gap-4 sm:mb-0 mb-4">
+            {user ? (
+              <>
+                <Link to="/profile">
+                  <Button size="3" variant="surface" color="green">
+                    {user.username}
+                  </Button>
+                </Link>
+                <Link to="/">
+                  <Button
+                    size="3"
+                    variant="solid"
+                    color="green"
+                    onClick={logoutUser}
+                  >
+                    Salir
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button size="2" variant="solid" color="green">
+                    Entrar
+                  </Button>
+                </Link>
+                <Link to="/register-client">
+                  <Button size="2" variant="surface" color="green">
+                    Registrarse
+                  </Button>
+                </Link>
+              </>
+            )}
+            <button className="lg:hidden ml-4 mr-4" onClick={handleMenu}>
+              <svg
+                className="w-7 h-7"
+                fill="#000"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <ul
+            className={`${
+              open ? "max-lg:block" : "max-lg:hidden"
+            } flex lg:ml-12 lg:space-x-4 max-lg:space-y-2 max-lg:w-full`}
+          >
+            {user?.rol === "owner" ? (
+              <>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/my-gyms"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Mis gimnasios
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/equipments"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Mis máquinas
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/users"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Usuarios
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/tickets"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Tickets
+                  </Link>
+                </li>
+              </>
+            ) : user?.rol === "client" ? (
+              <>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/user/routines"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Rutinas
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/user/add-tickets"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Crear ticket
+                  </Link>
+                </li>
+              </>
+            ) : null}
+          </ul>
+        </div>
+      </header>
     );
 };
 
