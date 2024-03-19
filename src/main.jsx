@@ -25,6 +25,7 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
+import PricingPage from "./views/PricingPage/PricingPage";
 
 const ownerRoutes = [
   {
@@ -63,6 +64,10 @@ const ownerRoutes = [
     path: "my-gyms",
     element: <MyGymsOwner />,
   },
+  {
+    path: "pricing",
+    element: <PricingPage />,
+  }
 ];
 
 const userRoutes = [
