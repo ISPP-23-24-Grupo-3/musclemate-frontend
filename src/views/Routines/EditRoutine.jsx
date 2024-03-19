@@ -2,51 +2,66 @@ import {
   Button,
   IconButton,
   Card,
-  Dialog,
   Flex,
   Heading,
   Text,
   TextField,
   Section,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
 import { useForm } from "react-hook-form";
 import { LuPencil } from "react-icons/lu";
+import { useParams } from "react-router-dom";
+import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
-
-const workouts = [
-  {
-    id: 1,
-    name: "Press de banca",
-    sets: 4,
-    reps: 3,
-    weight: 12,
-    machine: "Press de banca",
-  },
-  {
-    id: 2,
-    name: "Extensiones de triceps",
-    sets: 4,
-    reps: 3,
-    weight: 24,
-    machine: "Polea",
-  },
-];
+import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
+import AuthContext from "../../utils/context/AuthContext";
+import { fetchClient } from "../../utils/functions/fetchUser";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
-    name: "Routine 1",
-    workouts,
+    name: "",
   });
+
+  const [workouts, set_workouts] = useState([]);
   const [hide_form, set_hide_form] = useState(true);
   const [editing_name, set_editing_name] = useState(false);
+  const [client, set_client] = useState({});
+  const { user } = useContext(AuthContext);
+  console.log(client.name);
 
-  const updateName = (name) => setRoutine({ ...routine, name: name });
-  const updateWorkouts = (workouts) =>
-    setRoutine({ ...routine, workouts: workouts });
+  const routineId = useParams().id;
+  const updateName = (name) => {
+    const prevRoutine = { ...routine };
+    const tempRoutine = { ...routine, name: name };
+    setRoutine({ tempRoutine });
+    putToApi("routines/update/" + routine.id + "/", tempRoutine)
+      .then((r) => r.json())
+      .then((updatedRoutine) => setRoutine(updatedRoutine))
+      .catch(setRoutine(prevRoutine));
+  };
+
+  useEffect(() => {
+    const fetchWorkouts = async (routineId) => {
+      const response = await getFromApi("workouts/");
+      const fetchedWorkouts = await response.json();
+      return fetchedWorkouts.filter((w) => w.routine === routineId);
+    };
+    const fetchRoutine = async (id) => {
+      const response = await getFromApi(`routines/`);
+      const fetchedRoutines = await response.json();
+      const fetchedRoutine = fetchedRoutines.find((r) => r.id == id);
+      return fetchedRoutine;
+    };
+
+    fetchWorkouts(routineId).then((w) => set_workouts(w));
+    fetchRoutine(routineId).then((r) => setRoutine(r));
+    fetchClient(user.username).then((c) => set_client(c));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routineId]);
 
   const { register, handleSubmit, setValue } = useForm();
 
@@ -103,38 +118,24 @@ export const EditRoutine = () => {
         <Heading as="h2">Ejercicios</Heading>
         <Flex direction="column" gap="3" className="mt-4">
           <EditableWorkout
-            workouts={routine.workouts}
-            editWorkout={updateWorkouts}
+            workouts={workouts}
+            editWorkout={set_workouts}
             hideForm={hide_form}
             setHideForm={set_hide_form}
+            client={client}
+            routine={routine}
           />
-          <WorkoutList workouts={routine.workouts} />
+          <WorkoutList workouts={workouts} />
         </Flex>
       </Section>
     </>
   );
 };
 
-const EditDialog = ({ updateRoutine }) => {
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger>
-        <Button size="1">Editar nombre</Button>
-      </Dialog.Trigger>
-      <Dialog.Content>
-        <TextField.Input
-          placeholder="Nombre de la rutina"
-          onChange={updateRoutine}
-        ></TextField.Input>
-        <Text>Hola</Text>
-      </Dialog.Content>
-    </Dialog.Root>
-  );
-};
-
 const WorkoutList = ({ workouts }) => {
   return (
     <>
+      <Info message="No tienes ningún ejercicio registrado" />
       {workouts.map((workout) => (
         <Card key={workout.id}>
           <Flex justify="between">
@@ -175,13 +176,39 @@ WorkoutList.propTypes = {
       sets: PropTypes.number,
       reps: PropTypes.number,
       weigth: PropTypes.number,
-    }),
+    })
   ),
 };
 
-const EditableWorkout = ({ workouts, editWorkout, hideForm, setHideForm }) => {
+const EditableWorkout = ({
+  workouts,
+  editWorkout,
+  hideForm,
+  setHideForm,
+  client,
+  routine,
+}) => {
+  const addWorkout = (workout) => {
+    const temp_workout = { ...workout, temp_id: Date.now() };
+    editWorkout([temp_workout, ...workouts]);
+
+    postToApi("workouts/create/", workout)
+      .then((r) => r.json())
+      .then((postedWorkout) =>
+        editWorkout(
+          workouts.map((w) =>
+            w.temp_id == temp_workout.temp_id ? postedWorkout : w
+          )
+        )
+      )
+      .catch(
+        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id))
+      );
+  };
+
   const onSubmit = (data) => {
-    editWorkout([data, ...workouts]);
+    addWorkout(data);
+
     setHideForm(true);
     reset();
   };
@@ -191,7 +218,12 @@ const EditableWorkout = ({ workouts, editWorkout, hideForm, setHideForm }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    values: {
+      client: client.id,
+      routine: routine.name,
+    },
+  });
 
   return (
     <>
