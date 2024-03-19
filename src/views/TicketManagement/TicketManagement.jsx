@@ -17,7 +17,7 @@ const TicketManagement = () => {
         if (response.ok) {
           const data = await response.json();
           setAllTickets(data);
-          setFilteredTickets(data);
+          setFilteredTickets(data.sort((a, b) => new Date(b.date) - new Date(a.date))); // Ordenar por fecha
           setApiDataLoaded(true);
         } else {
           console.error("Error fetching API tickets:", response.status);
@@ -37,7 +37,7 @@ const TicketManagement = () => {
         ticket.gym_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ticket.equipment_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredTickets(filtered);
+    setFilteredTickets(filtered.sort((a, b) => new Date(b.date) - new Date(a.date))); // Ordenar por fecha
   }, [searchTerm, allTickets]);
 
   const toggleStatus = async (ticketId) => {
@@ -143,12 +143,12 @@ const TicketManagement = () => {
                         </span>
                       </p>
                     </div>
-                    <div>
-                      <p className="text-radixgreen font-bold mb-1">
-                        Gimnasio:{" "}
-                        <span className="text-black">{ticket.gym_name}</span>
-                      </p>
-                    </div>
+                  </div>
+                  <div>
+                    <p className="text-radixgreen font-bold mb-1">
+                      Gimnasio:{" "}
+                      <span className="text-black">{ticket.gym_name}</span>
+                    </p>
                   </div>
                   <div className="flex">
                     <div className="mr-4">
