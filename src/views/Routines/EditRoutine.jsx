@@ -45,7 +45,11 @@ export const EditRoutine = () => {
     const fetchWorkouts = async (routineId) => {
       const response = await getFromApi("workouts/");
       const fetchedWorkouts = await response.json();
-      return fetchedWorkouts.filter((w) => w.routine === routineId);
+      console.log(fetchedWorkouts);
+      return fetchedWorkouts.filter((w) =>
+        // Array.includes does not cover the case of having string inputs and numbers inside the array
+        w.routine.some((r) => r == routineId),
+      );
     };
     const fetchRoutine = async (id) => {
       const response = await getFromApi(`routines/`);
@@ -137,7 +141,9 @@ export const EditRoutine = () => {
 const WorkoutList = ({ workouts }) => {
   return (
     <>
-      <Info message="No tienes ningún ejercicio registrado" />
+      {workouts.length == 0 && (
+        <Info message="No tienes ningún ejercicio registrado" />
+      )}
       {workouts.map((workout) => (
         <Card key={workout.id}>
           <Flex justify="between">
@@ -240,47 +246,6 @@ const EditableWorkout = ({
                 className={`${errors.name && "!border-red-500"}`}
               ></TextField.Input>
             </Flex>
-            <div className="flex place-content-around w-3/5">
-              <Flex direction="column items-center" className="flex-1">
-                <Text weight="bold">Sets</Text>
-                <TextField.Input
-                  type="number"
-                  min="0"
-                  name="sets"
-                  color={errors.sets && "red"}
-                  className={`!w-20 ${errors.sets && "!border-red-500"}`}
-                  {...register("sets", { required: true })}
-                ></TextField.Input>
-              </Flex>
-              <Flex direction="column items-center" className="flex-1">
-                <Text weight="bold">Repeticiones</Text>
-                <TextField.Input
-                  name="reps"
-                  type="number"
-                  min="0"
-                  color={errors.reps && "red"}
-                  className={`!w-20 ${errors.reps && "!border-red-500"}`}
-                  {...register("reps", {
-                    valueAsNumber: "true",
-                    required: true,
-                  })}
-                ></TextField.Input>
-              </Flex>
-              <Flex direction="column items-center" className="flex-1">
-                <Text weight="bold">Peso</Text>
-                <TextField.Input
-                  name="weight"
-                  type="number"
-                  min="0"
-                  color={errors.weight && "red"}
-                  className={`!w-20 ${errors.weight && "!border-red-500"}`}
-                  {...register("weight", {
-                    valueAsNumber: true,
-                    required: false,
-                  })}
-                ></TextField.Input>
-              </Flex>
-            </div>
             <div className="w-1/5 items-end flex flex-col">
               <Text weight="bold">Máquina</Text>
               <Select.Root>
@@ -291,13 +256,11 @@ const EditableWorkout = ({
                       {e.name}
                     </Select.Item>
                   ))}
-                  {/* <Select.Item value="1">Prueba 1</Select.Item> */}
-                  {/* <Select.Item value="2">Prueba 2</Select.Item> */}
                 </Select.Content>
               </Select.Root>
             </div>
           </Flex>
-          <Button className="!mt-3">Finish editing</Button>
+          <Button className="!mt-3">Aceptar</Button>
         </Card>
       </form>
     </>
