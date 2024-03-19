@@ -75,35 +75,88 @@ const userRoutes = [
 ];
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
       {
         path: "/",
-        element: <App />,
+        element: <AuthProvider />,
+        children: [
+          {
+            path: "/",
+            element: <MainLayout />,
+            children: [
+              {
+                path: "/",
+                element: <App />,
+              },
+              {
+                path: "/login",
+                element: <Login />,
+              },
+              {
+                path: "/register-client",
+                element: <RegisterClient/>,
+              },
+              {
+                path: "/",
+                element: <OwnerRoute />,
+                children: [
+                  {
+                    path: "/register-user",
+                    element: <RegisterUser />,
+                  },
+                  {
+                    path: "/my-machines",
+                    element: <MachineList />,
+                  },
+                  {
+                    path: "/add-machine",
+                    element: <GymMachineForm/>,
+                  },
+                  {
+                    path: "/users",
+                    element: <Users />,
+                  },
+                  {
+                    path: "/owner-home",
+                    element: <OwnerHomePage />,
+                  },
+                  {
+                    path: "/equipment-details/:id",
+                    element: <EquipmentDetails />,
+                  },
+                ],
+              },
+              {
+                path: "/",
+                element: <UserRoute />,
+                children: [
+                  { path: "/routines/:id/edit", element: <EditRoutine /> },
+                  { path: "/routines/new", element: <EditRoutine /> },
+                  { path: "/routines/", element: <Routines /> },
+                  { path: "/events/", element: <EventList /> },
+                ],
+              },
+              {
+                path: "/equipment-details/:id",
+                element: <EquipmentDetails />,
+              },
+              {
+                path: "/users/:userId/profile",
+                element: <Profile />,
+              },
+            ],
+          },
+          {
+            path: "/",
+            element: <UserRoute />,
+            children: [
+              { path: "/routines/:id/edit", element: <EditRoutine /> },
+              { path: "/routines/new", element: <EditRoutine /> },
+              { path: "/routines/", element: <Routines /> },
+            ],
+          },
+          
+        ],
       },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register-client",
-        element: <RegisterClient />,
-      },
-      {
-        path: "/owner",
-        element: <OwnerRoute />,
-        children: ownerRoutes,
-      },
-      {
-        path: "/user",
-        element: <UserRoute />,
-        children: userRoutes,
-      },
-    ],
-    errorElement: <ErrorPage />,
-  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
