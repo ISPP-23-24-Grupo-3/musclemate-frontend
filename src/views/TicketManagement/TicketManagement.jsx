@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
 import { Heading, TextField } from "@radix-ui/themes";
@@ -9,6 +9,8 @@ const TicketManagement = () => {
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ticketsPerPage] = useState(4);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -31,7 +33,7 @@ const TicketManagement = () => {
   }, []);
 
   useEffect(() => {
-    // Filtrar los tickets según el término de búsqueda
+    
     const filtered = allTickets.filter(
       (ticket) =>
         ticket.gym_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -39,6 +41,14 @@ const TicketManagement = () => {
     );
     setFilteredTickets(filtered.sort((a, b) => new Date(b.date) - new Date(a.date))); // Ordenar por fecha
   }, [searchTerm, allTickets]);
+
+  
+  const indexOfLastTicket = currentPage * ticketsPerPage;
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
+  const currentTickets = filteredTickets.slice(indexOfFirstTicket, indexOfLastTicket);
+
+  
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const toggleStatus = async (ticketId) => {
     try {
@@ -64,9 +74,7 @@ const TicketManagement = () => {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
         const updatedTicket = await response.json();
-        console.log(updatedTicket);
-        updatedTicket.status = checked; // Actualiza el estado del ticket
-        // Realiza la solicitud PUT para actualizar el estado en la base de datos
+        updatedTicket.status = checked; 
         const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
           label: updatedTicket.label,
           description: updatedTicket.description,
@@ -76,7 +84,7 @@ const TicketManagement = () => {
           status: updatedTicket.status,
         });
         if (updateResponse.ok) {
-          // Si la actualización en la base de datos es exitosa, actualiza el estado localmente
+          
           setAllTickets((prevTickets) =>
             prevTickets.map((ticket) =>
               ticket.id === ticketId ? updatedTicket : ticket
@@ -120,17 +128,15 @@ const TicketManagement = () => {
         </TextField.Root>
       </div>
       <ul>
-        {apiDataLoaded && filteredTickets.length > 0 ? (
-          filteredTickets.map((ticket) => (
+        {apiDataLoaded && currentTickets.length > 0 ? (
+          currentTickets.map((ticket) => (
             <li
               key={ticket.id}
               className="bg-white shadow-md p-4 rounded-md mb-4"
             >
               <div className="flex items-center mb-2">
                 <HiTicket
-                  className={`text-${
-                    ticket.status ? "green" : "red"
-                  }-500 w-6 h-6 mr-2 cursor-pointer`}
+                  className={`text-${ticket.status ? "green" : "red"}-500 w-6 h-6 mr-2 cursor-pointer`}
                   onClick={() => toggleStatus(ticket.id)}
                 />
                 <div>
@@ -207,6 +213,42 @@ const TicketManagement = () => {
           <p className="text-red-500">No hay tickets disponibles.</p>
         )}
       </ul>
+      {/* Agregar controles de paginación */}
+      <div className="flex justify-center mt-4">
+        <ul className="flex">
+          <li className="mr-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+            >
+              Anterior
+            </button>
+          </li>
+          {filteredTickets.length > 0 &&
+            Array.from({ length: Math.ceil(filteredTickets.length / ticketsPerPage) }, (_, i) => (
+              <li key={i} className="mr-2">
+                <button
+                  onClick={() => paginate(i + 1)}
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === i + 1 ? "bg-radixgreen text-white" : "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))}
+          <li>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === Math.ceil(filteredTickets.length / ticketsPerPage)}
+              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+            >
+              Siguiente
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };
