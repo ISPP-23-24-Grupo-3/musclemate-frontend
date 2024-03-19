@@ -11,7 +11,7 @@ import {
 } from "@radix-ui/themes";
 import { useContext, useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
-import { CgGym } from "react-icons/cg";
+import { CgGym, CgTrash } from "react-icons/cg";
 import { FaPlus } from "react-icons/fa";
 import { LuPencil } from "react-icons/lu";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
@@ -19,7 +19,12 @@ import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 
 import PropTypes from "prop-types";
-import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
+import {
+  deleteFromApi,
+  getFromApi,
+  postToApi,
+  putToApi,
+} from "../../utils/functions/api";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
@@ -131,14 +136,28 @@ export const EditRoutine = () => {
             routine={routine}
             equipment={equipment}
           />
-          <WorkoutList workouts={workouts} equipments={equipment} />
+          <WorkoutList
+            workouts={workouts}
+            equipments={equipment}
+            set_workouts={set_workouts}
+          />
         </Flex>
       </Section>
     </>
   );
 };
 
-const WorkoutList = ({ workouts, equipments }) => {
+const WorkoutList = ({ workouts, equipments, set_workouts }) => {
+  const deleteWorkout = (workout) => {
+    deleteFromApi("workouts/delete/" + workout.id + "/").then((r) => {
+      if (r.ok) {
+        set_workouts((c_workouts) =>
+          c_workouts.filter((w) => w.id != workout.id),
+        );
+      }
+    });
+  };
+
   const getEquipmentName = (equipment_id) => {
     if (equipments.length == 0) return;
     return equipments.find((e) => e.id == equipment_id).name;
@@ -151,18 +170,29 @@ const WorkoutList = ({ workouts, equipments }) => {
       )}
       {workouts.map((workout) => (
         <Card key={workout.id}>
-          <Flex justify="between">
-            <Flex direction="column" className="w-1/5">
-              <Text weight="bold">Ejercicio</Text>
-              <Text>{workout.name}</Text>
-            </Flex>
-            <Flex direction="column" className="w-1/5 items-end">
-              <Text weight="bold">Máquinas</Text>
-              {workout.equipment.map((e) => (
-                <span key={e}>{getEquipmentName(e)}</span>
-              ))}
-            </Flex>
-          </Flex>
+          <div className="flex gap-5 items-center">
+            <div className="flex justify-between grow">
+              <Flex direction="column" className="w-1/5">
+                <Text weight="bold">Ejercicio</Text>
+                <Text>{workout.name}</Text>
+              </Flex>
+              <Flex direction="column" className="w-1/5 items-end">
+                <Text weight="bold">Máquinas</Text>
+                {workout.equipment.map((e) => (
+                  <span key={e}>{getEquipmentName(e)}</span>
+                ))}
+              </Flex>
+            </div>
+            <IconButton
+              size="3"
+              radius="full"
+              color="red"
+              variant="outline"
+              onClick={() => deleteWorkout(workout)}
+            >
+              <CgTrash className="size-6" />
+            </IconButton>
+          </div>
         </Card>
       ))}
     </>
