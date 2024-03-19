@@ -213,6 +213,8 @@ export default function EquipmentDetails() {
           const filteredTickets = data.filter(
             (ticket) => ticket.equipment_name === machineDetails?.name
           );
+          // Ordenar los tickets por fecha
+          filteredTickets.sort((a, b) => new Date(b.date) - new Date(a.date));
           setApiTickets(filteredTickets);
           setApiDataLoaded(true);
         } else {
@@ -222,11 +224,12 @@ export default function EquipmentDetails() {
         console.error("Error fetching API tickets:", error);
       }
     };
-
+  
     if (machineDetails?.name) {
       fetchTickets();
     }
   }, [machineDetails]);
+  
 
   const indexOfLastTicket = currentPage * ticketsPerPage;
   const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
