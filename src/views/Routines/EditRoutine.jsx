@@ -46,7 +46,6 @@ export const EditRoutine = () => {
     const fetchWorkouts = async (routineId) => {
       const response = await getFromApi("workouts/");
       const fetchedWorkouts = await response.json();
-      console.log(fetchedWorkouts);
       return fetchedWorkouts.filter((w) =>
         // Array.includes does not cover the case of having string inputs and numbers inside the array
         w.routine.some((r) => r == routineId),
@@ -132,14 +131,19 @@ export const EditRoutine = () => {
             routine={routine}
             equipment={equipment}
           />
-          <WorkoutList workouts={workouts} />
+          <WorkoutList workouts={workouts} equipments={equipment} />
         </Flex>
       </Section>
     </>
   );
 };
 
-const WorkoutList = ({ workouts }) => {
+const WorkoutList = ({ workouts, equipments }) => {
+  const getEquipmentName = (equipment_id) => {
+    if (equipments.length == 0) return;
+    return equipments.find((e) => e.id == equipment_id).name;
+  };
+
   return (
     <>
       {workouts.length == 0 && (
@@ -154,7 +158,9 @@ const WorkoutList = ({ workouts }) => {
             </Flex>
             <Flex direction="column" className="w-1/5 items-end">
               <Text weight="bold">Máquinas</Text>
-              <Text>{workout.machine}</Text>
+              {workout.equipment.map((e) => (
+                <span key={e}>{getEquipmentName(e)}</span>
+              ))}
             </Flex>
           </Flex>
         </Card>
@@ -206,7 +212,6 @@ const EditableWorkout = ({
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     addWorkout(data);
 
     setHideForm(true);
