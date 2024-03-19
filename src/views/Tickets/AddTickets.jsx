@@ -23,14 +23,17 @@ const AddTickets = () => {
       });
       if (response.ok) {
         setSuccessMessage("Ticket creado exitosamente");
+        setErrorMessage(""); // Limpiar el mensaje de error si la solicitud es exitosa
         setLabel("");
         setDescription("");
         setEquipmentId("");
       } else {
         setErrorMessage("Error al crear el ticket. Por favor, inténtelo de nuevo más tarde.");
+        setSuccessMessage(""); // Limpiar el mensaje de éxito si hay un error
       }
     } catch (error) {
       setErrorMessage("Error de red o del servidor. Por favor, inténtelo de nuevo más tarde.");
+      setSuccessMessage(""); // Limpiar el mensaje de éxito si hay un error
     }
   };
 
