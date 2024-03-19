@@ -207,7 +207,7 @@ export default function MachineList() {
           </Popover.Root>
         </div>
         
-        <Link to="/add-machine">
+        <Link to="equipments/add">
         <Button size="3">
           <IoMdAddCircleOutline className="size-6" />
           Añadir máquina
