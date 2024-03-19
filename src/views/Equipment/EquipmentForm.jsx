@@ -58,7 +58,7 @@ const GymMachineForm = () => {
       }
   
       console.log('Máquina agregada exitosamente');
-      navigate('/equipments')
+      navigate('/owner/equipments')
     } catch (error) {
       console.error('Hubo un error al agregar la máquina:', error);
     }

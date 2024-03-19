@@ -207,12 +207,15 @@ export default function MachineList() {
           </Popover.Root>
         </div>
         
-        <Link to="/add">
-        <Button size="3">
-          <IoMdAddCircleOutline className="size-6" />
-          Añadir máquina
-        </Button>
+        <Link to="add">
+          <Button size="3" className="w-full">
+            <IoMdAddCircleOutline className="size-6" />
+            Añadir máquina
+          </Button>
         </Link>
+
+
+
         {filtered_machine_list.map((machine) => {
           const ratings = machine?.reviews?.map((review) => review.rating);
           const avg_rating =
