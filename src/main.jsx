@@ -14,7 +14,6 @@ import OwnerRoute from "./components/OwnerRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import Users from "./views/UserListing/Users";
 import Profile from "./views/UserListing/Profile";
-import EventList from "./views/EventsClasses/EventList";
 import EquipmentList from "./views/Equipment/EquipmentList";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
@@ -26,6 +25,7 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
+import EventList from "./views/EventsClasses/EventList";
 
 const ownerRoutes = [
   {
@@ -43,6 +43,10 @@ const ownerRoutes = [
   {
     path: "users/:userId/profile",
     element: <Profile />,
+  },
+  {
+    path: "events",
+    element: <EventList />,
   },
   {
     path: "equipments",
@@ -75,88 +79,35 @@ const userRoutes = [
 ];
 
 const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
       {
         path: "/",
-        element: <AuthProvider />,
-        children: [
-          {
-            path: "/",
-            element: <MainLayout />,
-            children: [
-              {
-                path: "/",
-                element: <App />,
-              },
-              {
-                path: "/login",
-                element: <Login />,
-              },
-              {
-                path: "/register-client",
-                element: <RegisterClient/>,
-              },
-              {
-                path: "/",
-                element: <OwnerRoute />,
-                children: [
-                  {
-                    path: "/register-user",
-                    element: <RegisterUser />,
-                  },
-                  {
-                    path: "/my-machines",
-                    element: <MachineList />,
-                  },
-                  {
-                    path: "/add-machine",
-                    element: <GymMachineForm/>,
-                  },
-                  {
-                    path: "/users",
-                    element: <Users />,
-                  },
-                  {
-                    path: "/owner-home",
-                    element: <OwnerHomePage />,
-                  },
-                  {
-                    path: "/equipment-details/:id",
-                    element: <EquipmentDetails />,
-                  },
-                ],
-              },
-              {
-                path: "/",
-                element: <UserRoute />,
-                children: [
-                  { path: "/routines/:id/edit", element: <EditRoutine /> },
-                  { path: "/routines/new", element: <EditRoutine /> },
-                  { path: "/routines/", element: <Routines /> },
-                  { path: "/events/", element: <EventList /> },
-                ],
-              },
-              {
-                path: "/equipment-details/:id",
-                element: <EquipmentDetails />,
-              },
-              {
-                path: "/users/:userId/profile",
-                element: <Profile />,
-              },
-            ],
-          },
-          {
-            path: "/",
-            element: <UserRoute />,
-            children: [
-              { path: "/routines/:id/edit", element: <EditRoutine /> },
-              { path: "/routines/new", element: <EditRoutine /> },
-              { path: "/routines/", element: <Routines /> },
-            ],
-          },
-          
-        ],
+        element: <App />,
       },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register-client",
+        element: <RegisterClient />,
+      },
+      {
+        path: "/owner",
+        element: <OwnerRoute />,
+        children: ownerRoutes,
+      },
+      {
+        path: "/user",
+        element: <UserRoute />,
+        children: userRoutes,
+      },
+    ],
+    errorElement: <ErrorPage />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

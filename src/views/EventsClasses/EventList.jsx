@@ -58,6 +58,7 @@ const EventList = () => {
   const handleEventClick = (eventId) => {
     const selected = events.find((event) => event.id === eventId);
     setSelectedEvent(selected);
+
   };
 
   const handleClosePopover = () => {
@@ -84,7 +85,7 @@ const EventList = () => {
         if(filters.date !== ''){
           const filterDate = new Date(filters.date);
           const eventDate = new Date(event.date);
-          return filterDate.toDateString()==eventDate.toDateString();
+          return filterDate.toDateString()===eventDate.toDateString();
 
         }else{
           return true;
@@ -192,7 +193,8 @@ const EventList = () => {
         </div>
 
         {filteredEventList.map((event) => (
-          <Link to={`/event-details/${event.id}`} key={event.id}>
+          <Popover.Root>
+            <Popover.Trigger>
             <Button
               size="3"
               onClick={() => handleEventClick(event.id)}
@@ -208,27 +210,22 @@ const EventList = () => {
                 <span>Intensidad: {event.intensity}</span>
               </div>
             </Button>
-          </Link>
-        ))}
-        {selectedEvent && (
-          <Popover.Root onOpenChange={(isOpen) => isOpen && setSelectedEvent(null)}>
-            <Popover.Anchor>
-              <button>Mostrar detalles</button>
-            </Popover.Anchor>
-            <Popover.Content>
+            </Popover.Trigger>
+            <Popover.Content side="bottom">
               <div className="bg-white border border-gray-200 rounded-md p-4">
-                <p>Nombre: {selectedEvent.name}</p>
-                <p>Descripción: {selectedEvent.description}</p>
-                <p>Capacidad: {selectedEvent.capacity}</p>
-                <p>Instructor: {selectedEvent.instructor}</p>
-                <p>Fecha: {selectedEvent.date}</p>
-                <p>Duración: {selectedEvent.duration}</p>
-                <p>Intensidad: {selectedEvent.intensity}</p>
-                <Button size="1" onClick={handleClosePopover}>Cerrar</Button>
+                <p>Nombre: {selectedEvent!==null?selectedEvent.name:""}</p>
+                <p>Descripción: {selectedEvent!==null?selectedEvent.description:""}</p>
+                <p>Capacidad: {selectedEvent!==null?selectedEvent.capacity:""}</p>
+                <p>Instructor: {selectedEvent!==null?selectedEvent.instructor:""}</p>
+                <p>Fecha: {selectedEvent!==null?selectedEvent.date:""}</p>
+                <p>Duración: {selectedEvent!==null?selectedEvent.duration:""}</p>
+                <p>Intensidad: {selectedEvent!==null?selectedEvent.intensity:""}</p>
               </div>
             </Popover.Content>
           </Popover.Root>
-        )}
+        ))}
+          
+            
       </div>
     </>
   );
