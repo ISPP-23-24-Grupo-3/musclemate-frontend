@@ -12,8 +12,9 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym } from "react-icons/cg";
-import { useForm } from "react-hook-form";
+import { FaPlus } from "react-icons/fa";
 import { LuPencil } from "react-icons/lu";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 
@@ -76,11 +77,11 @@ export const EditRoutine = () => {
       <Section className="!pt-1">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Heading className={editing_name && "hidden"}>
+            <Heading className={editing_name ? "hidden" : undefined}>
               {routine.name}
             </Heading>
             <form
-              className={`${!editing_name && "hidden"} flex gap-5`}
+              className={`${!editing_name ? "hidden" : undefined} flex gap-5`}
               onSubmit={handleSubmit((r) => {
                 updateName(r.name);
                 set_editing_name(false);
@@ -90,7 +91,7 @@ export const EditRoutine = () => {
               <Button>Aceptar</Button>
             </form>
             <IconButton
-              className={editing_name && "!hidden"}
+              className={editing_name ? "!hidden" : undefined}
               radius="full"
               onClick={() => {
                 set_editing_name(true);
@@ -142,7 +143,7 @@ const WorkoutList = ({ workouts }) => {
   return (
     <>
       {workouts.length == 0 && (
-        <Info message="No tienes ningún ejercicio registrado" />
+        <Info size="3" message="No tienes ningún ejercicio registrado" />
       )}
       {workouts.map((workout) => (
         <Card key={workout.id}>
@@ -151,22 +152,8 @@ const WorkoutList = ({ workouts }) => {
               <Text weight="bold">Ejercicio</Text>
               <Text>{workout.name}</Text>
             </Flex>
-            <div className="flex place-content-around w-3/5">
-              <Flex direction="column items-center">
-                <Text weight="bold">Sets</Text>
-                <Text>{workout.sets}</Text>
-              </Flex>
-              <Flex direction="column items-center">
-                <Text weight="bold">Repeticiones</Text>
-                <Text>{workout.reps}</Text>
-              </Flex>
-              <Flex direction="column items-center">
-                <Text weight="bold">Peso</Text>
-                <Text>{workout.weight}</Text>
-              </Flex>
-            </div>
             <Flex direction="column" className="w-1/5 items-end">
-              <Text weight="bold">Máquina</Text>
+              <Text weight="bold">Máquinas</Text>
               <Text>{workout.machine}</Text>
             </Flex>
           </Flex>
@@ -197,10 +184,14 @@ const EditableWorkout = ({
   equipment,
 }) => {
   const addWorkout = (workout) => {
-    const temp_workout = { ...workout, temp_id: Date.now() };
+    const parsed_workout = {
+      ...workout,
+      equipment: workout.equipment.map((e) => e.value),
+    };
+    const temp_workout = { ...parsed_workout, temp_id: Date.now() };
     editWorkout([temp_workout, ...workouts]);
 
-    postToApi("workouts/create/", workout)
+    postToApi("workouts/create/", parsed_workout)
       .then((r) => r.json())
       .then((postedWorkout) =>
         editWorkout(
@@ -215,6 +206,7 @@ const EditableWorkout = ({
   };
 
   const onSubmit = (data) => {
+    console.log(data);
     addWorkout(data);
 
     setHideForm(true);
@@ -225,16 +217,25 @@ const EditableWorkout = ({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm({
     values: {
       routine: [routine.id],
+      equipment: [],
     },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "equipment",
   });
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className={hideForm && "hidden"}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={hideForm ? "hidden" : undefined}
+      >
         <Card>
           <Flex justify="between">
             <Flex direction="column" className="w-1/5">
@@ -243,24 +244,49 @@ const EditableWorkout = ({
                 name="name"
                 {...register("name", { required: true })}
                 color={errors.name && "red"}
-                className={`${errors.name && "!border-red-500"}`}
+                className={`${errors.name ? "!border-red-500" : undefined}`}
               ></TextField.Input>
             </Flex>
-            <div className="w-1/5 items-end flex flex-col">
-              <Text weight="bold">Máquina</Text>
-              <Select.Root>
-                <Select.Trigger placeholder="Selecciona una máquina" />
-                <Select.Content>
-                  {equipment.map((e) => (
-                    <Select.Item key={e.id} value={"" + e.id}>
-                      {e.name}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
+            <div className="w-1/5 items-end flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <IconButton
+                  type="button"
+                  radius="full"
+                  size="1"
+                  onClick={() => append({ value: undefined })}
+                >
+                  <FaPlus className="size-3" />
+                </IconButton>
+                <Text weight="bold">Máquina</Text>
+              </div>
+              {fields.map((f, index) => (
+                <Controller
+                  key={f.id}
+                  control={control}
+                  name={`equipment.${index}.value`}
+                  render={({ field: { onChange, value, defaultValue } }) => (
+                    <Select.Root
+                      onValueChange={onChange}
+                      value={value}
+                      defaultValue={defaultValue}
+                    >
+                      <Select.Trigger placeholder="Selecciona una máquina" />
+                      <Select.Content>
+                        {equipment.map((e) => (
+                          <Select.Item key={e.id} value={"" + e.id}>
+                            {e.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
+              ))}
             </div>
           </Flex>
-          <Button className="!mt-3">Aceptar</Button>
+          <Button className="!mt-3" type="submit">
+            Aceptar
+          </Button>
         </Card>
       </form>
     </>
