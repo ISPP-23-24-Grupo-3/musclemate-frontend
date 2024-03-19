@@ -9,7 +9,7 @@ import { HiTicket } from "react-icons/hi";
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
-  const [gymName, setGymName] = useState(null);
+  const [gymName, setGymName] = useState("No disponible"); // Cambio aquí
   const [error, setError] = useState(null);
 
   const [apiTickets, setApiTickets] = useState([]);
@@ -59,12 +59,31 @@ export default function EquipmentDetails() {
   useEffect(() => {
     getFromApi("equipments/detail/" + equipmentId + "/")
       .then((response) => {
-        // console.log(response);
         return response.json();
       })
       .then((data) => {
-        // console.log(data);
         setMachineDetails(data);
+        // Cambio aquí para obtener el nombre del gimnasio
+        if (data.gym) {
+          const gymId = data.gym;
+          getFromApi(`gyms/detail/${gymId}/`)
+            .then((response) => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error("Nombre de gimnasio no disponible");
+              }
+            })
+            .then((gymData) => {
+              setGymName(gymData.name);
+            })
+            .catch((error) => {
+              setGymName(error.message);
+            });
+        }
+      })
+      .catch((error) => {
+        setError("No se encontró la máquina con la ID proporcionada.");
       });
   }, [equipmentId]);
 
@@ -164,7 +183,7 @@ export default function EquipmentDetails() {
           // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
           if (data.gym) {
             const gymId = data.gym;
-            const gymResponse = await getFromApi(`gyms/${gymId}/`);
+            const gymResponse = await getFromApi(`gyms/detail/${gymId}/`);
             if (gymResponse.ok) {
               const gymData = await gymResponse.json();
               setGymName(gymData.name);
@@ -342,92 +361,8 @@ export default function EquipmentDetails() {
             }}
           >
             <Rating rating={actualRating} />
-            <Button
-              onClick={() => setValuationOn(!valuationOn)}
-              className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-            >
-              {valuationOn ? "Volver" : "Valorar"}
-            </Button>
           </div>
         </div>
-
-        {actualRating}
-
-        {valuationOn && (
-          /*isClient*/ <div>
-            <div className="mb-4">
-              <strong className="text-radixgreen">Su Valoración:</strong>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Rating rating={newRating} />
-
-                <TextField.Input
-                  type="number"
-                  value={newRating}
-                  onChange={(e) => {
-                    e.target.value > 5
-                      ? (e.target.value = 5)
-                      : e.target.value < 0
-                      ? (e.target.value = 0)
-                      : e.target.value;
-                    setNewRating(e.target.value);
-                  }}
-                  min="0"
-                  max="5"
-                  step="0.5"
-                  className="w-16"
-                />
-
-                {machineRatings.length > 0 ? (
-                  <p className="text-radixgreen">
-                    Valoraciones: {machineRatings.length} {machineRatings}
-                  </p>
-                ) : (
-                  <p className="text-radixgreen">Sin valoraciones</p>
-                )}
-
-                <Button
-                  onClick={() => {
-                    newRate();
-                    setValuationOn(false);
-                  }}
-                  className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-                >
-                  Actualizar valoración
-                </Button>
-
-                {/* <Button onClick={async () => {
-                  const assessments = await getFromApi('assessments');
-                  const existingAssessment = assessments.find(assessment => assessment.client === clientId);
-
-                  if (existingAssessment) {
-                    putToApi('assessments/update/'+ existingAssessment.id, {
-                      id: existingAssessment.id,
-                      stars: newRating,
-                      equipment: Number(equipmentId),
-                      client: clientId
-                    });
-                  } else {
-                    postToApi('assessments/create', {
-                      stars: newRating,
-                      equipment: Number(equipmentId),
-                      client: client.id
-                    });
-                  }
-                  newRate();
-                  setValuationOn(false);
-                }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
-                  Enviar Valoración
-                </Button>  */}
-              </div>
-            </div>
-          </div>
-        )}
 
         {editMode && (
           <div className="mt-4 text-center">
@@ -480,10 +415,10 @@ export default function EquipmentDetails() {
                       <span className="text-black">
                         {ticket.client.name} {ticket.client.lastName}
                       </span>
-                      <span className="ml-7">
+                    </p>
+                    <p className="text-radixgreen font-bold mb-1">
                         Asunto:{" "}
                         <span className="text-black">{ticket.label}</span>
-                      </span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
                       Descripción:{" "}
