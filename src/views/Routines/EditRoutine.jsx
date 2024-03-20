@@ -33,6 +33,7 @@ export const EditRoutine = () => {
     name: "",
   });
 
+  const [other_workouts, set_other_workouts] = useState([]);
   const [workouts, set_workouts] = useState([]);
   const [hide_form, set_hide_form] = useState(true);
   const [editing_name, set_editing_name] = useState(false);
@@ -53,6 +54,9 @@ export const EditRoutine = () => {
     const fetchWorkouts = async (routineId) => {
       const response = await getFromApi("workouts/");
       const fetchedWorkouts = await response.json();
+      set_other_workouts(
+        fetchedWorkouts.filter((w) => w.routine.some((r) => r != routineId)),
+      );
       return fetchedWorkouts.filter((w) =>
         // Array.includes does not cover the case of having string inputs and numbers inside the array
         w.routine.some((r) => r == routineId),
@@ -137,12 +141,14 @@ export const EditRoutine = () => {
             setHideForm={set_hide_form}
             routine={routine}
             equipment={equipment}
+            other_workouts={other_workouts}
           />
           <WorkoutList
             workouts={workouts}
             equipments={equipment}
             set_workouts={set_workouts}
             routine={routine}
+            other_workouts={other_workouts}
           />
         </Flex>
       </Section>
@@ -150,7 +156,13 @@ export const EditRoutine = () => {
   );
 };
 
-const WorkoutList = ({ workouts, equipments, set_workouts, routine }) => {
+const WorkoutList = ({
+  workouts,
+  equipments,
+  set_workouts,
+  routine,
+  other_workouts,
+}) => {
   return (
     <>
       {workouts.length == 0 && (
@@ -164,13 +176,21 @@ const WorkoutList = ({ workouts, equipments, set_workouts, routine }) => {
           set_workouts={set_workouts}
           equipments={equipments}
           routine={routine}
+          other_workouts={other_workouts}
         />
       ))}
     </>
   );
 };
 
-const Workout = ({ workouts, workout, set_workouts, equipments, routine }) => {
+const Workout = ({
+  workouts,
+  workout,
+  set_workouts,
+  equipments,
+  routine,
+  other_workouts,
+}) => {
   const [editing, setEditing] = useState(false);
 
   const deleteWorkout = (workout) => {
@@ -198,6 +218,7 @@ const Workout = ({ workouts, workout, set_workouts, equipments, routine }) => {
               equipment={equipments}
               setHideForm={setEditing}
               hideForm={false}
+              other_workouts={other_workouts}
             />
           )}
         </div>
@@ -236,7 +257,7 @@ WorkoutList.propTypes = {
 const WorkoutInfo = ({ workout, equipments }) => {
   const getEquipmentName = (equipment_id) => {
     if (equipments.length == 0) return;
-    return equipments.find((e) => e.id == equipment_id).name;
+    return equipments?.find((e) => e.id == equipment_id).name || "";
   };
 
   return (
@@ -264,6 +285,7 @@ const EditableWorkout = ({
   routine,
   equipment,
   defaultWorkout,
+  other_workouts,
 }) => {
   const addWorkout = (workout) => {
     const parsed_workout = {
@@ -337,6 +359,14 @@ const EditableWorkout = ({
       });
   };
 
+  const hasUniqueName = (name) => {
+    const allWorkouts = [...workouts, ...other_workouts];
+    return (
+      !allWorkouts.some((w) => w.name == name && defaultWorkout != w) ||
+      "Ya tienes un ejercicio con ese nombre"
+    );
+  };
+
   const onSubmit = (data) => {
     defaultWorkout ? editWorkout(data, defaultWorkout.id) : addWorkout(data);
 
@@ -371,7 +401,10 @@ const EditableWorkout = ({
             <Text weight="bold">Ejercicio</Text>
             <TextField.Input
               name="name"
-              {...register("name", { required: true })}
+              {...register("name", {
+                required: "Debes escribir un nombre",
+                validate: { unique: hasUniqueName },
+              })}
               color={errors.name && "red"}
               className={`${errors.name ? "!border-red-500" : undefined}`}
             ></TextField.Input>
@@ -380,9 +413,10 @@ const EditableWorkout = ({
             <EquipmentSelect equipment={equipment} control={control} />
           </div>
         </Flex>
-        <Button className="!mt-3" type="submit">
-          Aceptar
-        </Button>
+        <div className="flex items-center gap-3 pt-2">
+          <Button type="submit">Aceptar</Button>
+          <span className="text-red-500">{errors.name?.message}</span>
+        </div>
       </form>
     </>
   );
