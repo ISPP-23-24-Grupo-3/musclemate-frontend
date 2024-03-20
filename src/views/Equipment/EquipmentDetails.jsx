@@ -18,6 +18,8 @@ export default function EquipmentDetails() {
   const [actualRating, setActualRating] = useState(0);
   const [newRating, setNewRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ticketsPerPage] = useState(3); //Salen 3 tickets x pagina
 
   const [editMode, setEditMode] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState(null);
@@ -211,6 +213,8 @@ export default function EquipmentDetails() {
           const filteredTickets = data.filter(
             (ticket) => ticket.equipment_name === machineDetails?.name
           );
+          // Ordenar los tickets por fecha
+          filteredTickets.sort((a, b) => new Date(b.date) - new Date(a.date));
           setApiTickets(filteredTickets);
           setApiDataLoaded(true);
         } else {
@@ -220,11 +224,19 @@ export default function EquipmentDetails() {
         console.error("Error fetching API tickets:", error);
       }
     };
-
+  
     if (machineDetails?.name) {
       fetchTickets();
     }
   }, [machineDetails]);
+  
+
+  const indexOfLastTicket = currentPage * ticketsPerPage;
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
+  const currentTickets = apiTickets.slice(indexOfFirstTicket, indexOfLastTicket);
+
+  
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleInputChange = (e, field) => {
     setUpdatedDetails({
@@ -399,8 +411,8 @@ export default function EquipmentDetails() {
         Tickets
       </Heading>
         <ul>
-          {apiDataLoaded && apiTickets.length > 0 ? (
-            apiTickets.map((ticket) => (
+        {apiDataLoaded && currentTickets.length > 0 ? (
+          currentTickets.map((ticket) => (
               <li
                 key={ticket.id}
                 className={`bg-white shadow-md p-4 rounded-md mb-4 ${
@@ -465,7 +477,43 @@ export default function EquipmentDetails() {
             <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
           )}
         </ul>
+      {/* Agregar controles de paginación */}
+      <div className="flex justify-center mt-4">
+        <ul className="flex">
+          <li className="mr-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+            >
+              Anterior
+            </button>
+          </li>
+          {apiTickets.length > 0 &&
+            Array.from({ length: Math.ceil(apiTickets.length / ticketsPerPage) }, (_, i) => (
+              <li key={i} className="mr-2">
+                <button
+                  onClick={() => paginate(i + 1)}
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === i + 1 ? "bg-radixgreen text-white" : "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))}
+          <li>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === Math.ceil(apiTickets.length / ticketsPerPage)}
+              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+            >
+              Siguiente
+            </button>
+          </li>
+        </ul>
       </div>
+    </div>
     </div>
   );
 }
