@@ -25,6 +25,7 @@ import RegisterUser from "./views/RegisterPage/RegisterUser";
 import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
+import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 
 const ownerRoutes = [
   {
@@ -58,6 +59,10 @@ const ownerRoutes = [
   {
     path: "tickets",
     element: <TicketManagement />,
+  },
+  {
+    path: "my-gyms",
+    element: <MyGymsOwner />,
   },
 ];
 

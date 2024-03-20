@@ -9,7 +9,7 @@ import { HiTicket } from "react-icons/hi";
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
-  const [gymName, setGymName] = useState(null);
+  const [gymName, setGymName] = useState("No disponible"); // Cambio aquí
   const [error, setError] = useState(null);
 
   const [apiTickets, setApiTickets] = useState([]);
@@ -18,6 +18,8 @@ export default function EquipmentDetails() {
   const [actualRating, setActualRating] = useState(0);
   const [newRating, setNewRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ticketsPerPage] = useState(3); //Salen 3 tickets x pagina
 
   const [editMode, setEditMode] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState(null);
@@ -59,12 +61,31 @@ export default function EquipmentDetails() {
   useEffect(() => {
     getFromApi("equipments/detail/" + equipmentId + "/")
       .then((response) => {
-        // console.log(response);
         return response.json();
       })
       .then((data) => {
-        // console.log(data);
         setMachineDetails(data);
+        // Cambio aquí para obtener el nombre del gimnasio
+        if (data.gym) {
+          const gymId = data.gym;
+          getFromApi(`gyms/detail/${gymId}/`)
+            .then((response) => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error("Nombre de gimnasio no disponible");
+              }
+            })
+            .then((gymData) => {
+              setGymName(gymData.name);
+            })
+            .catch((error) => {
+              setGymName(error.message);
+            });
+        }
+      })
+      .catch((error) => {
+        setError("No se encontró la máquina con la ID proporcionada.");
       });
   }, [equipmentId]);
 
@@ -192,6 +213,8 @@ export default function EquipmentDetails() {
           const filteredTickets = data.filter(
             (ticket) => ticket.equipment_name === machineDetails?.name
           );
+          // Ordenar los tickets por fecha
+          filteredTickets.sort((a, b) => new Date(b.date) - new Date(a.date));
           setApiTickets(filteredTickets);
           setApiDataLoaded(true);
         } else {
@@ -201,11 +224,19 @@ export default function EquipmentDetails() {
         console.error("Error fetching API tickets:", error);
       }
     };
-
+  
     if (machineDetails?.name) {
       fetchTickets();
     }
   }, [machineDetails]);
+  
+
+  const indexOfLastTicket = currentPage * ticketsPerPage;
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
+  const currentTickets = apiTickets.slice(indexOfFirstTicket, indexOfLastTicket);
+
+  
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleInputChange = (e, field) => {
     setUpdatedDetails({
@@ -342,92 +373,8 @@ export default function EquipmentDetails() {
             }}
           >
             <Rating rating={actualRating} />
-            <Button
-              onClick={() => setValuationOn(!valuationOn)}
-              className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-            >
-              {valuationOn ? "Volver" : "Valorar"}
-            </Button>
           </div>
         </div>
-
-        {actualRating}
-
-        {valuationOn && (
-          /*isClient*/ <div>
-            <div className="mb-4">
-              <strong className="text-radixgreen">Su Valoración:</strong>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Rating rating={newRating} />
-
-                <TextField.Input
-                  type="number"
-                  value={newRating}
-                  onChange={(e) => {
-                    e.target.value > 5
-                      ? (e.target.value = 5)
-                      : e.target.value < 0
-                      ? (e.target.value = 0)
-                      : e.target.value;
-                    setNewRating(e.target.value);
-                  }}
-                  min="0"
-                  max="5"
-                  step="0.5"
-                  className="w-16"
-                />
-
-                {machineRatings.length > 0 ? (
-                  <p className="text-radixgreen">
-                    Valoraciones: {machineRatings.length} {machineRatings}
-                  </p>
-                ) : (
-                  <p className="text-radixgreen">Sin valoraciones</p>
-                )}
-
-                <Button
-                  onClick={() => {
-                    newRate();
-                    setValuationOn(false);
-                  }}
-                  className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-                >
-                  Actualizar valoración
-                </Button>
-
-                {/* <Button onClick={async () => {
-                  const assessments = await getFromApi('assessments');
-                  const existingAssessment = assessments.find(assessment => assessment.client === clientId);
-
-                  if (existingAssessment) {
-                    putToApi('assessments/update/'+ existingAssessment.id, {
-                      id: existingAssessment.id,
-                      stars: newRating,
-                      equipment: Number(equipmentId),
-                      client: clientId
-                    });
-                  } else {
-                    postToApi('assessments/create', {
-                      stars: newRating,
-                      equipment: Number(equipmentId),
-                      client: client.id
-                    });
-                  }
-                  newRate();
-                  setValuationOn(false);
-                }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
-                  Enviar Valoración
-                </Button>  */}
-              </div>
-            </div>
-          </div>
-        )}
 
         {editMode && (
           <div className="mt-4 text-center">
@@ -464,8 +411,8 @@ export default function EquipmentDetails() {
         Tickets
       </Heading>
         <ul>
-          {apiDataLoaded && apiTickets.length > 0 ? (
-            apiTickets.map((ticket) => (
+        {apiDataLoaded && currentTickets.length > 0 ? (
+          currentTickets.map((ticket) => (
               <li
                 key={ticket.id}
                 className={`bg-white shadow-md p-4 rounded-md mb-4 ${
@@ -480,10 +427,10 @@ export default function EquipmentDetails() {
                       <span className="text-black">
                         {ticket.client.name} {ticket.client.lastName}
                       </span>
-                      <span className="ml-7">
+                    </p>
+                    <p className="text-radixgreen font-bold mb-1">
                         Asunto:{" "}
                         <span className="text-black">{ticket.label}</span>
-                      </span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
                       Descripción:{" "}
@@ -530,7 +477,43 @@ export default function EquipmentDetails() {
             <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
           )}
         </ul>
+      {/* Agregar controles de paginación */}
+      <div className="flex justify-center mt-4">
+        <ul className="flex">
+          <li className="mr-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+            >
+              Anterior
+            </button>
+          </li>
+          {apiTickets.length > 0 &&
+            Array.from({ length: Math.ceil(apiTickets.length / ticketsPerPage) }, (_, i) => (
+              <li key={i} className="mr-2">
+                <button
+                  onClick={() => paginate(i + 1)}
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === i + 1 ? "bg-radixgreen text-white" : "bg-gray-200 text-gray-600"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))}
+          <li>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === Math.ceil(apiTickets.length / ticketsPerPage)}
+              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+            >
+              Siguiente
+            </button>
+          </li>
+        </ul>
       </div>
+    </div>
     </div>
   );
 }
