@@ -58,7 +58,7 @@ const Profile = () => {
             <div className="grid md:grid-cols-2 md:gap-4 md:mt-4 md:mb-4">
                 <div className="flex justify-center md:m-0 m-5 items-center bg-radixgreen/30 border-2 border-radixgreen rounded-3xl py-2 md:px-5 pt-8 flex-col">
                     <div>
-                        <img className="w-80 h-80" src={user ? user.photo : "https://i.imgur.com/Y23W1X9.png"} onError={(e) => {e.target.onerror = null; e.target.src="https://i.imgur.com/Y23W1X9.png"}}/>
+                        <img className="w-80 h-80" src="https://i.imgur.com/Y23W1X9.png" />
                     </div>
                     <p className="text-center text-radixgreen text-2xl font-bold mt-5 mb-3">{user ? user.user : "Cargando..."}</p>
                     <p className="text-center text-black/60 text-2xl uppercase font-bold mb-4">{gym ? gym.name : "Cargando..."}</p>
