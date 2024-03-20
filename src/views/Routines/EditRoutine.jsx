@@ -18,6 +18,7 @@ import { LuPencil } from "react-icons/lu";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
+import * as Toggle from "@radix-ui/react-toggle";
 
 import PropTypes from "prop-types";
 import {
@@ -131,7 +132,7 @@ export const EditRoutine = () => {
         <Flex direction="column" gap="3" className="mt-4">
           <EditableWorkout
             workouts={workouts}
-            editWorkout={set_workouts}
+            set_workout={set_workouts}
             hideForm={hide_form}
             setHideForm={set_hide_form}
             routine={routine}
@@ -141,6 +142,7 @@ export const EditRoutine = () => {
             workouts={workouts}
             equipments={equipment}
             set_workouts={set_workouts}
+            routine={routine}
           />
         </Flex>
       </Section>
@@ -148,7 +150,7 @@ export const EditRoutine = () => {
   );
 };
 
-const WorkoutList = ({ workouts, equipments, set_workouts }) => {
+const WorkoutList = ({ workouts, equipments, set_workouts, routine }) => {
   return (
     <>
       {workouts.length == 0 && (
@@ -156,17 +158,19 @@ const WorkoutList = ({ workouts, equipments, set_workouts }) => {
       )}
       {workouts.map((workout) => (
         <Workout
+          workouts={workouts}
           workout={workout}
           key={workout.id}
           set_workouts={set_workouts}
           equipments={equipments}
+          routine={routine}
         />
       ))}
     </>
   );
 };
 
-const Workout = ({ workout, set_workouts, equipments }) => {
+const Workout = ({ workouts, workout, set_workouts, equipments, routine }) => {
   const [editing, setEditing] = useState(false);
 
   const deleteWorkout = (workout) => {
@@ -179,26 +183,30 @@ const Workout = ({ workout, set_workouts, equipments }) => {
     });
   };
 
-  const getEquipmentName = (equipment_id) => {
-    if (equipments.length == 0) return;
-    return equipments.find((e) => e.id == equipment_id).name;
-  };
-
   return (
     <Card key={workout.id}>
       <div className="flex gap-5 items-center">
         <div className="flex justify-between grow">
-          <Flex direction="column" className="w-1/5">
-            <Text weight="bold">Ejercicio</Text>
-            <Text>{workout.name}</Text>
-          </Flex>
-          <Flex direction="column" className="w-1/5 items-end">
-            <Text weight="bold">Máquinas</Text>
-            {workout.equipment.map((e) => (
-              <span key={e}>{getEquipmentName(e)}</span>
-            ))}
-          </Flex>
+          {!editing ? (
+            <WorkoutInfo workout={workout} equipments={equipments} />
+          ) : (
+            <EditableWorkout
+              workouts={workouts}
+              defaultWorkout={workout}
+              set_workout={set_workouts}
+              routine={routine}
+              equipment={equipments}
+              setHideForm={setEditing}
+              hideForm={false}
+            />
+          )}
         </div>
+        <Toggle.Root
+          onPressedChange={(pressed) => setEditing(pressed)}
+          className="border border-radixgreen text-radixgreen p-3 rounded-full  data-state-on:bg-radixgreen/10 hover:bg-radixgreen/20"
+        >
+          <LuPencil className="size-4" />
+        </Toggle.Root>
         <IconButton
           size="3"
           radius="full"
@@ -225,40 +233,114 @@ WorkoutList.propTypes = {
   ),
 };
 
+const WorkoutInfo = ({ workout, equipments }) => {
+  const getEquipmentName = (equipment_id) => {
+    if (equipments.length == 0) return;
+    return equipments.find((e) => e.id == equipment_id).name;
+  };
+
+  return (
+    <>
+      <Flex direction="column" className="w-1/5">
+        <Text weight="bold">Ejercicio</Text>
+        <Text>{workout.name}</Text>
+      </Flex>
+      <Flex direction="column" className="w-1/5 items-end">
+        <Text weight="bold">Máquinas</Text>
+        {workout.equipment &&
+          workout.equipment.map((e) => (
+            <span key={e}>{getEquipmentName(e)}</span>
+          ))}
+      </Flex>
+    </>
+  );
+};
+
 const EditableWorkout = ({
   workouts,
-  editWorkout,
+  set_workout,
   hideForm,
   setHideForm,
   routine,
   equipment,
+  defaultWorkout,
 }) => {
   const addWorkout = (workout) => {
     const parsed_workout = {
       ...workout,
       equipment: workout.equipment.map((e) => e.value),
     };
-    const temp_workout = { ...parsed_workout, temp_id: Date.now() };
-    editWorkout([temp_workout, ...workouts]);
+    const temp_workout = {
+      ...parsed_workout,
+      temp_id: Date.now(),
+      id: Date.now(),
+    };
+    set_workout([temp_workout, ...workouts]);
 
     postToApi("workouts/create/", parsed_workout)
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (r.ok) {
+          return await r.json();
+        }
+        throw r;
+      })
       .then((postedWorkout) =>
-        editWorkout(
-          workouts.map((w) =>
+        set_workout((c_workouts) =>
+          c_workouts.map((w) =>
             w.temp_id == temp_workout.temp_id ? postedWorkout : w,
           ),
         ),
       )
-      .catch(
-        editWorkout(workouts.filter((w) => w.temp_id != temp_workout.temp_id)),
-      );
+      .catch((e) => {
+        set_workout((c_workouts) =>
+          c_workouts.filter((w) => w.temp_id != temp_workout.temp_id),
+        );
+        console.log("error: ", e);
+      });
+  };
+
+  const editWorkout = (workout, id) => {
+    const parsed_workout = {
+      ...workout,
+      equipment: workout.equipment.map((e) => e.value),
+    };
+    const temp_workout = { ...parsed_workout, temp_id: Date.now() };
+
+    set_workout((c_workouts) =>
+      // The list component uses the ID as key, so it needs to be given
+      c_workouts.map((w) => (w.id == id ? { ...temp_workout, id: id } : w)),
+    );
+    putToApi(`workouts/update/${id}/`, parsed_workout)
+      .then(async (r) => {
+        if (r.ok) {
+          return await r.json();
+        }
+        throw r;
+      })
+      .then((updatedWorkout) => {
+        set_workout((c_workouts) =>
+          c_workouts.map((w) =>
+            w.temp_id == temp_workout.temp_id ? updatedWorkout : w,
+          ),
+        );
+        console.log("updated: ", updatedWorkout);
+      })
+      .catch((e) => {
+        set_workout((c_workouts) =>
+          c_workouts.map((w) =>
+            w.temp_id == temp_workout.temp_id
+              ? { ...parsed_workout, id: id }
+              : w,
+          ),
+        ),
+          console.log("error: ", e);
+      });
   };
 
   const onSubmit = (data) => {
-    addWorkout(data);
+    defaultWorkout ? editWorkout(data, defaultWorkout.id) : addWorkout(data);
 
-    setHideForm(true);
+    setHideForm((c) => !c);
     reset();
   };
 
@@ -271,7 +353,10 @@ const EditableWorkout = ({
   } = useForm({
     values: {
       routine: [routine.id],
-      equipment: [],
+      name: defaultWorkout?.name,
+      equipment: defaultWorkout?.equipment
+        ? defaultWorkout.equipment.map((e) => ({ value: e.id }))
+        : [],
     },
   });
 
@@ -279,27 +364,25 @@ const EditableWorkout = ({
     <>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className={hideForm ? "hidden" : undefined}
+        className={`w-full ${hideForm ? "hidden" : ""}`}
       >
-        <Card>
-          <Flex justify="between">
-            <Flex direction="column" className="w-1/5">
-              <Text weight="bold">Ejercicio</Text>
-              <TextField.Input
-                name="name"
-                {...register("name", { required: true })}
-                color={errors.name && "red"}
-                className={`${errors.name ? "!border-red-500" : undefined}`}
-              ></TextField.Input>
-            </Flex>
-            <div className="w-1/5 items-end flex flex-col gap-2">
-              <EquipmentSelect equipment={equipment} control={control} />
-            </div>
+        <Flex justify="between">
+          <Flex direction="column" className="w-1/5">
+            <Text weight="bold">Ejercicio</Text>
+            <TextField.Input
+              name="name"
+              {...register("name", { required: true })}
+              color={errors.name && "red"}
+              className={`${errors.name ? "!border-red-500" : undefined}`}
+            ></TextField.Input>
           </Flex>
-          <Button className="!mt-3" type="submit">
-            Aceptar
-          </Button>
-        </Card>
+          <div className="w-1/5 items-end flex flex-col gap-2">
+            <EquipmentSelect equipment={equipment} control={control} />
+          </div>
+        </Flex>
+        <Button className="!mt-3" type="submit">
+          Aceptar
+        </Button>
       </form>
     </>
   );
