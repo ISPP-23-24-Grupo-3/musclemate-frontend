@@ -71,7 +71,7 @@ const userRoutes = [
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
-  { path: "equipments-client/:equipmentId", element: <EquipmentDetailsClient /> },
+  { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
 ];
 

@@ -8,15 +8,13 @@ import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
-import AuthContext from "../../utils/context/AuthContext"; "../../utils/context/AuthContext";
+import AuthContext from "../../utils/context/AuthContext";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
 
   const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
-  const [gymName, setGymName] = useState(null);
-  const [error, setError] = useState(null);
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
@@ -24,9 +22,11 @@ const EquipmentDetailsClient = () => {
   const [valuationOn, setValuationOn] = useState(false);
 
   const [hasValoration, setHasValoration] = useState(false);
+  const [valuationId, setValuationId] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [clientUsername, setClientUsername] = useState(null);
   const [clientId, setClientId] = useState(null);
+  const [message, setMessage] = useState("");
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -52,39 +52,57 @@ const EquipmentDetailsClient = () => {
 
   // Datos del Usuario
   useEffect(() => {
-    if(user?.rol === "client"){
+    if (user.rol==='client'){
       setIsClient(true);
-      setClientId(user.user_id);
       setClientUsername(user.username);
     }
   }, [user]);
 
-  // Machine Ratings
+  // Datos del Usuario
   useEffect(() => {
-    getFromApi(`assessments/detail/${clientId}`)
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const hasValor= data.some((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.stars);
-      setHasValoration(hasValor);
-      const valor= data.filter((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.stars);
-      setActualRating(valor);
-    });
-  }, [clientId]);
+    if (clientUsername) {
+      getFromApi("clients/detail/"+ clientUsername +"/" )
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setClientId(data.id);
+      });
+    }
+  }, [clientUsername]);
 
   // Machine Details
   useEffect(() => {
-    getFromApi("equipments/detail/"+ equipmentId +"/" ) 
-    .then((response) => {
-        // console.log(response);
-        return response.json();
-    })
-    .then((data) => {
-        // console.log(data);
-        setMachineDetails(data);
-    });
+    if (equipmentId){
+      getFromApi("equipments/detail/"+ equipmentId +"/" ) 
+      .then((response) => {
+          return response.json();
+      })
+      .then((data) => {
+          setMachineDetails(data);
+      });
+    }
   }, [equipmentId]);
+
+  // Machine Ratings
+  useEffect(() => {
+    if(clientId && equipmentId){
+      getFromApi("assessments/client/"+ clientId +"/")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        const hasValor= data.some((valoration) => valoration.equipment === Number(equipmentId));
+        setHasValoration(hasValor);
+        if (hasValor) {
+          const valor= data.filter((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.stars);
+          const valorationId= data.filter((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.id);
+          setActualRating(valor);
+          setValuationId(valorationId);
+        }
+      });
+    }
+  }, [clientId, equipmentId]);
 
   // Función para formatear la fecha
   const formatDate = (dateString) => {
@@ -92,60 +110,27 @@ const EquipmentDetailsClient = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  useEffect(() => {
-    const fetchMachineDetails = async () => {
-      try {
-        const response = await getFromApi(`equipments/detail/${equipmentId}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setMachineDetails(data);
-          // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
-          if (data.gym) {
-            const gymId = data.gym;
-            const gymResponse = await getFromApi(`gyms/detail/${gymId}/`);
-            if (gymResponse.ok) {
-              const gymData = await gymResponse.json();
-              setGymName(gymData.name);
-            } else {
-              setGymName("Nombre de gimnasio no disponible");
-            }
-          }
-        } else {
-          setError("No se encontró la máquina con la ID proporcionada.");
-        }
-      } catch (error) {
-        setError("Error al obtener los detalles de la máquina.");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchTickets = async () => {
+  //     try {
+  //       const response = await getFromApi("tickets/");
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         const filteredTickets = data.filter(ticket => ticket.equipment_name === machineDetails?.name);
+  //         setApiTickets(filteredTickets);
+  //         setApiDataLoaded(true);
+  //       } else {
+  //         console.error("Error fetching API tickets:", response.statusText);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching API tickets:", error);
+  //     }
+  //   };
 
-    fetchMachineDetails();
-  }, [equipmentId]);
-
-  useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const response = await getFromApi("tickets/");
-        if (response.ok) {
-          const data = await response.json();
-          const filteredTickets = data.filter(ticket => ticket.equipment_name === machineDetails?.name);
-          setApiTickets(filteredTickets);
-          setApiDataLoaded(true);
-        } else {
-          console.error("Error fetching API tickets:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching API tickets:", error);
-      }
-    };
-
-    if (machineDetails?.name) {
-      fetchTickets();
-    }
-  }, [machineDetails]);
-
-  if (error) {
-    return <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">{error}</div>;
-  }
+  //   if (machineDetails?.name) {
+  //     fetchTickets();
+  //   }
+  // }, [machineDetails]);
 
   if (!machineDetails) {
     return <div className="mt-8 p-4 border border-yellow-500 rounded bg-yellow-100 text-yellow-700 text-center">Cargando...</div>;
@@ -155,7 +140,7 @@ const EquipmentDetailsClient = () => {
     <div className="mt-8 max-w-xl mx-auto">
       <div className="p-10 border border-radixgreen rounded">
         <h2 className="mb-6 text-radixgreen font-bold text-3xl text-center">
-          Detalles de la Máquina de Gimnasio
+          Detalles de la Máquina de Gimnasio 
         </h2>
         <div className="mb-4">
           <strong className="text-radixgreen">Nombre:</strong> {machineDetails.name}
@@ -167,69 +152,54 @@ const EquipmentDetailsClient = () => {
           <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Gimnasio:</strong> {gymName || 'No disponible'}
-        </div>
-        <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-        <div className="mb-4">
-          <strong className="text-radixgreen">Número de Serie:</strong> {machineDetails.serial_number}
-        </div>
 
-        <div className="mb-4">
+        <div className="mb-1">
           <strong className="text-radixgreen">Tu Valoración:</strong> 
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
             <Rating rating={actualRating}/>
-            <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
-              {valuationOn ? 'Volver' : 'Valorar'}
-            </Button>
-          </div>
-        </div>
 
-        {actualRating}
-
-        {valuationOn && /*isClient*/ (
-          <div>
-            <div className="mb-4">
-              <strong className="text-radixgreen">Su Valoración:</strong> 
-              <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Rating rating={actualRating}/>
-
+            {valuationOn && isClient && (
+              <div style={{display: 'flex'}}>
                 <TextField.Input type="number" value={actualRating} onChange={(e) => {
                   e.target.value > 5 ? e.target.value = 5 : e.target.value < 0 ? e.target.value = 0 : e.target.value;
                   setActualRating(e.target.value);
-                }} min="0" max="5" step="0.5" className="w-16" />
+                }} min="0" max="5" step="0.5" />
 
-                <Button onClick={() => {setValuationOn(false);}} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
-                  Actualizar valoración
-                </Button>
-
-                {/* <Button onClick={async () => {
+                <Button onClick={async () => {
 
                   if (hasValoration) {              
-                    putToApi('assessments/update/'+ valorationId, {
-                      stars: actualRating,
+                    await putToApi('assessments/update/'+ valuationId + "/", {
+                      stars: Number(actualRating),
                       equipment: Number(equipmentId),
                       client: Number(clientId)
                     });
                   } else {
-                    postToApi('assessments/create', {
-                      id: Math.floor(Math.random() * 1000000),
-                      stars: actualRating,
+                    await postToApi('assessments/create/', {
+                      stars: Number(actualRating),
                       equipment: Number(equipmentId),
                       client: Number(clientId)
                     });
                   }
                   setValuationOn(false);
+                  setMessage('Valoración Enviada!');
                 }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
-                  Actualizar Valoración
-                </Button>  */}
-                
-              </div>      
-            </div>
-          </div>
-        )}
+                  Enviar
+                </Button> 
+              </div>
+            )}
 
+            <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
+              {valuationOn ? 'Volver' : 'Valorar'}
+            </Button>
+
+          </div>
+        </div>
+        <div className="mt-4 flex justify-center items-center">
+          <strong className="text-radixgreen">{message && <div>{message}</div>}</strong>
+        </div>
+        
 
       </div>
       <div className="mt-8 text-center">
