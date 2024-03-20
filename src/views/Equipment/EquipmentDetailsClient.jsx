@@ -12,12 +12,9 @@ import AuthContext from "../../utils/context/AuthContext";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
-  console.log(user);
 
   const { equipmentId } = useParams();
   const [machineDetails, setMachineDetails] = useState(null);
-  const [gymName, setGymName] = useState(null);
-  const [error, setError] = useState(null);
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
 
@@ -25,9 +22,11 @@ const EquipmentDetailsClient = () => {
   const [valuationOn, setValuationOn] = useState(false);
 
   const [hasValoration, setHasValoration] = useState(false);
+  const [valuationId, setValuationId] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [clientUsername, setClientUsername] = useState(null);
   const [clientId, setClientId] = useState(null);
+  const [message, setMessage] = useState("");
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -61,28 +60,28 @@ const EquipmentDetailsClient = () => {
 
   // Datos del Usuario
   useEffect(() => {
-    getFromApi("clients/detail/"+ 157856 +"/" )
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-      setClientId(data.id);
-    });
+    if (clientUsername) {
+      getFromApi("clients/detail/"+ clientUsername +"/" )
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setClientId(data.id);
+      });
+    }
   }, [clientUsername]);
-
 
   // Machine Details
   useEffect(() => {
-    getFromApi("equipments/detail/"+ equipmentId +"/" ) 
-    .then((response) => {
-        // console.log(response);
-        return response.json();
-    })
-    .then((data) => {
-        // console.log(data);
-        setMachineDetails(data);
-    });
+    if (equipmentId){
+      getFromApi("equipments/detail/"+ equipmentId +"/" ) 
+      .then((response) => {
+          return response.json();
+      })
+      .then((data) => {
+          setMachineDetails(data);
+      });
+    }
   }, [equipmentId]);
 
   // Machine Ratings
@@ -94,11 +93,12 @@ const EquipmentDetailsClient = () => {
       })
       .then((data) => {
         const hasValor= data.some((valoration) => valoration.equipment === Number(equipmentId));
-        console.log(hasValor);
         setHasValoration(hasValor);
         if (hasValor) {
           const valor= data.filter((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.stars);
+          const valorationId= data.filter((valoration) => valoration.equipment === Number(equipmentId)).map((valoration) => valoration.id);
           setActualRating(valor);
+          setValuationId(valorationId);
         }
       });
     }
@@ -109,35 +109,6 @@ const EquipmentDetailsClient = () => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
-  useEffect(() => {
-    const fetchMachineDetails = async () => {
-      try {
-        const response = await getFromApi(`equipments/detail/${equipmentId}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setMachineDetails(data);
-          // Si la máquina tiene asociado un gimnasio, obtenemos su nombre
-          if (data.gym) {
-            const gymId = data.gym;
-            const gymResponse = await getFromApi(`gyms/detail/${gymId}/`);
-            if (gymResponse.ok) {
-              const gymData = await gymResponse.json();
-              setGymName(gymData.name);
-            } else {
-              setGymName("Nombre de gimnasio no disponible");
-            }
-          }
-        } else {
-          setError("No se encontró la máquina con la ID proporcionada.");
-        }
-      } catch (error) {
-        setError("Error al obtener los detalles de la máquina.");
-      }
-    };
-
-    fetchMachineDetails();
-  }, [equipmentId]);
 
   // useEffect(() => {
   //   const fetchTickets = async () => {
@@ -161,10 +132,6 @@ const EquipmentDetailsClient = () => {
   //   }
   // }, [machineDetails]);
 
-  if (error) {
-    return <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">{error}</div>;
-  }
-
   if (!machineDetails) {
     return <div className="mt-8 p-4 border border-yellow-500 rounded bg-yellow-100 text-yellow-700 text-center">Cargando...</div>;
   }
@@ -185,9 +152,6 @@ const EquipmentDetailsClient = () => {
           <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Gimnasio:</strong> {gymName || 'No disponible'}
-        </div>
-        <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong> {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
 
@@ -206,7 +170,7 @@ const EquipmentDetailsClient = () => {
                 <Button onClick={async () => {
 
                   if (hasValoration) {              
-                    await putToApi('assessments/update/'+ valorationId, {
+                    await putToApi('assessments/update/'+ valuationId + "/", {
                       stars: Number(actualRating),
                       equipment: Number(equipmentId),
                       client: Number(clientId)
@@ -215,22 +179,27 @@ const EquipmentDetailsClient = () => {
                     await postToApi('assessments/create/', {
                       stars: Number(actualRating),
                       equipment: Number(equipmentId),
-                      client: 157856
+                      client: Number(clientId)
                     });
                   }
                   setValuationOn(false);
+                  setMessage('Valoración Enviada!');
                 }} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
                   Enviar
                 </Button> 
-                
               </div>
             )}
 
             <Button onClick={() => setValuationOn(!valuationOn)} className="ml-2 bg-radixgreen text-white px-2 py-1 rounded">
               {valuationOn ? 'Volver' : 'Valorar'}
             </Button>
+
           </div>
         </div>
+        <div className="mt-4 flex justify-center items-center">
+          <strong className="text-radixgreen">{message && <div>{message}</div>}</strong>
+        </div>
+        
 
       </div>
       <div className="mt-8 text-center">
