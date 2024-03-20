@@ -384,9 +384,8 @@ const EditableWorkout = ({
     values: {
       routine: [routine.id],
       name: defaultWorkout?.name,
-      equipment: defaultWorkout?.equipment
-        ? defaultWorkout.equipment.map((e) => ({ value: e.id }))
-        : [],
+      equipment:
+        defaultWorkout?.equipment.map((e) => ({ value: e + "" })) || [],
     },
   });
 
