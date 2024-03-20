@@ -25,6 +25,7 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
+import { EditWorkout } from "./views/Workouts/EditWorkout";
 
 const ownerRoutes = [
   {
@@ -71,6 +72,7 @@ const userRoutes = [
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
+  { path: "workouts/:id", element: <EditWorkout /> },
 ];
 
 const router = createBrowserRouter([
