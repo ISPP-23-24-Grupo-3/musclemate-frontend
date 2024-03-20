@@ -10,6 +10,7 @@ import {
   Section,
   Select,
 } from "@radix-ui/themes";
+import { ImCross } from "react-icons/im";
 import { useContext, useEffect, useState } from "react";
 import { BsQrCodeScan } from "react-icons/bs";
 import { CgGym, CgTrash } from "react-icons/cg";
@@ -438,30 +439,40 @@ const EquipmentSelect = ({ equipment, control }) => {
         >
           <FaPlus className="size-3" />
         </IconButton>
-        <Text weight="bold">Máquina</Text>
+        <Text weight="bold">Máquinas</Text>
       </div>
       {fields.map((f, index) => (
-        <Controller
-          key={f.id}
-          control={control}
-          name={`equipment.${index}.value`}
-          render={({ field: { onChange, value, defaultValue } }) => (
-            <Select.Root
-              onValueChange={onChange}
-              value={value}
-              defaultValue={defaultValue}
-            >
-              <Select.Trigger placeholder="Selecciona una máquina" />
-              <Select.Content>
-                {equipment.map((e) => (
-                  <Select.Item key={e.id} value={"" + e.id}>
-                    {e.name}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          )}
-        />
+        <div key={f.id} className="flex items-center gap-3">
+          <Controller
+            control={control}
+            name={`equipment.${index}.value`}
+            render={({ field: { onChange, value, defaultValue } }) => (
+              <Select.Root
+                onValueChange={onChange}
+                value={value}
+                defaultValue={defaultValue}
+              >
+                <Select.Trigger placeholder="Selecciona una máquina" />
+                <Select.Content>
+                  {equipment.map((e) => (
+                    <Select.Item key={e.id} value={"" + e.id}>
+                      {e.name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            )}
+          />
+          <IconButton
+            radius="full"
+            size="1"
+            color="red"
+            variant="ghost"
+            onClick={() => remove(index)}
+          >
+            <ImCross className="size-2.5" />
+          </IconButton>
+        </div>
       ))}
     </>
   );
