@@ -19,7 +19,6 @@ import { LuPencil } from "react-icons/lu";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
-import * as Toggle from "@radix-ui/react-toggle";
 
 import PropTypes from "prop-types";
 import {
@@ -223,12 +222,13 @@ const Workout = ({
             />
           )}
         </div>
-        <Toggle.Root
-          onPressedChange={(pressed) => setEditing(pressed)}
-          className="border border-radixgreen text-radixgreen p-3 rounded-full  data-state-on:bg-radixgreen/10 hover:bg-radixgreen/20"
+        <IconButton
+          variant="surface"
+          radius="full"
+          onClick={() => setEditing(!editing)}
         >
           <LuPencil className="size-4" />
-        </Toggle.Root>
+        </IconButton>
         <IconButton
           size="3"
           radius="full"
