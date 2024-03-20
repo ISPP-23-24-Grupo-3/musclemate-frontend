@@ -1,3 +1,4 @@
+/* eslint react/prop-types: 0 */
 import {
   Button,
   IconButton,
@@ -148,6 +149,26 @@ export const EditRoutine = () => {
 };
 
 const WorkoutList = ({ workouts, equipments, set_workouts }) => {
+  return (
+    <>
+      {workouts.length == 0 && (
+        <Info size="3" message="No tienes ningún ejercicio registrado" />
+      )}
+      {workouts.map((workout) => (
+        <Workout
+          workout={workout}
+          key={workout.id}
+          set_workouts={set_workouts}
+          equipments={equipments}
+        />
+      ))}
+    </>
+  );
+};
+
+const Workout = ({ workout, set_workouts, equipments }) => {
+  const [editing, setEditing] = useState(false);
+
   const deleteWorkout = (workout) => {
     deleteFromApi("workouts/delete/" + workout.id + "/").then((r) => {
       if (r.ok) {
@@ -164,38 +185,31 @@ const WorkoutList = ({ workouts, equipments, set_workouts }) => {
   };
 
   return (
-    <>
-      {workouts.length == 0 && (
-        <Info size="3" message="No tienes ningún ejercicio registrado" />
-      )}
-      {workouts.map((workout) => (
-        <Card key={workout.id}>
-          <div className="flex gap-5 items-center">
-            <div className="flex justify-between grow">
-              <Flex direction="column" className="w-1/5">
-                <Text weight="bold">Ejercicio</Text>
-                <Text>{workout.name}</Text>
-              </Flex>
-              <Flex direction="column" className="w-1/5 items-end">
-                <Text weight="bold">Máquinas</Text>
-                {workout.equipment.map((e) => (
-                  <span key={e}>{getEquipmentName(e)}</span>
-                ))}
-              </Flex>
-            </div>
-            <IconButton
-              size="3"
-              radius="full"
-              color="red"
-              variant="outline"
-              onClick={() => deleteWorkout(workout)}
-            >
-              <CgTrash className="size-6" />
-            </IconButton>
-          </div>
-        </Card>
-      ))}
-    </>
+    <Card key={workout.id}>
+      <div className="flex gap-5 items-center">
+        <div className="flex justify-between grow">
+          <Flex direction="column" className="w-1/5">
+            <Text weight="bold">Ejercicio</Text>
+            <Text>{workout.name}</Text>
+          </Flex>
+          <Flex direction="column" className="w-1/5 items-end">
+            <Text weight="bold">Máquinas</Text>
+            {workout.equipment.map((e) => (
+              <span key={e}>{getEquipmentName(e)}</span>
+            ))}
+          </Flex>
+        </div>
+        <IconButton
+          size="3"
+          radius="full"
+          color="red"
+          variant="outline"
+          onClick={() => deleteWorkout(workout)}
+        >
+          <CgTrash className="size-6" />
+        </IconButton>
+      </div>
+    </Card>
   );
 };
 
@@ -260,10 +274,6 @@ const EditableWorkout = ({
       equipment: [],
     },
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "equipment",
-  });
 
   return (
     <>
@@ -283,40 +293,7 @@ const EditableWorkout = ({
               ></TextField.Input>
             </Flex>
             <div className="w-1/5 items-end flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <IconButton
-                  type="button"
-                  radius="full"
-                  size="1"
-                  onClick={() => append({ value: undefined })}
-                >
-                  <FaPlus className="size-3" />
-                </IconButton>
-                <Text weight="bold">Máquina</Text>
-              </div>
-              {fields.map((f, index) => (
-                <Controller
-                  key={f.id}
-                  control={control}
-                  name={`equipment.${index}.value`}
-                  render={({ field: { onChange, value, defaultValue } }) => (
-                    <Select.Root
-                      onValueChange={onChange}
-                      value={value}
-                      defaultValue={defaultValue}
-                    >
-                      <Select.Trigger placeholder="Selecciona una máquina" />
-                      <Select.Content>
-                        {equipment.map((e) => (
-                          <Select.Item key={e.id} value={"" + e.id}>
-                            {e.name}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Root>
-                  )}
-                />
-              ))}
+              <EquipmentSelect equipment={equipment} control={control} />
             </div>
           </Flex>
           <Button className="!mt-3" type="submit">
@@ -324,6 +301,52 @@ const EditableWorkout = ({
           </Button>
         </Card>
       </form>
+    </>
+  );
+};
+
+const EquipmentSelect = ({ equipment, control }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "equipment",
+  });
+
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <IconButton
+          type="button"
+          radius="full"
+          size="1"
+          onClick={() => append({ value: undefined })}
+        >
+          <FaPlus className="size-3" />
+        </IconButton>
+        <Text weight="bold">Máquina</Text>
+      </div>
+      {fields.map((f, index) => (
+        <Controller
+          key={f.id}
+          control={control}
+          name={`equipment.${index}.value`}
+          render={({ field: { onChange, value, defaultValue } }) => (
+            <Select.Root
+              onValueChange={onChange}
+              value={value}
+              defaultValue={defaultValue}
+            >
+              <Select.Trigger placeholder="Selecciona una máquina" />
+              <Select.Content>
+                {equipment.map((e) => (
+                  <Select.Item key={e.id} value={"" + e.id}>
+                    {e.name}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          )}
+        />
+      ))}
     </>
   );
 };
