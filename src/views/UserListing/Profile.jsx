@@ -53,6 +53,25 @@ const Profile = () => {
         }
     };
 
+    const handleToggleRegistration = async () => {
+        const updatedUser = { ...user, register: !user.register };
+        setUser(updatedUser); // Actualiza el estado local del usuario
+        if (editMode) {
+            setEditedUser(updatedUser); // Actualiza el objeto editedUser si estamos en modo de edición
+        }
+        try {
+            const response = await putToApi(`clients/update/${userId}/`, updatedUser);
+            if (response.ok) {
+                // No necesitas actualizar el estado del usuario aquí, ya que ya lo has hecho arriba
+                // setUser(prevUser => ({ ...prevUser, register: !prevUser.register }));
+            } else {
+                console.error("Error toggling registration:", response.status);
+            }
+        } catch (error) {
+            console.error("Error toggling registration:", error);
+        }
+    };
+
     return (
         <>
             <div className="grid md:grid-cols-2 md:gap-4 md:mt-4 md:mb-4">
@@ -79,12 +98,14 @@ const Profile = () => {
                         <>
                             <input
                                 type="text"
+                                className="text-black"
                                 value={editedUser ? editedUser.name : ""}
                                 onChange={(e) => handleInputChange(e, "name")}
                                 placeholder="Nombre"
                             />
                             <input
                                 type="text"
+                                className="text-black"
                                 value={editedUser ? editedUser.lastName : ""}
                                 onChange={(e) => handleInputChange(e, "lastName")}
                                 placeholder="Apellido"
@@ -95,15 +116,34 @@ const Profile = () => {
                         )}
                     </p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Fecha de Nacimiento: 
-                        <span className="text-black/60">{user ? user.birth : "Cargando..."}</span>
+                        {editMode ? (
+                            <input
+                                type="date"
+                                className="text-black"
+                                value={editedUser ? editedUser.birth : ""}
+                                onChange={(e) => handleInputChange(e, "birth")}
+                            />
+                        ) : (
+                            <span className="text-black/60">{user ? user.birth : "Cargando..."}</span>
+                        )}
                     </p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Mail: 
-                        <span className="text-black/60">{user ? user.email : "Cargando..."}</span>
+                        {editMode ? (
+                            <input
+                                type="email"
+                                className="text-black"
+                                value={editedUser ? editedUser.email : ""}
+                                onChange={(e) => handleInputChange(e, "email")}
+                            />
+                        ) : (
+                            <span className="text-black/60">{user ? user.email : "Cargando..."}</span>
+                        )}
                     </p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Número de Teléfono: 
                         {editMode ? (
                             <input
                                 type="text"
+                                className="text-black"
                                 value={editedUser ? editedUser.phoneNumber : ""}
                                 onChange={(e) => handleInputChange(e, "phoneNumber")}
                             />
@@ -115,6 +155,7 @@ const Profile = () => {
                         {editMode ? (
                             <input
                                 type="text"
+                                className="text-black"
                                 value={editedUser ? editedUser.address : ""}
                                 onChange={(e) => handleInputChange(e, "address")}
                             />
@@ -126,6 +167,7 @@ const Profile = () => {
                         {editMode ? (
                             <input
                                 type="text"
+                                className="text-black"
                                 value={editedUser ? editedUser.city : ""}
                                 onChange={(e) => handleInputChange(e, "city")}
                             />
@@ -134,21 +176,27 @@ const Profile = () => {
                         )}
                     </p>
                     <div>
-                        <p className={user && user.register ? "bg-amber-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center": 
-                         "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>
+                        <p className={user && user.register ? "bg-amber-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center" : "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>
                             Estado de Matrícula: {user ? user.register ? "Activa" : "Caducada" : "Cargando..."}
                         </p>
+                        {editMode ? (
+                            <div className="mt-4 text-center">
+                                <Button onClick={handleSaveChanges}>Guardar</Button>
+                                <Button onClick={toggleEditMode}>Cancelar</Button>
+                            </div>
+                        ) : (
+                            <div className="mt-4 text-center">
+                                <Button onClick={toggleEditMode}>Editar</Button>
+                            </div>
+                        )}
+                        <div className="mt-4 text-center">
+                            {editMode ? (
+                                <Button onClick={handleToggleRegistration}>
+                                    {user && user.register ? 'Desactivar Matrícula' : 'Activar Matrícula'}
+                                </Button>
+                            ) : null}
+                        </div>
                     </div>
-                    {editMode ? (
-                        <div className="mt-4 text-center">
-                            <Button onClick={handleSaveChanges}>Guardar</Button>
-                            <Button onClick={toggleEditMode}>Cancelar</Button>
-                        </div>
-                    ) : (
-                        <div className="mt-4 text-center">
-                            <Button onClick={toggleEditMode}>Editar</Button>
-                        </div>
-                    )}
                 </div>
             </div>
         </>
