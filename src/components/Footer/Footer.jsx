@@ -12,7 +12,7 @@ const Footer = () => {
         <ul className="flex max-sm:flex-col gap-x-6 gap-y-2">
           <li>
             <a
-              href="javascript:void(0)"
+              href="#"
               className="hover:text-gray-600 text-black text-base transition-all"
             >
               Términos y Condiciones
@@ -20,7 +20,7 @@ const Footer = () => {
           </li>
           <li>
             <a
-              href="javascript:void(0)"
+              href="#"
               className="hover:text-gray-600 text-black text-base transition-all"
             >
               Política de Privacidad
@@ -28,7 +28,7 @@ const Footer = () => {
           </li>
           <li>
             <a
-              href="javascript:void(0)"
+              href="#"
               className="hover:text-gray-600 text-black text-base transition-all"
             >
               Contacto
