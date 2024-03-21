@@ -8,48 +8,39 @@ import {
   IconButton,
   TextField,
 } from "@radix-ui/themes";
-import { CgGym } from "react-icons/cg";
+import { CgGym, CgSpinner, CgTrash } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { LuPencil } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
-import AuthContext from "../../utils/context/AuthContext";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { getFromApi, postToApi } from "../../utils/functions/api";
+import {
+  getFromApi,
+  postToApi,
+  deleteFromApi,
+} from "../../utils/functions/api";
 
 export const Routines = () => {
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
-  const { user } = useContext(AuthContext);
-  const [client, setClient] = useState({});
 
   useEffect(() => {
-    const fetchRoutines = async (cl) => {
+    const fetchRoutines = async () => {
       const response = await getFromApi("routines/");
       const fetchedRoutines = await response.json();
-      return fetchedRoutines.filter((r) => r.client == cl.id);
+      return fetchedRoutines;
     };
 
-    const fetchClient = async () => {
-      const response = await getFromApi("clients/");
-      const clients = await response.json();
-      const foundClient = clients.find(
-        (client) => client.user == user.username
-      );
-      setClient(foundClient);
-      return foundClient;
-    };
-
-    fetchClient()
-      .then((cl) => fetchRoutines(cl))
+    fetchRoutines()
       .then((r) => setRoutines(r))
       .catch(() => {
         setError(
-          "There was a problem while searching your routines. Please stand by."
+          "There was a problem while searching your routines. Please stand by.",
         );
       });
-  }, [user.username]);
+  }, []);
 
   return (
     <Section className="md:m-0 m-5">
@@ -59,25 +50,35 @@ export const Routines = () => {
         </Heading>
       </div>
 
-      <RoutineForm
-        client={client}
-        set_routines={setRoutines}
-        routines={routines}
-      />
+      <RoutineForm set_routines={setRoutines} routines={routines} />
 
       {error ? (
         <Error message={error} size="3" />
       ) : (
-        <ListRoutines routines={routines} />
+        <ListRoutines routines={routines} set_routines={setRoutines} />
       )}
     </Section>
   );
 };
 
-const ListRoutines = ({ routines }) => {
+const ListRoutines = ({ routines, set_routines }) => {
   const navigate = useNavigate();
-  const editRoutine = (routine) => navigate("/routines/" + routine.id);
+  const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
   const startRoutine = (routine) => navigate("start/" + routine.id);
+
+  const deleteRoutine = (routine) => {
+    if (
+      window.confirm(
+        `¿Estás seguro de que deseas borrar la rutina "${routine.name}"?`,
+      )
+    ) {
+      deleteFromApi(`routines/delete/${routine.id}/`).then(
+        set_routines((c_routines) =>
+          c_routines.filter((r) => r.name !== routine.name),
+        ).catch(() => {}),
+      );
+    }
+  };
 
   if (routines.length === 0) {
     return (
@@ -87,40 +88,57 @@ const ListRoutines = ({ routines }) => {
   return (
     <Flex gap="4" direction="column">
       {routines.map((routine) => (
-        <Button
+        <div
           key={routine.id}
-          variant="soft"
           size="4"
-          className="bg-radixgreen/10 !items-center !p-7 !justify-between "
-          onClick={() => editRoutine(routine)}
+          className="flex bg-radixgreen/10 items-center p-4 justify-between rounded-lg"
         >
-          <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
-            {routine.name}
-          </Text>
-          <IconButton
-            size="3"
-            radius="full"
-            onClick={() => startRoutine(routine)}
-          >
-            <CgGym className="size-6 rotate-30" />
-          </IconButton>
-        </Button>
+          <span className="flex gap-3 items-center">
+            <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
+              {routine.name}
+            </Text>
+            {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
+          </span>
+          <span className="flex gap-3">
+            <IconButton
+              size="3"
+              radius="full"
+              onClick={() => startRoutine(routine)}
+            >
+              <CgGym className="size-6 rotate-30" />
+            </IconButton>
+            <IconButton
+              size="3"
+              radius="full"
+              onClick={() => editRoutine(routine)}
+            >
+              <LuPencil className="size-5" />
+            </IconButton>
+            <IconButton
+              size="3"
+              radius="full"
+              color="red"
+              onClick={(e) => {
+                deleteRoutine(routine);
+                e.stopPropagation();
+              }}
+            >
+              <CgTrash className="size-6" />
+            </IconButton>
+          </span>
+        </div>
       ))}
     </Flex>
   );
 };
 
-const RoutineForm = ({ set_routines, routines, client }) => {
+const RoutineForm = ({ set_routines, routines }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    values: {
-      client: client.id,
-    },
-  });
+  } = useForm();
 
   const isUnique = (routineName) => {
     return (
@@ -141,8 +159,8 @@ const RoutineForm = ({ set_routines, routines, client }) => {
       .then((posted_routine) => {
         set_routines((c_routines) =>
           c_routines.map((r) =>
-            r.temp_id == tempObject.temp_id ? posted_routine : r
-          )
+            r.temp_id == tempObject.temp_id ? posted_routine : r,
+          ),
         );
       })
       .catch((e) => {
@@ -195,6 +213,6 @@ ListRoutines.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
 };
