@@ -26,7 +26,8 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
-import { EditWorkout } from "./views/Workouts/EditWorkout";
+import EditWorkout from "./views/Workouts/EditWorkout";
+import Series from "./views/Series/Series"; // Importar el componente Series
 
 const ownerRoutes = [
   {
@@ -73,8 +74,13 @@ const userRoutes = [
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
-  { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
-  { path: "workouts/:id", element: <EditWorkout /> },
+  { path: "add-tickets", element: <AddTickets /> },
+  { path: "routines/:routineId/workouts", element: <EditWorkout /> },
+  // Ruta de las series anidada bajo la ruta de User
+  { 
+    path: "workout/:workoutId/series", 
+    element: <Series /> 
+  },
 ];
 
 const router = createBrowserRouter([

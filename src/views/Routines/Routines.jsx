@@ -11,7 +11,7 @@ import {
 import { CgGym, CgSpinner, CgTrash } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuPencil } from "react-icons/lu";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
@@ -64,8 +64,7 @@ export const Routines = () => {
 const ListRoutines = ({ routines, set_routines }) => {
   const navigate = useNavigate();
   const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
-  const startRoutine = (routine) => navigate("start/" + routine.id);
-
+  const startRoutine = (routine) => navigate(`/user/routines/${routine.id}/workouts`, { state: { routineId: routine.id } });
   const deleteRoutine = (routine) => {
     if (
       window.confirm(
