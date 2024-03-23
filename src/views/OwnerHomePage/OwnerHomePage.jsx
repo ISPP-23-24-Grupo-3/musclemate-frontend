@@ -27,7 +27,7 @@ export default function OwnerHomePage() {
                     Mis Máquinas
                 </Button>
             </Link>
-            <Link to="/register-client">
+            <Link to="/register-user">
                 <Button size="4" variant="classic" className="mt-4">
                     Registrar Cliente
                 </Button>

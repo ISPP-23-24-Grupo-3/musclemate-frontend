@@ -3,26 +3,45 @@ import { HiUser, HiOutlineMail,HiPhone } from "react-icons/hi";
 import { HiHome} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import { postToApi } from "../../utils/functions/api";
+import { postToApi, postToApiRegister } from "../../utils/functions/api";
+import { useNavigate } from "react-router";
 
 
 
 const ClientRegister = () => {
+
+  const navigate = useNavigate()
+
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-
-  const postUser = async () => {
-    postToApi('users/create/', {
-      "username":"owner1",
-       "password": "pbkdf2_sha256$720000$WSQKOFW6AKLFtPIMa6E3aU$QQt4xn2PQjMAW8X31Jf3UXhxp8IkYA82lTbcQaL/K58=",
-       "rol": "owner"
-    }).then(res => res.json())
-  }
-
-  const onSubmit =  (register) => {
-    postUser().then(res => console.log(res))
-    
-  }
+  const onSubmit = async (formData) => {
+    try {
+      const { name, lastName, email, phoneNumber, address, username, password } = formData;
+      
+      const requestBody = {
+        name,
+        lastName,
+        email,
+        phoneNumber,
+        address,
+        userCustom: {
+          username,
+          password
+        }
+      };
+      
+      const response = await postToApiRegister('owners/create/', requestBody);
+  
+      if (!response.ok) {
+        throw new Error('Error al crear propietario');
+      }
+  
+      console.log('Propietario creado exitosamente');
+      navigate('/login');
+    } catch (error) {
+      console.error('Hubo un error al crear el propietario:', error);
+    }
+  };
 
 
 
@@ -47,21 +66,21 @@ const ClientRegister = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="relative flex items-center mb-4">
             <HiUser className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="userName" className="mr-3">Nombre</label>
+            <label htmlFor="name" className="mr-3">Nombre</label>
             <input
-              {...register("userName", {
+              {...register("name", {
                 required: messages.req,
               })}
-              name="userName"
+              name="name"
               type="text"
               className={`w-full pl-4 pr-100000 px-4 py-3 border rounded-lg ${
-                errors.userName ? 'border-red-500' : 'border-radixgreen'
+                errors.name ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
               style={{ marginLeft: "3rem" }}
             />
           </div>
-          {errors.userName && (
-            <p className="text-red-500">{errors.userName.message}</p>
+          {errors.name && (
+            <p className="text-red-500">{errors.name.message}</p>
           )}
 
           <div className="relative flex items-center mb-4">
@@ -82,42 +101,42 @@ const ClientRegister = () => {
 
           <div className="relative flex items-center mb-4">
             <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="mail" className="mr-3">Correo electrónico</label>
+            <label htmlFor="email" className="mr-3">Correo electrónico</label>
             <input
-              {...register("mail", {
+              {...register("email", {
                 required: messages.req,
-                pattern: { value: patterns.mail, message: messages.mail }
+                pattern: { value: patterns.email, message: messages.email }
               })}
-              name="mail"
+              name="email"
               type="email"
               className={`w-full pl-90 px-4 py-3 border rounded-lg ${
-                errors.mail ? 'border-red-500' : 'border-radixgreen'
+                errors.email ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
               style={{ marginLeft: "1rem" }}
             />
           </div>
-          {errors.mail && (
-            <p className="text-red-500">{errors.mail.message}</p>
+          {errors.email && (
+            <p className="text-red-500">{errors.email.message}</p>
           )}
 
           <div className="relative flex items-center mb-4">
             <HiPhone className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="phone" className="mr-3">Número de telefono</label>
+            <label htmlFor="phoneNumber" className="mr-3">Número de telefono</label>
             <input
-              {...register("phone", {
+              {...register("phoneNumber", {
                 required: messages.req,
-                pattern: { value: patterns.phoneNumber, message: messages.phone}
+                pattern: { value: patterns.phoneNumber, message: messages.phoneNumber}
               })}
-              name="phone"
+              name="phoneNumber"
               type="number"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.phone ? 'border-red-500' : 'border-radixgreen'
+                errors.phoneNumber ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
               style={{ marginLeft: "0.5rem" }}
             />
           </div>
-          {errors.phone && (
-          <p className="text-red-500">{errors.phone.message}</p>
+          {errors.phoneNumber && (
+          <p className="text-red-500">{errors.phoneNumber.message}</p>
           )}
 
           <div className="relative flex items-center mb-4">
@@ -138,6 +157,43 @@ const ClientRegister = () => {
           {errors.address && (
           <p className="text-red-500">{errors.address.message}</p>
           )}
+
+          <div className="relative flex items-center mb-4">
+          <HiHome className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="username" className="mr-3">Nombre de usuario</label>
+            <input
+              {...register("username", {
+                required: messages.req,
+              })}
+              name="username"
+              type="text"
+              className={`w-full pl-4 pr-100000 px-4 py-3 border rounded-lg ${
+                errors.username ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+              style={{ marginLeft: "3rem" }}
+            />
+          </div>
+
+
+          <div className="relative flex items-center mb-4">  
+          <HiHome className="w-6 h-6 text-radixgreen mr-3" />
+            <label htmlFor="password" className="mr-3">Contraseña</label>  
+            <input
+              {...register("password", {
+                required: messages.req,
+                minLength: {
+                  value: 10,
+                  message: "La contraseña debe tener más de 10 caracteres"
+                }
+              })}
+              name="password"
+              type="password"
+              className={`w-full pl-4 pr-100000 px-4 py-3 border rounded-lg ${
+                errors.password ? 'border-red-500' : 'border-radixgreen'
+              } bg-white text-black`}
+              style={{ marginLeft: "3rem" }}
+            />
+          </div>
 
           <Button
             type="submit"
