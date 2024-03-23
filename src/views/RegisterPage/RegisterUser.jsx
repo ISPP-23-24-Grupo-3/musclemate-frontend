@@ -244,7 +244,11 @@ const UserRegister = () => {
             <label htmlFor="zipCode">Código Postal</label>
             <input
               {...register("zipCode", {
-                required: messages.req
+                required: messages.req,
+                minLength: {
+                  value: 5,
+                  message: "El código postal tiene que estar compuesto por 5 dígitos"
+                }
               })}
               name="zipCode"
               type="number"
