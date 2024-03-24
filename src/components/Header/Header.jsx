@@ -72,7 +72,7 @@ const Header = () => {
                 </Link>
               </>
             )}
-            <button className="lg:hidden ml-4 mr-4" onClick={handleMenu}>
+            <button className={`lg:hidden ${user ? "" : "hidden"} ml-4 mr-4`} onClick={handleMenu}>
               <svg
                 className="w-7 h-7"
                 fill="#000"
