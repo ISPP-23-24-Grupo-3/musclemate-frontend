@@ -145,6 +145,14 @@ const Header = () => {
                     Crear ticket
                   </Link>
                 </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/user/profile"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Mi Perfil
+                  </Link>
+                </li>
               </>
             ) : null}
           </ul>
