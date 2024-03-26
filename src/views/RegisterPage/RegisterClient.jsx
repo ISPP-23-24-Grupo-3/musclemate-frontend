@@ -1,5 +1,5 @@
 import React from "react";
-import { HiUser, HiOutlineMail,HiPhone } from "react-icons/hi";
+import { HiUser, HiLockClosed, HiOutlineMail,HiPhone } from "react-icons/hi";
 import { HiHome} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
@@ -176,7 +176,7 @@ const ClientRegister = () => {
 
 
           <div className="relative flex items-center mb-4">  
-          <HiHome className="w-6 h-6 text-radixgreen mr-3" />
+          <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
             <label htmlFor="password" className="mr-3">Contraseña</label>  
             <input
               {...register("password", {

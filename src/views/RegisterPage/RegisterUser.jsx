@@ -17,12 +17,13 @@ const UserRegister = () => {
   const [gyms, setGyms] = useState(null);
   const navigate = useNavigate();
   const [selectedGym, setSelectedGym] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function getGyms() {
   
     const responseGym = await getFromApi('gyms/');
     const gymsData = await responseGym.json();
-    console.log(gymsData); // Log the response to check its format
+    console.log(gymsData); 
     return gymsData;
   }
 
@@ -58,7 +59,9 @@ const UserRegister = () => {
       const response = await postToApi('clients/create/', requestBody);
   
       if (!response.ok) {
-        throw new Error('Error al crear usuario');
+        const responseData = await response.json();
+        setErrorMessage(responseData.username[0]);
+        return;
       }
   
       console.log('Usuario creado exitosamente');
@@ -124,6 +127,10 @@ const UserRegister = () => {
               style={{ marginLeft: "2rem" }}
             />
           </div>
+          {errors.lastName && (
+            <p className="text-red-500">{errors.lastName.message}</p>
+          )}
+
           
 
           <div className="relative flex items-center">
@@ -158,6 +165,10 @@ const UserRegister = () => {
               className="w-full px-4 py-3 border rounded-lg g-white text-black"
             />
           </div>
+          {errors.birth && (
+          <p className="text-red-500">{errors.birth.message}</p>
+          )}
+
 
 
           <div className="relative flex items-center">
@@ -174,7 +185,7 @@ const UserRegister = () => {
                 <option value="">Seleccionar...</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
-                <option value="O">No binario</option>
+                <option value="O">Otro</option>
               </select>
           </div>
           {errors.gender && (
@@ -277,10 +288,14 @@ const UserRegister = () => {
               style={{ marginLeft: "3rem" }}
             />
           </div>
+          {errors.username && (
+            <p className="text-red-500 absolute mt-1 ml-3">{errors.username.message}</p>
+          )}
+          {errorMessage && <p className="text-red-500 mt-1 ml-3">{errorMessage}</p>}
 
 
           <div className="relative flex items-center mb-4">  
-          <HiHome className="w-6 h-6 text-radixgreen mr-3" />
+          <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
             <label htmlFor="password" className="mr-3">Contraseña</label>  
             <input
               {...register("password", {
@@ -298,6 +313,9 @@ const UserRegister = () => {
               style={{ marginLeft: "3rem" }}
             />
           </div>
+          {errors.password && (
+          <p className="text-red-500">{errors.password.message}</p>
+          )}
 
           <div className="flex items-center mb-4">
           <label htmlFor="gym" className="mr-3">Gimnasio</label>
@@ -315,7 +333,8 @@ const UserRegister = () => {
         </div>
         {errors.gym && (
           <p className="text-red-500">{errors.gym.message}</p>
-        )}
+          )}
+        
 
           <Button
             type="submit"
