@@ -1,7 +1,8 @@
-import { Button, Flex, Heading } from "@radix-ui/themes";
-import { Link } from "react-router-dom";
+import { Button, Flex, Heading } from '@radix-ui/themes'
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-export default function OwnerHomePage() {
+export default function ClientHomePage() {
   return (
     <>
       <Flex align="center" justify="center" direction="row">
@@ -16,33 +17,24 @@ export default function OwnerHomePage() {
           MuscleMate
         </Heading>
       </Flex>
-      <Flex direction="column" justify="center" align="center" gap="4" className="mb-5">
-        <Link to="../equipments">
+
+      <Flex direction="column" justify="center" align="center" gap="4">
+        <Link to="../routines">
           <Button size="4" variant="classic" className="mt-4">
-            Mis Máquinas
+            Mis Rutinas
           </Button>
         </Link>
-        <Link to="../users/register-user">
+        <Link to="../add-tickets">
           <Button size="4" variant="classic" className="mt-4">
-            Registrar Cliente
+            Crear un ticket
           </Button>
         </Link>
-        <Link to="../users">
+        <Link to="../profile">
           <Button size="4" variant="classic" className="mt-4">
-            Usuarios
-          </Button>
-        </Link>
-        <Link to="../tickets">
-          <Button size="4" variant="classic" className="mt-4">
-            Ver Tickets
-          </Button>
-        </Link>
-        <Link to="../my-gyms">
-          <Button size="4" variant="classic" className="mt-4">
-            Mis Gimnasios
+            Mi Perfil
           </Button>
         </Link>
       </Flex>
     </>
-  );
+  )
 }

@@ -77,17 +77,15 @@ const UserRegister = () => {
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
     phoneNumber: "Tiene que ser un numero de 9 cifras"
-
   };
 
   const patterns = {
     mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-    phoneNumber: /^\d{9}$/
+    phoneNumber: /^\d{9}$/,
   };
 
-
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen md:m-0 m-5">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Registro de nuevo usuario
@@ -131,15 +129,13 @@ const UserRegister = () => {
             <p className="text-red-500">{errors.lastName.message}</p>
           )}
 
-          
-
           <div className="relative flex items-center">
             <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
             <label htmlFor="email">Correo electrónico</label>
             <input
               {...register("email", {
                 required: messages.req,
-                pattern: { value: patterns.mail, message: messages.mail }
+                pattern: { value: patterns.mail, message: messages.mail },
               })}
               name="email"
               type="email"
@@ -170,7 +166,6 @@ const UserRegister = () => {
           )}
 
 
-
           <div className="relative flex items-center">
               <HiMiniIdentification className="w-6 h-6 text-radixgreen mr-3" />
               <label htmlFor="gender">Género</label>
@@ -189,7 +184,7 @@ const UserRegister = () => {
               </select>
           </div>
           {errors.gender && (
-          <p className="text-red-500">{errors.gender.message}</p>
+            <p className="text-red-500">{errors.gender.message}</p>
           )}
 
           <div className="relative flex items-center">
@@ -217,18 +212,18 @@ const UserRegister = () => {
             <label htmlFor="address">Dirección</label>
             <input
               {...register("address", {
-                required: messages.req
+                required: messages.req,
               })}
               name="address"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.address ? 'border-red-500' : 'border-radixgreen'
+                errors.address ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "2.10rem" }}
             />
           </div>
           {errors.address && (
-          <p className="text-red-500">{errors.address.message}</p>
+            <p className="text-red-500">{errors.address.message}</p>
           )}
 
           <div className="relative flex items-center">
@@ -236,19 +231,17 @@ const UserRegister = () => {
             <label htmlFor="city">Ciudad</label>
             <input
               {...register("city", {
-                required: messages.req
+                required: messages.req,
               })}
               name="city"
               type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
-                errors.city ? 'border-red-500' : 'border-radixgreen'
+                errors.city ? "border-red-500" : "border-radixgreen"
               } bg-white text-black`}
               style={{ marginLeft: "3.10rem" }}
             />
           </div>
-          {errors.city && (
-          <p className="text-red-500">{errors.city.message}</p>
-          )}
+          {errors.city && <p className="text-red-500">{errors.city.message}</p>}
 
           <div className="relative flex items-center">
             <HiBuildingOffice2 className="w-6 h-6 text-radixgreen mr-3" />

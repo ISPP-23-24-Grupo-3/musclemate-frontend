@@ -6,8 +6,6 @@ import { Button } from "@radix-ui/themes";
 import { postToApi, postToApiRegister } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 
-
-
 const ClientRegister = () => {
 
   const navigate = useNavigate()
@@ -43,21 +41,23 @@ const ClientRegister = () => {
     }
   };
 
-
+  const onSubmit = (register) => {
+    postUser().then((res) => console.log(res));
+  };
 
   const messages = {
     req: "Este campo es obligatorio",
     name: "El nombre del gimnasio tiene que ser mayor a 8 caracteres",
     mail: "Debes introducir una dirección correcta",
-    password: "La contraseña tiene que ser mayor a 10 caracteres"
+    password: "La contraseña tiene que ser mayor a 10 caracteres",
   };
 
   const patterns = {
-    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
   };
 
   return (
-    <div className="flex flex-col mt-3 md:flex-row justify-center items-center min-h-screen">
+    <div className="flex flex-col mt-3 md:flex-row justify-center items-center min-h-screen md:m-0 m-5">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl mb-8 md:mb-0 md:mr-8">
         <div className="w-full">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
@@ -208,12 +208,15 @@ const ClientRegister = () => {
        
         </form>
         </div>
-         
       </div>
-      
+
       <div className="w-full md:w-1/2">
-          <img src="https://img.grouponcdn.com/deal/pzR5AeLirhPUNLX4zHZz/zs-2048x1242/v1/c870x524.jpg" alt="Descripción de la imagen" className="mt-4 w-full h-auto"/>
-        </div>
+        <img
+          src="https://img.grouponcdn.com/deal/pzR5AeLirhPUNLX4zHZz/zs-2048x1242/v1/c870x524.jpg"
+          alt="Descripción de la imagen"
+          className="mt-4 w-full h-auto"
+        />
+      </div>
     </div>
   );
 };
