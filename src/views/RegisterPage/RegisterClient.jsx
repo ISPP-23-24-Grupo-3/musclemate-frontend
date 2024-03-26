@@ -41,10 +41,6 @@ const ClientRegister = () => {
     }
   };
 
-  const onSubmit = (register) => {
-    postUser().then((res) => console.log(res));
-  };
-
   const messages = {
     req: "Este campo es obligatorio",
     name: "El nombre del gimnasio tiene que ser mayor a 8 caracteres",
