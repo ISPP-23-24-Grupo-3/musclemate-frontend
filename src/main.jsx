@@ -27,6 +27,7 @@ import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 import MailVerification from "./views/VerificationPage/MailVerification";
+import ProfileClient from "./views/UserListing/ProfileClient";
 
 const ownerRoutes = [
   {
@@ -74,6 +75,7 @@ const userRoutes = [
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
+  { path: "profile", element: <ProfileClient /> }, // Ruta dentro de UserRoute
 ];
 
 const router = createBrowserRouter([
