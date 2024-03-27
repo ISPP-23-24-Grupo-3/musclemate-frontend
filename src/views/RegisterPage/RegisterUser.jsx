@@ -3,7 +3,6 @@ import { HiUser, HiLockClosed, HiOutlineMail,HiPhone, } from "react-icons/hi";
 import { HiBuildingOffice2,HiHome,HiMiniCake,HiMiniIdentification   } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import { Link } from "react-router-dom";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
@@ -65,7 +64,7 @@ const UserRegister = () => {
       }
   
       console.log('Usuario creado exitosamente');
-      navigate('/users');
+      navigate('/owner/users');
     } catch (error) {
       console.error('Hubo un error al crear el usuario:', error);
     }
