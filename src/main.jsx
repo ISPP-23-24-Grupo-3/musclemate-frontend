@@ -76,6 +76,7 @@ const userRoutes = [
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
+  { path: "events", element: <EventList /> },
 ];
 
 const router = createBrowserRouter([

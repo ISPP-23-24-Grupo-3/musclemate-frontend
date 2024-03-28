@@ -43,6 +43,11 @@ export default function OwnerHomePage() {
             Mis Gimnasios
           </Button>
         </Link>
+        <Link to="../events">
+          <Button size="4" variant="classic" className="mt-4">
+            Mis Eventos
+          </Button>
+        </Link>
       </Flex>
     </>
   );
