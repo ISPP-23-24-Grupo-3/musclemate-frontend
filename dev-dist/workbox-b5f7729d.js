@@ -3287,12 +3287,12 @@ define(['exports'], (function (exports) { 'use strict';
        * @param {Object} options
        * @param {Array<RegExp>} [options.denylist] If any of these patterns match,
        * the route will not handle the request (even if a allowlist RegExp matches).
-       * @param {Array<RegExp>} [options.allowlist=[/./]] If any of these patterns
+       * @param {Array<RegExp>} [options.allowlist=[/./, /terms-conditions/]] If any of these patterns
        * match the URL's pathname and search parameter, the route will handle the
        * request (assuming the denylist doesn't match).
        */
       constructor(handler, {
-        allowlist = [/./],
+        allowlist = [/./, /terms-conditions/],
         denylist = []
       } = {}) {
         {
