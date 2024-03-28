@@ -42,7 +42,7 @@ export default function TermsConditions() {
                 <br></br>
                 <p> Operamos el sitio web MuscleMate (el "Sitio"), así como cualquier otro producto y servicio relacionado que haga referencia o enlace a estos términos legales (los "Términos Legales") (colectivamente, los "Servicios"). </p><br></br>
 
-                <p>Puede ponerse en contacto con nosotros por correo electrónico a <a style={{ color: "green" }}>musclemate33@gmail.com.</a></p><br></br>
+                <p>Puede ponerse en contacto con nosotros por correo electrónico a <strong style={{ color: "green" }}>musclemate33@gmail.com.</strong></p><br></br>
 
                 <p>Las presentes Condiciones Legales constituyen un acuerdo jurídicamente vinculante firmado entre usted, ya sea personalmente o en nombre de una entidad ("usted"),
                     y MuscleMate, Inc., en relación con su acceso y uso de los Servicios. Usted acepta que, al acceder a los Servicios, ha leído, comprendido y aceptado la totalidad
