@@ -29,17 +29,24 @@ const AddEventsForm = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm( {values: {gym: selectedGym}},);
 
-  const onSubmit = async (machineInfo) => {
+  const onSubmit = async (eventInfo) => {
     try {
-      const response = await postToApi('events/create/',
-        machineInfo);
+      const durationHours = Math.floor(eventInfo.duration / 60);
+      const durationMinutes = eventInfo.duration % 60;
+      const durationSeconds = 0;
+      const formattedDuration = `${durationHours.toString().padStart(2, '0')}:${durationMinutes.toString().padStart(2, '0')}:${durationSeconds.toString().padStart(2, '0')}`;
+  
+      
+      const eventData = { ...eventInfo, duration: formattedDuration };
+  
+      const response = await postToApi('events/create/', eventData);
   
       if (!response.ok) {
         throw new Error('Error al crear evento');
       }
   
       console.log('Evento creado exitosamente');
-      /*navigate('/owner/equipments')*/
+      // navigate('/owner/equipments');
     } catch (error) {
       console.error('Hubo un error al crear el evento:', error);
     }
