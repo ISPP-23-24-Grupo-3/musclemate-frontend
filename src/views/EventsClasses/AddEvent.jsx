@@ -58,7 +58,7 @@ const AddEventsForm = () => {
     <div className="flex justify-center items-center min-h-screen">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
-          Agregar máquina de gimnasio
+          Crear evento
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex items-center mb-4">
