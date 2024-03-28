@@ -206,11 +206,15 @@ export default function MachineList() {
             </Popover.Content>
           </Popover.Root>
         </div>
+        
+        <Link to="add">
+          <Button size="3" className="w-full">
+            <IoMdAddCircleOutline className="size-6" />
+            Añadir máquina
+          </Button>
+        </Link>
 
-        <Button size="3">
-          <IoMdAddCircleOutline className="size-6" />
-          Añadir máquina
-        </Button>
+
 
         {filtered_machine_list.map((machine) => {
           const ratings = machine?.reviews?.map((review) => review.rating);
