@@ -34,6 +34,11 @@ export default function ClientHomePage() {
             Eventos
           </Button>
         </Link>
+        <Link to="../profile">
+          <Button size="4" variant="classic" className="mt-4">
+            Mi Perfil
+          </Button>
+        </Link>
       </Flex>
     </>
   )
