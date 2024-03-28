@@ -23,8 +23,19 @@ export default function MachineList() {
   const [sorting_reverse, set_sorting_reverse] = useState(false);
   const [search, set_search] = useState("");
   const [machines, setMachines] = useState([]);
-
+  const [selectedGym, setSelectedGym] = useState(null);
+  const [gyms, setGyms] = useState([]);
   const [machineRatings, setMachineRatings] = useState([]);
+
+  const getGyms = () => {
+    getFromApi("gyms/")
+      .then((response) => response.json())
+      .then((data) => setGyms(data));
+  };
+
+  useEffect(() => {
+    getGyms();
+  }, []);
 
   function getMachines() {
     getFromApi("equipments/")
@@ -98,6 +109,8 @@ export default function MachineList() {
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
               : true
+              &&
+              (selectedGym === null || m.gym === selectedGym)
           )
           .sort(
             (a, b) =>
@@ -189,7 +202,7 @@ export default function MachineList() {
               </ToggleGroup.Root>
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
-              <span className="text-lg font-bold">Filtrar por</span>
+              <span className="text-lg font-bold">Filtrar por musculos</span>
               <div className="flex gap-3">
                 {MUSCLES.map((m) => (
                   <Toggle.Root
@@ -203,6 +216,21 @@ export default function MachineList() {
                   </Toggle.Root>
                 ))}
               </div>
+              <span className="text-lg font-bold">Filtrar por gimnasios</span>
+              <div className="flex gap-3">
+                {gyms.map((gym) => (
+                  <Toggle.Root
+                    key={gym.id}
+                    className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
+                      selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
+                      py-1 px-2 border border-radixgreen rounded-full`}
+                    onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
+                  >
+                    {gym.name}
+                  </Toggle.Root>
+                ))}
+              </div>
+              
             </Popover.Content>
           </Popover.Root>
         </div>
