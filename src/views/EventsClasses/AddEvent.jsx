@@ -4,6 +4,13 @@ import { Button } from "@radix-ui/themes";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
+import {
+    HiBuildingOffice2,
+    HiHome,
+    HiMiniCake,
+    HiMiniIdentification,
+  } from "react-icons/hi2";
+  import { HiUser, HiOutlineMail, HiPhone } from "react-icons/hi";
 
 const AddEventsForm = () => {
 
