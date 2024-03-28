@@ -17,6 +17,7 @@ import Profile from "./views/UserListing/Profile";
 import EquipmentList from "./views/Equipment/EquipmentList";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
+import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
 import { Routines } from "./views/Routines/Routines";
 import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
@@ -75,6 +76,7 @@ const userRoutes = [
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
+  { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
   { path: "events", element: <EventList /> },
 ];
