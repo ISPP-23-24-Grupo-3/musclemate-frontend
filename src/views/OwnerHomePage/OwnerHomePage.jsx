@@ -16,14 +16,13 @@ export default function OwnerHomePage() {
           MuscleMate
         </Heading>
       </Flex>
-
       <Flex direction="column" justify="center" align="center" gap="4" className="mb-5">
         <Link to="../equipments">
           <Button size="4" variant="classic" className="mt-4">
             Mis Máquinas
           </Button>
         </Link>
-        <Link to="../users/register">
+        <Link to="../users/register-user">
           <Button size="4" variant="classic" className="mt-4">
             Registrar Cliente
           </Button>
