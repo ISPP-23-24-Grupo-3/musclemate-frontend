@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 const ClientRegister = () => {
 
   const [isChecked, setIsChecked] = useState(false);
+  const [error, setError] = useState(null); 
 
   const navigate = useNavigate()
 
@@ -36,13 +37,13 @@ const ClientRegister = () => {
         if (!response.ok) {
           throw new Error('Error al crear propietario');
         }
+        console.log('Propietario creado exitosamente');
+        navigate('/login');
       } else {
         throw new Error('Debes aceptar los Términos y Condiciones para registrarte');
       }
-
-      console.log('Propietario creado exitosamente');
-      navigate('/login');
     } catch (error) {
+      setError(error.message);
       console.error('Hubo un error al crear el propietario:', error);
     }
   };
@@ -65,6 +66,9 @@ const ClientRegister = () => {
           <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
             Registro de nuevo propietario
           </h2>
+          {error && (
+          <div className="text-red-500">{error}</div>
+        )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="relative flex items-center mb-4">
               <HiUser className="w-6 h-6 text-radixgreen mr-3" />
@@ -190,7 +194,7 @@ const ClientRegister = () => {
               />
             </div>
             <br></br>
-            <input type="checkbox" onChange={() => setIsChecked(!isChecked)} /><p>Acepta los <Link to="/terms-conditions" style={{color: "blue"}}>Términos y Condiciones</Link></p>
+            <input type="checkbox" onChange={() => setIsChecked(!isChecked)} /><p>Acepta los <Link to="/terms-conditions" style={{ color: "blue" }}>Términos y Condiciones</Link></p>
 
             <Button
               type="submit"
