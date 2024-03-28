@@ -10,6 +10,8 @@ import {
   HiMiniCake,
   HiMiniIdentification,
 } from "react-icons/hi2";
+import { HiUser, HiOutlineMail, HiPhone } from "react-icons/hi";
+
 
 const AddEventsForm = () => {
 
