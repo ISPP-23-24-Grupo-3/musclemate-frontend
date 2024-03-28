@@ -3,7 +3,7 @@ import { HiUser, HiLockClosed, HiOutlineMail,HiPhone } from "react-icons/hi";
 import { HiHome} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import { postToApi, postToApiRegister } from "../../utils/functions/api";
+import { postToApiRegister } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 
 const ClientRegister = () => {
