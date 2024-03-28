@@ -29,6 +29,11 @@ function App() {
             Iniciar Sesión
           </Button>
         </Link>
+        <Link to="/terms-conditions">
+          <Button size="4" variant="classic" color="green">
+            Terminos y condiciones
+          </Button>
+        </Link>
         <div className="md:mt-8 m-5 grid grid-row-3 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center">
                 <IoStatsChart className="h-16 w-16 text-gray-700" />
