@@ -4,13 +4,19 @@ import { Button } from "@radix-ui/themes";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
+import {
+  HiBuildingOffice2,
+  HiHome,
+  HiMiniCake,
+  HiMiniIdentification,
+} from "react-icons/hi2";
 
 const AddEventsForm = () => {
 
 
 
   const { user } = useContext(AuthContext);
-  const [gyms, setGyms] = useState(null)
+  const [gyms, setGyms] = useState([]);
   const [selectedGym, setSelectedGym] = useState(null);
   const navigate = useNavigate()
 
@@ -204,7 +210,7 @@ const AddEventsForm = () => {
             } bg-white text-black`}
           >
             <option value="">Seleccionar gimnasio</option>
-            {gyms && gyms.map(gym=><option key={gym.id} value={gym.id}>{gym.name}</option>)}
+            {gyms && gyms.map(gym=>(<option key={gym.id} value={gym.id}>{gym.name}</option>))}
             
           </select>
         </div>
