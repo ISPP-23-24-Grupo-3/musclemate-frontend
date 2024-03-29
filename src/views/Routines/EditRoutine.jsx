@@ -291,11 +291,26 @@ const EditableWorkout = ({
 }) => {
   const { user } = useContext(AuthContext); // Obtenemos la información del usuario del contexto de autorización
 
+  const [clientId, setClientId] = useState(null);
+  const clientUsername = user?.username;
+
+  useEffect(() => {
+    if (clientUsername) {
+      getFromApi("clients/detail/" + clientUsername + "/")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setClientId(data.id);
+        });
+    }
+  }, [clientUsername]);
+
   const addWorkout = (workout) => {
     const parsed_workout = {
       ...workout,
       equipment: workout.equipment.map((e) => e.value),
-      client: user.id, // Asignamos el ID del usuario al workout
+      client: clientId, // Asignamos el ID del usuario al workout
     };
     const temp_workout = {
       ...parsed_workout,
@@ -389,8 +404,11 @@ const EditableWorkout = ({
     values: {
       routine: [routine.id],
       name: defaultWorkout?.name,
-      equipment:
-        defaultWorkout?.equipment.map((e) => ({ value: e + "" })) || [],
+      equipment: Array.isArray(defaultWorkout?.equipment)
+        ? defaultWorkout?.equipment.length > 1
+          ? defaultWorkout?.equipment.map((e) => ({ value: e + "" }))
+          : { value: defaultWorkout?.equipment[0] + "" }
+        : [],
     },
   });
 
