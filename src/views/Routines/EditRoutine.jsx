@@ -19,6 +19,7 @@ import { LuPencil } from "react-icons/lu";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
+import AuthContext from "../../utils/context/AuthContext";
 
 import PropTypes from "prop-types";
 import {
@@ -288,10 +289,13 @@ const EditableWorkout = ({
   defaultWorkout,
   other_workouts,
 }) => {
+  const { user } = useContext(AuthContext); // Obtenemos la información del usuario del contexto de autorización
+
   const addWorkout = (workout) => {
     const parsed_workout = {
       ...workout,
       equipment: workout.equipment.map((e) => e.value),
+      client: user.id, // Asignamos el ID del usuario al workout
     };
     const temp_workout = {
       ...parsed_workout,
