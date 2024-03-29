@@ -27,6 +27,7 @@ import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 import EventList from "./views/EventsClasses/EventList";
+import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
 import MailVerification from "./views/VerificationPage/MailVerification";
 import ProfileClient from "./views/UserListing/ProfileClient";
 
@@ -112,8 +113,13 @@ const router = createBrowserRouter([
         children: userRoutes,
       },
       {
+        path: "/terms-conditions",
+        element: <TermsConditions />,
+       },
+       {
         path: "/verify",
         element: <MailVerification />
+
       },
     ],
     errorElement: <ErrorPage />,
