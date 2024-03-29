@@ -5,6 +5,7 @@ import { useContext } from "react";
 import AuthContext from "./utils/context/AuthContext";
 import { IoBarbell, IoStatsChart, IoTicket } from "react-icons/io5";
 
+
 function App() {
 
   const {user} = useContext(AuthContext)

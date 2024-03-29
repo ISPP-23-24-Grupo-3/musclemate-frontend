@@ -17,6 +17,7 @@ import Profile from "./views/UserListing/Profile";
 import EquipmentList from "./views/Equipment/EquipmentList";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
+import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
 import { Routines } from "./views/Routines/Routines";
 import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
@@ -28,7 +29,9 @@ import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 import PricingPage from "./views/PricingPage/PricingPage";
 import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
 import SuccessPage from "./views/SuccessPage";
-import SubscriptionContext from "./utils/context/SubscriptionContext";
+import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
+import MailVerification from "./views/VerificationPage/MailVerification";
+import ProfileClient from "./views/UserListing/ProfileClient";
 
 const ownerRoutes = [
   {
@@ -87,7 +90,9 @@ const userRoutes = [
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
+  { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
+  { path: "profile", element: <ProfileClient /> }, // Ruta dentro de UserRoute
 ];
 
 const router = createBrowserRouter([
@@ -116,6 +121,15 @@ const router = createBrowserRouter([
         path: "/user",
         element: <UserRoute />,
         children: userRoutes,
+      },
+      {
+        path: "/terms-conditions",
+        element: <TermsConditions />,
+       },
+       {
+        path: "/verify",
+        element: <MailVerification />
+
       },
     ],
     errorElement: <ErrorPage />,
