@@ -11,17 +11,17 @@ export function GetPricingPlans(){
     });
 }
 
-export async function CreateCheckoutSession(priceId){
+export async function CreateCheckoutSession(priceId, quantity = 1){
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
             {
                 price: priceId,
-                quantity: 1,
+                quantity: quantity,
             },
         ],
         mode: 'subscription',
-        success_url: `${window.location.origin}/success`,
+        success_url: `${window.location.origin}/owner/success?session_id={CHECKOUT_SESSION_ID}&priceId=${priceId}`,
         cancel_url: `${window.location.origin}/owner/pricing`,
     });
     return JSON.stringify({url: session.url});

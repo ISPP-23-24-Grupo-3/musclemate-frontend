@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { GetPricingPlans } from '../../utils/functions/stripe'
 import PricingButton from '../../components/PricingButton/PricingButton'
 import PricingCard from '../../components/PricingCard/PricingCard'
 import { MoonLoader } from 'react-spinners'
 import { Heading } from '@radix-ui/themes'
-
+import SubscriptionContext from '../../utils/context/SubscriptionContext'
 
 
 function PricingPage() {
@@ -17,8 +17,6 @@ function PricingPage() {
             setPlans(plans.data.slice(0, 2))
         })
         setLoading(false)
-
-        
     }, [])
 
   return (

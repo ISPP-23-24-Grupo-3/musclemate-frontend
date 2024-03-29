@@ -14,7 +14,7 @@ function PricingCard({priceId, name, price ,features, background = "light"}) {
               </div>
               <div className="">
               {
-              background === "light" ? <PricingButton priceId={priceId} /> : <PricingButton priceId={priceId} background={"dark"} />
+              background === "light" ? <PricingButton subscription_plan={name} priceId={priceId} /> : <PricingButton subscription_plan={name} priceId={priceId} background={"dark"} />
               }
                 <ul className="space-y-4">
                   {/* Features */}

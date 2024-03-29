@@ -126,6 +126,22 @@ const Header = () => {
                     Tickets
                   </Link>
                 </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/pricing"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Planes
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/subscriptions"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Subscripciones
+                  </Link>
+                </li>
               </>
             ) : user?.rol === "client" ? (
               <>
