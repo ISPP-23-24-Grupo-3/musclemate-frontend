@@ -127,7 +127,7 @@ export default function MachineList() {
           <Popover.Root>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
-                <Button radius="none" size="2" variant="soft" className="m-0">
+                <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
                   <HiOutlineFilter />
                 </Button>
               </Popover.Trigger>
@@ -150,6 +150,7 @@ export default function MachineList() {
               <div className="flex justify-between mb-2">
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
+                  name="reverse_sort"
                   onPressedChange={(p) => set_sorting_reverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -234,6 +235,7 @@ export default function MachineList() {
           return (
             <Link to={`${machine.id}`} key={machine.id}>
               <Button
+                name = "maquina"
                 key={machine.id}
                 variant="soft"
                 size="3"
