@@ -72,7 +72,7 @@ const Header = () => {
                 </Link>
               </>
             )}
-            <button className="lg:hidden ml-4 mr-4" onClick={handleMenu}>
+            <button className={`lg:hidden ${user ? "" : "hidden"} ml-4 mr-4`} onClick={handleMenu}>
               <svg
                 className="w-7 h-7"
                 fill="#000"
@@ -124,6 +124,22 @@ const Header = () => {
                     className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
                   >
                     Tickets
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/pricing"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Planes
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/subscriptions"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Subscripciones
                   </Link>
                 </li>
               </>
