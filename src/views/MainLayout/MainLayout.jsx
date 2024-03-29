@@ -3,10 +3,12 @@ import { Theme, Container } from "@radix-ui/themes";
 import Footer from "../../components/Footer/Footer";
 import { Outlet } from "react-router";
 import { AuthProvider } from "../../utils/context/AuthContext";
+import { SubscriptionProvider } from "../../utils/context/SubscriptionContext";
 
 const MainLayout = ({ children }) => {
   return (
-    <AuthProvider>
+    <SubscriptionProvider>
+      <AuthProvider>
       <Theme>
         <div className="flex flex-col min-h-screen">
           <Header />
@@ -18,6 +20,7 @@ const MainLayout = ({ children }) => {
         </div>
       </Theme>
     </AuthProvider>
+    </SubscriptionProvider>
   );
 };
 
