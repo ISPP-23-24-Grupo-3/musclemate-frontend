@@ -26,20 +26,14 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
-<<<<<<< HEAD
-<<<<<<< HEAD
 import EditWorkout from "./views/Workouts/EditWorkout";
-import Series from "./views/Series/Series"; // Importar el componente Series
-=======
-=======
+import Series from "./views/Series/Series";
 import PricingPage from "./views/PricingPage/PricingPage";
 import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
 import SuccessPage from "./views/SuccessPage";
 import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
 import MailVerification from "./views/VerificationPage/MailVerification";
->>>>>>> origin/develop
 import ProfileClient from "./views/UserListing/ProfileClient";
->>>>>>> origin/develop
 
 const ownerRoutes = [
   {
