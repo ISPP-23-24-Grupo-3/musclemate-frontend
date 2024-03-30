@@ -57,10 +57,10 @@ const MyGymsOwner = () => {
 
         </div>
 
-        <Button size="3" onClick={handleLinkClick}>
+        {/* <Button size="3" onClick={handleLinkClick}>
           <IoMdAddCircleOutline className="size-6" />
           Crear Nuevo Gimnasio
-        </Button>
+        </Button> */}
 
         {isLoading ? (
           <p>Cargando...</p>

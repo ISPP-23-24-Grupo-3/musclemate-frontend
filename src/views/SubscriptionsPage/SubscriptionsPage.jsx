@@ -9,6 +9,7 @@ import { useLocation } from "react-router";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import AuthContext from "../../utils/context/AuthContext";
 import Stripe from "stripe";
+import { Link } from "react-router-dom";
 
 const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
@@ -166,11 +167,14 @@ function SubscriptionsPage() {
       const data = await response.json();
       if (!location.state?.subscription_plan) {
         setGyms(data.filter((gym) => gym.subscription_plan !== "free"));
+        if (gyms.length === 0) {
+          setError("No tienes gimnasios suscritos.");
+        }
       }else{
       setGyms(data);
       }
     } else {
-      alert("Error al obtener los gimnasios.");
+      setError("Error al cargar los gimnasios.");
     }
   };
 
@@ -189,6 +193,19 @@ function SubscriptionsPage() {
               : "Gestiona tus gimnasios suscritos"}
           </Heading>
         </div>
+      {!location.state?.subscription_plan ? (
+      <>
+        {error && 
+        <>
+        <p className="text-red-500">{error}</p>
+        <Link to="/owner/pricing">
+          <Button color="radixgreen">Ver planes de suscripción</Button>
+        </Link>
+        </>
+        }
+      </>
+      ) : null}
+
         <div className="flex flex-col gap-3 md:grid md:grid-cols-2">
           {gyms.map((gym) => (
             <Gym
