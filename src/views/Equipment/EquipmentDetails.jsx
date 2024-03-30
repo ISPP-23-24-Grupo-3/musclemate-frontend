@@ -224,18 +224,18 @@ export default function EquipmentDetails() {
         console.error("Error fetching API tickets:", error);
       }
     };
-  
+
     if (machineDetails?.name) {
       fetchTickets();
     }
   }, [machineDetails]);
-  
+
 
   const indexOfLastTicket = currentPage * ticketsPerPage;
   const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
   const currentTickets = apiTickets.slice(indexOfFirstTicket, indexOfLastTicket);
 
-  
+
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleInputChange = (e, field) => {
@@ -286,16 +286,17 @@ export default function EquipmentDetails() {
   return (
     <div className="mt-8 max-w-xl mx-auto">
       <div className="p-10 border border-radixgreen rounded md:m-0 m-5">
-      <Heading
-        size="7"
-        className="text-radixgreen !mb-3 text-center"
-      >
-        Detalles de la Máquina
-      </Heading>
+        <Heading
+          size="7"
+          className="text-radixgreen !mb-3 text-center"
+        >
+          Detalles de la Máquina
+        </Heading>
         <div className="mb-4">
           <strong className="text-radixgreen">Nombre:</strong>{" "}
           {editMode ? (
             <input
+              name="name"
               type="text"
               className="border border-gray-300 rounded px-2 py-1"
               value={updatedDetails.name}
@@ -309,6 +310,7 @@ export default function EquipmentDetails() {
           <strong className="text-radixgreen">Descripción:</strong>{" "}
           {editMode ? (
             <textarea
+              name="description"
               className="border border-gray-300 rounded px-2 py-1"
               value={updatedDetails.description}
               onChange={(e) => handleInputChange(e, "description")}
@@ -321,6 +323,7 @@ export default function EquipmentDetails() {
           <strong className="text-radixgreen">Marca:</strong>{" "}
           {editMode ? (
             <input
+              name="brand"
               type="text"
               className="border border-gray-300 rounded px-2 py-1"
               value={updatedDetails.brand}
@@ -338,6 +341,7 @@ export default function EquipmentDetails() {
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
           {editMode ? (
             <select
+              name="muscular_group"
               className="border border-gray-300 rounded px-2 py-1"
               value={updatedDetails.muscular_group}
               onChange={(e) => handleInputChange(e, "muscular_group")}
@@ -354,6 +358,7 @@ export default function EquipmentDetails() {
           <strong className="text-radixgreen">Número de Serie:</strong>{" "}
           {editMode ? (
             <input
+              name="serial_number"
               type="text"
               className="border border-gray-300 rounded px-2 py-1"
               value={updatedDetails.serial_number}
@@ -404,20 +409,19 @@ export default function EquipmentDetails() {
         )}
       </div>
       <div className="mt-8 text-center md:m-0 m-5">
-      <Heading
-        size="7"
-        className="text-radixgreen !mt-8 !mb-3 text-center"
-      >
-        Tickets
-      </Heading>
+        <Heading
+          size="7"
+          className="text-radixgreen !mt-8 !mb-3 text-center"
+        >
+          Tickets
+        </Heading>
         <ul>
-        {apiDataLoaded && currentTickets.length > 0 ? (
-          currentTickets.map((ticket) => (
+          {apiDataLoaded && currentTickets.length > 0 ? (
+            currentTickets.map((ticket) => (
               <li
                 key={ticket.id}
-                className={`bg-white shadow-md p-4 rounded-md mb-4 ${
-                  ticket.status ? "text-green-500" : "text-red-500"
-                }`}
+                className={`bg-white shadow-md p-4 rounded-md mb-4 ${ticket.status ? "text-green-500" : "text-red-500"
+                  }`}
               >
                 <div className="flex items-center mb-2">
                   <HiTicket className="w-6 h-6 mr-2" />
@@ -429,8 +433,8 @@ export default function EquipmentDetails() {
                       </span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
-                        Asunto:{" "}
-                        <span className="text-black">{ticket.label}</span>
+                      Asunto:{" "}
+                      <span className="text-black">{ticket.label}</span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
                       Descripción:{" "}
@@ -477,43 +481,42 @@ export default function EquipmentDetails() {
             <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
           )}
         </ul>
-      {/* Agregar controles de paginación */}
-      <div className="flex justify-center mt-4">
-        <ul className="flex">
-          <li className="mr-2">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
-            >
-              Anterior
-            </button>
-          </li>
-          {apiTickets.length > 0 &&
-            Array.from({ length: Math.ceil(apiTickets.length / ticketsPerPage) }, (_, i) => (
-              <li key={i} className="mr-2">
-                <button
-                  onClick={() => paginate(i + 1)}
-                  className={`px-3 py-1 rounded-lg ${
-                    currentPage === i + 1 ? "bg-radixgreen text-white" : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              </li>
-            ))}
-          <li>
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === Math.ceil(apiTickets.length / ticketsPerPage)}
-              className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
-            >
-              Siguiente
-            </button>
-          </li>
-        </ul>
+        {/* Agregar controles de paginación */}
+        <div className="flex justify-center mt-4">
+          <ul className="flex">
+            <li className="mr-2">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+              >
+                Anterior
+              </button>
+            </li>
+            {apiTickets.length > 0 &&
+              Array.from({ length: Math.ceil(apiTickets.length / ticketsPerPage) }, (_, i) => (
+                <li key={i} className="mr-2">
+                  <button
+                    onClick={() => paginate(i + 1)}
+                    className={`px-3 py-1 rounded-lg ${currentPage === i + 1 ? "bg-radixgreen text-white" : "bg-gray-200 text-gray-600"
+                      }`}
+                  >
+                    {i + 1}
+                  </button>
+                </li>
+              ))}
+            <li>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === Math.ceil(apiTickets.length / ticketsPerPage)}
+                className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+              >
+                Siguiente
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
