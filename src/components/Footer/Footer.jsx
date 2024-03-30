@@ -1,5 +1,6 @@
 import { Flex } from "@radix-ui/themes";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -11,28 +12,14 @@ const Footer = () => {
         </Flex>
         <ul className="flex max-sm:flex-col gap-x-6 gap-y-2">
           <li>
-            <a
-              href="#"
+            <Link to="/terms-conditions"
               className="hover:text-gray-600 text-black text-base transition-all"
             >
               Términos y Condiciones
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
-              className="hover:text-gray-600 text-black text-base transition-all"
-            >
-              Política de Privacidad
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="hover:text-gray-600 text-black text-base transition-all"
-            >
-              Contacto
-            </a>
+            <strong>musclemate33@gmail.com</strong>
           </li>
         </ul>
       </div>
