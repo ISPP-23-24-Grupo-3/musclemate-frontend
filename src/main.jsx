@@ -27,9 +27,17 @@ import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import EditWorkout from "./views/Workouts/EditWorkout";
 import Series from "./views/Series/Series"; // Importar el componente Series
 =======
+=======
+import PricingPage from "./views/PricingPage/PricingPage";
+import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
+import SuccessPage from "./views/SuccessPage";
+import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
+import MailVerification from "./views/VerificationPage/MailVerification";
+>>>>>>> origin/develop
 import ProfileClient from "./views/UserListing/ProfileClient";
 >>>>>>> origin/develop
 
@@ -70,6 +78,19 @@ const ownerRoutes = [
     path: "my-gyms",
     element: <MyGymsOwner />,
   },
+  {
+    path:"pricing",
+    element:<PricingPage/>
+  },
+  {
+    path:"subscriptions",
+    element:<SubscriptionsPage/>
+  },
+  {
+    path:"success",
+    element: <SuccessPage/>
+  }
+
 ];
 
 const userRoutes = [
@@ -78,18 +99,10 @@ const userRoutes = [
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
-<<<<<<< HEAD
   { path: "add-tickets", element: <AddTickets /> },
   { path: "routines/:routineId/workouts", element: <EditWorkout /> },
-  // Ruta de las series anidada bajo la ruta de User
-  { 
-    path: "workout/:workoutId/series", 
-    element: <Series /> 
-  },
-=======
-  { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
-  { path: "profile", element: <ProfileClient /> }, // Ruta dentro de UserRoute
->>>>>>> origin/develop
+  { path: "workout/:workoutId/series", element: <Series /> },
+  { path: "profile", element: <ProfileClient /> }, 
 ];
 
 const router = createBrowserRouter([
@@ -118,6 +131,15 @@ const router = createBrowserRouter([
         path: "/user",
         element: <UserRoute />,
         children: userRoutes,
+      },
+      {
+        path: "/terms-conditions",
+        element: <TermsConditions />,
+       },
+       {
+        path: "/verify",
+        element: <MailVerification />
+
       },
     ],
     errorElement: <ErrorPage />,
