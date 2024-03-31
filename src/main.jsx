@@ -81,13 +81,14 @@ const ownerRoutes = [
   {
     path: "events",
     element: <AddEventsForm/>
-  }
+  },
+  {
     path:"pricing",
-    element:<PricingPage/>
+    element: <PricingPage/>
   },
   {
     path:"subscriptions",
-    element:<SubscriptionsPage/>
+    element: <SubscriptionsPage/>
   },
   {
     path:"success",
