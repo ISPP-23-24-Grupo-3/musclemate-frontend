@@ -1,21 +1,13 @@
-import React ,{useState, useEffect,useContext} from "react";
+import { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
-import {
-  HiBuildingOffice2,
-  HiHome,
-  HiMiniCake,
-  HiMiniIdentification,
-} from "react-icons/hi2";
-import { HiUser, HiOutlineMail, HiPhone } from "react-icons/hi";
+import { HiMiniCake } from "react-icons/hi2";
 
 
 const AddEventsForm = () => {
-
-
 
   const { user } = useContext(AuthContext);
   const [gyms, setGyms] = useState([]);
@@ -24,18 +16,18 @@ const AddEventsForm = () => {
 
 
   async function getGyms() {
-  
-          const responseGym = await getFromApi('gyms/');
-          return responseGym.json();
-         
+
+    const responseGym = await getFromApi('gyms/');
+    return responseGym.json();
+
   }
 
   useEffect(() => {
     getGyms().then(gyms => setGyms(gyms)).catch(error => console.log(error));
-    }, []);
+  }, []);
 
 
-  const { register, handleSubmit, formState: { errors } } = useForm( {values: {gym: selectedGym}},);
+  const { register, handleSubmit, formState: { errors } } = useForm({ values: { gym: selectedGym } },);
 
   const onSubmit = async (eventInfo) => {
     try {
@@ -43,18 +35,28 @@ const AddEventsForm = () => {
       const durationMinutes = eventInfo.duration % 60;
       const durationSeconds = 0;
       const formattedDuration = `${durationHours.toString().padStart(2, '0')}:${durationMinutes.toString().padStart(2, '0')}:${durationSeconds.toString().padStart(2, '0')}`;
-  
-      
+
+
       const eventData = { ...eventInfo, duration: formattedDuration };
-  
-      const response = await postToApi('events/create/', eventData);
-  
-      if (!response.ok) {
-        throw new Error('Error al crear evento');
+
+      const currentDate = new Date().toISOString().split('T')[0];;
+      console.log(currentDate)
+      console.log(eventInfo.date)
+
+      if (eventInfo.date < currentDate) {
+        throw new Error("La fecha debe ser posterior a la fecha actual");
+      } 
+      else{ 
+
+        const response = await postToApi('events/create/', eventData);
+
+        if (!response.ok) {
+          throw new Error('Error al crear evento');
+        }
+
+        console.log('Evento creado exitosamente');
+        navigate('/owner/events')
       }
-  
-      console.log('Evento creado exitosamente');
-      // navigate('/owner/equipments');
     } catch (error) {
       console.error('Hubo un error al crear el evento:', error);
     }
@@ -62,9 +64,7 @@ const AddEventsForm = () => {
 
   const messages = {
     req: "Este campo es obligatorio",
-    name: "El nombre de la máquina debe tener más de 5 caracteres",
-    brand: "La marca debe tener más de 3 caracteres",
-    reference: "El número de referencia debe ser único por gimnasio",
+    name: "El nombre del evento debe tener más de 5 caracteres",
     description: "La descripción debe tener más de 10 caracteres",
     muscularGroup: "El grupo muscular debe ser especificado",
   };
@@ -79,27 +79,25 @@ const AddEventsForm = () => {
           <div className="flex items-center mb-4">
             <label htmlFor="name" className="mr-3">Titulo del evento</label>
             <input
-              {...register("name", { required: messages.req})}
+              {...register("name", { required: messages.req, minLength: { value: 5, message: messages.name } })}
               name="name"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.name ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.name ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
+
             />
           </div>
           {errors.name && (
             <p className="text-red-500">{errors.name.message}</p>
           )}
-          
+
           <div className="flex items-center mb-4">
             <label htmlFor="description" className="mr-3">Descripción</label>
             <textarea
               {...register("description", { required: messages.req, minLength: { value: 10, message: messages.description } })}
               name="description"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.description ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.description ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
               rows="4"
             />
           </div>
@@ -112,46 +110,47 @@ const AddEventsForm = () => {
             <input
               {...register("capacity", { required: messages.req })}
               name="capacity"
-              type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.capacity ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              type="number"
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.capacity ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
               style={{ marginLeft: "0.4rem" }}
+              min="0" // Establecer el valor mínimo permitido
+              step="1"
             />
           </div>
           {errors.capacity && (
             <p className="text-red-500">{errors.capacity.message}</p>
           )}
-          
+
           <div className="flex items-center mb-4">
             <label htmlFor="attendees" className="mr-3">Asistentes</label>
             <input
               {...register("attendees")}
               name="attendees"
-              type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.attendees ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              type="number"
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.attendees ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
               style={{ marginLeft: "0.4rem" }}
+              min="0" // Establecer el valor mínimo permitido
+              step="1"
             />
           </div>
 
           <div className="flex items-center mb-4">
             <label htmlFor="instructor" className="mr-3">Monitor</label>
             <input
-              {...register("instructor", { required: messages.req})}
+              {...register("instructor", { required: messages.req })}
               name="instructor"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.instructor ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.instructor ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
+
             />
           </div>
           {errors.instructor && (
             <p className="text-red-500">{errors.instructor.message}</p>
           )}
-          
+
           <div className="relative flex items-center">
             <HiMiniCake className="w-6 h-6 text-radixgreen mr-3" />
             <label htmlFor="date">Fecha del evento</label>
@@ -171,9 +170,8 @@ const AddEventsForm = () => {
               {...register("duration", { required: "Este campo es obligatorio" })}
               name="duration"
               type="number"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.duration ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.duration ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
             />
           </div>
           {errors.duration && (
@@ -186,16 +184,15 @@ const AddEventsForm = () => {
               {...register("intensity", { required: messages.req })}
               name="intensity"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.intensity ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.intensity ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
               style={{ marginLeft: "3rem" }}
-              
+
             >
-            <option value="">Selecciona una intensidad</option>
-            <option value="L">Low</option>
-            <option value="M">Medium</option>
-            <option value="H">High</option>
+              <option value="">Selecciona una intensidad</option>
+              <option value="L">Low</option>
+              <option value="M">Medium</option>
+              <option value="H">High</option>
             </select>
           </div>
           {errors.intensity && (
@@ -203,22 +200,21 @@ const AddEventsForm = () => {
           )}
 
           <div className="flex items-center mb-4">
-          <label htmlFor="gym" className="mr-3">Gimnasio</label>
-          <select
-            {...register("gym", { required: messages.req })}
-            name="gym"
-            className={`flex-1 px-4 py-3 border rounded-lg ${
-              errors.gym ? 'border-red-500' : 'border-radixgreen'
-            } bg-white text-black`}
-          >
-            <option value="">Seleccionar gimnasio</option>
-            {gyms && gyms.map(gym=>(<option key={gym.id} value={gym.id}>{gym.name}</option>))}
-            
-          </select>
-        </div>
-        {errors.gym && (
-          <p className="text-red-500">{errors.gym.message}</p>
-        )}
+            <label htmlFor="gym" className="mr-3">Gimnasio</label>
+            <select
+              {...register("gym", { required: messages.req })}
+              name="gym"
+              className={`flex-1 px-4 py-3 border rounded-lg ${errors.gym ? 'border-red-500' : 'border-radixgreen'
+                } bg-white text-black`}
+            >
+              <option value="">Seleccionar gimnasio</option>
+              {gyms && gyms.map(gym => (<option key={gym.id} value={gym.id}>{gym.name}</option>))}
+
+            </select>
+          </div>
+          {errors.gym && (
+            <p className="text-red-500">{errors.gym.message}</p>
+          )}
 
           <Button
             type="submit"
@@ -227,12 +223,12 @@ const AddEventsForm = () => {
             color="green"
             className="w-full py-3"
           >
-            Agregar máquina
+            Publicar Evento
           </Button>
         </form>
       </div>
     </div>
   );
-        };
+};
 
 export default AddEventsForm;

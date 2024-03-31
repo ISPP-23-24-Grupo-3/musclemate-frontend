@@ -59,6 +59,10 @@ const ownerRoutes = [
     element: <EventList />,
   },
   {
+    path: "events/add",
+    element: <AddEventsForm/>
+  },
+  {
     path: "equipments",
     element: <EquipmentList />,
   },
@@ -77,10 +81,6 @@ const ownerRoutes = [
   {
     path: "my-gyms",
     element: <MyGymsOwner />,
-  },
-  {
-    path: "events",
-    element: <AddEventsForm/>
   },
   {
     path:"pricing",

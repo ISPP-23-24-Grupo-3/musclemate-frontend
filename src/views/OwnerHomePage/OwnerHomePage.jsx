@@ -37,11 +37,6 @@ export default function OwnerHomePage() {
             Ver Tickets
           </Button>
         </Link>
-        <Link to="../events">
-          <Button size="4" variant="classic" className="mt-4">
-            Crear evento
-          </Button>
-        </Link>
         <Link to="../my-gyms">
           <Button size="4" variant="classic" className="mt-4">
             Mis Gimnasios

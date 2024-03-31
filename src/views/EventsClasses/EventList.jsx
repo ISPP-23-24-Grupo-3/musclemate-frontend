@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IoMdSearch, IoIosClose, IoIosArrowRoundUp } from 'react-icons/io';
+import { IoMdSearch, IoIosClose, IoIosArrowRoundUp, IoMdAddCircleOutline } from 'react-icons/io';
 import * as Toggle from '@radix-ui/react-toggle';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { HiOutlineFilter } from 'react-icons/hi';
@@ -191,11 +191,18 @@ const EventList = () => {
             </Popover.Content>
           </Popover.Root>
         </div>
+        <Link to="add">
+          <Button size="3" className="w-full">
+            <IoMdAddCircleOutline className="size-6" />
+            Añadir evento
+          </Button>
+        </Link>
 
         {filteredEventList.map((event) => (
           <Popover.Root>
             <Popover.Trigger>
             <Button
+              key={event}
               size="3"
               onClick={() => handleEventClick(event.id)}
               className="flex !justify-between !h-fit !p-2 !px-4 w-full"
