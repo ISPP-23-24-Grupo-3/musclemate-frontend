@@ -36,6 +36,7 @@ import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
 import MailVerification from "./views/VerificationPage/MailVerification";
 import ProfileClient from "./views/UserListing/ProfileClient";
 import AddEventsForm from "./views/EventsClasses/AddEvent";
+import CreateGym from "./views/Gyms/CreateGym";
 
 const ownerRoutes = [
   {
@@ -93,6 +94,10 @@ const ownerRoutes = [
   {
     path:"success",
     element: <SuccessPage/>
+  },
+  {
+    path: "gyms/add",
+    element : <CreateGym />
   }
 ];
 

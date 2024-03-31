@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { IoMdAddCircleOutline, IoMdSearch} from "react-icons/io";
 import { Button, TextField, Heading } from "@radix-ui/themes";
 import { getFromApi } from "../../utils/functions/api";
+import { Link } from "react-router-dom"; // Importa Link desde react-router-dom
 
 const MyGymsOwner = () => {
   const [gyms, setGyms] = useState([]);
@@ -57,10 +58,12 @@ const MyGymsOwner = () => {
 
         </div>
 
-        {/* <Button size="3" onClick={handleLinkClick}>
-          <IoMdAddCircleOutline className="size-6" />
-          Crear Nuevo Gimnasio
-        </Button> */}
+        <Link to="/owner/gyms/add"> {/* Usa Link en lugar de Button */}
+          <Button size="3" className="w-full">
+            <IoMdAddCircleOutline className="size-6" />
+            Crear Nuevo Gimnasio
+          </Button>
+        </Link>
 
         {isLoading ? (
           <p>Cargando...</p>
