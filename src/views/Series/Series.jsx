@@ -112,15 +112,15 @@ const Series = () => {
     return () => clearInterval(interval);
   }, [timerOn]);
 
-  const editSerie = (id, reps, weight, date, duration) => {
+  const editSerie = (id, reps, weight) => {
     let serie = series.find((serie) => serie.id === id);
-    console.log(serie);
+    console.log(serie, reps, weight);
     putToApi(`series/update/${id}/`, {
-      reps: reps,
-      weight: weight,
-      date: date,
+      reps: reps === "" ? serie.reps : reps,
+      weight: weight === "" ? serie.weight : weight,
+      date: serie.date,
       workout: workoutId,
-      duration: duration
+      duration: serie.duration
     })
     .then((response) => {
       if (response.ok) {
@@ -161,12 +161,12 @@ const Series = () => {
             <div>
               <Text>Repeticiones: </Text>
               <TextField.Input {...register("reps", {
-                validate: value => value > 0 || "El valor debe ser un número positivo",
+                validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número entero positivo",
               })}></TextField.Input>
               <span className="text-red-500">{errors.reps?.message}</span>
               <Text>Peso: </Text>
               <TextField.Input {...register("peso", {
-                validate: value => value > 0 || "El valor debe ser un número positivo",
+                validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número positivo",
               })} ></TextField.Input>
               <span className="text-red-500">{errors.peso?.message}</span>
             </div>
@@ -199,26 +199,26 @@ const Series = () => {
 
                     <form className={`${editor[serie.id] ? undefined : "hidden"} text-radixgreen font-bold`}
                     onSubmit={handleSubmit((r) => {
-                      editSerie(serie.id, r.reps2, r.peso2, serie.date, serie.duration);
+                      editSerie(serie.id, r[`reps${serie.id}`], r[`peso${serie.id}`]);
                       setEditor(prev => ({ ...prev, [serie.id]: false }));
                     })}>
                       Repeticiones:
                       <TextField.Input
-                        color={`${errors.reps2 ? "red" : "green"}`}
-                        {...register("reps2", {
-                          validate: value => value === "" || value > 0 || "El valor debe ser un número positivo",
+                          color={`${errors[`reps${serie.id}`] ? "red" : "green"}`}
+                          defaultValue={serie.reps}
+                        {...register(`reps${serie.id}`, {
+                          validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número positivo",
                         })}
                       ></TextField.Input>
-                      <span className="text-red-500">{errors.reps2?.message}</span>
-                      Peso:
+                      <span className="text-red-500">{errors[`reps${serie.id}`] && errors[`reps${serie.id}`].message}</span>                      Peso:
                       <TextField.Input
-                        color={`${errors.peso2 ? "red" : "green"}`}
-                        {...register("peso2", {
-                          validate: value => value === "" || value > 0 || "El valor debe ser un número positivo",
+                          color={`${errors[`peso${serie.id}`] ? "red" : "green"}`}
+                          defaultValue={serie.weight}
+                          {...register(`peso${serie.id}`, {
+                            validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número positivo",
                         })}
                       ></TextField.Input>
-                      <span className="text-red-500">{errors.peso2?.message}</span>
-                      <Button>Aceptar</Button>
+                      <span className="text-red-500">{errors[`peso${serie.id}`] && errors[`peso${serie.id}`].message}</span>                      <Button>Aceptar</Button>
                     </form>
 
                   </div>
