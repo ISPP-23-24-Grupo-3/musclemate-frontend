@@ -159,6 +159,7 @@ const UserRegister = () => {
           {errors.email && (
             <p className="text-red-500">{errors.email.message}</p>
           )}
+          {errorMessageMail && <p className="text-red-500 mt-1 ml-3">{errorMessageMail}</p>}
 
           <div className="relative flex items-center">
             <HiMiniCake className="w-6 h-6 text-radixgreen mr-3" />
@@ -335,7 +336,6 @@ const UserRegister = () => {
           {errors.password && (
           <p className="text-red-500">{errors.password.message}</p>
           )}
-          {errorMessageMail && <p className="text-red-500 mt-1 ml-3">{errorMessageMail}</p>}
 
           <div className="flex items-center mb-4">
           <label htmlFor="gym" className="mr-3">Gimnasio</label>
