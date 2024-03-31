@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
 import { Button, TextField } from "@radix-ui/themes";
 
@@ -235,10 +235,12 @@ const EquipmentDetailsClient = () => {
       </div>
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-semibold mb-2">Tickets</h2>
-        <Button>
-          <IoMdAddCircleOutline className="size-6" />
-          Añadir ticket
-        </Button>
+        <Link to="../add-tickets">
+          <Button>
+            <IoMdAddCircleOutline className="size-6" />
+              Añadir ticket
+          </Button>
+        </Link>
         <ul className="mt-4">
           {apiDataLoaded && apiTickets.length > 0 ? (
             apiTickets.map((ticket) => (
