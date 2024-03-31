@@ -22,6 +22,16 @@ export function postToApi(url, data) {
   });
 }
 
+export function postToApiRegister(url, data) {
+  return fetch(`${BASE_URL}/${url}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+}
+
 export function putToApi(url, data) {
   return fetch(`${BASE_URL}/${url}`, {
     method: "PUT",

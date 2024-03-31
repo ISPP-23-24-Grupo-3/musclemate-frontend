@@ -26,6 +26,16 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
+import EventList from "./views/EventsClasses/EventList";
+import EditWorkout from "./views/Workouts/EditWorkout";
+import Series from "./views/Series/Series";
+import PricingPage from "./views/PricingPage/PricingPage";
+import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
+import SuccessPage from "./views/SuccessPage";
+import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
+import MailVerification from "./views/VerificationPage/MailVerification";
+import ProfileClient from "./views/UserListing/ProfileClient";
+import AddEventsForm from "./views/EventsClasses/AddEvent";
 import CreateGym from "./views/Gyms/CreateGym";
 
 const ownerRoutes = [
@@ -44,6 +54,14 @@ const ownerRoutes = [
   {
     path: "users/:userId/profile",
     element: <Profile />,
+  },
+  {
+    path: "events",
+    element: <EventList />,
+  },
+  {
+    path: "events/add",
+    element: <AddEventsForm/>
   },
   {
     path: "equipments",
@@ -66,6 +84,18 @@ const ownerRoutes = [
     element: <MyGymsOwner />,
   },
   {
+    path:"pricing",
+    element: <PricingPage/>
+  },
+  {
+    path:"subscriptions",
+    element: <SubscriptionsPage/>
+  },
+  {
+    path:"success",
+    element: <SuccessPage/>
+  },
+  {
     path: "gyms/add",
     element : <CreateGym />
   }
@@ -77,7 +107,11 @@ const userRoutes = [
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
-  { path: "add-tickets", element: <AddTickets /> }, // Ruta dentro de UserRoute
+  { path: "add-tickets", element: <AddTickets /> },
+  { path: "events", element: <EventList /> },
+  { path: "routines/:routineId/workouts", element: <EditWorkout /> },
+  { path: "workout/:workoutId/series", element: <Series /> },
+  { path: "profile", element: <ProfileClient /> }, 
 ];
 
 const router = createBrowserRouter([
@@ -106,6 +140,15 @@ const router = createBrowserRouter([
         path: "/user",
         element: <UserRoute />,
         children: userRoutes,
+      },
+      {
+        path: "/terms-conditions",
+        element: <TermsConditions />,
+       },
+       {
+        path: "/verify",
+        element: <MailVerification />
+
       },
     ],
     errorElement: <ErrorPage />,

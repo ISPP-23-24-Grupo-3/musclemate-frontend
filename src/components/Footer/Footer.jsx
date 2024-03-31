@@ -1,33 +1,29 @@
-
-import { Grid, Box, Flex} from '@radix-ui/themes';
+import { Flex } from "@radix-ui/themes";
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <Box className="bg-gray-100 border-t-2 border-black">
-        <Flex justify="center">
-            <img src="/pwa-64x64.png" alt="Logo" />
+    <footer className="bg-white border-t-2 py-6 px-16 font-[sans-serif]">
+      <div className="flex flex-col lg:flex-row items-center justify-between">
+        <Flex align="center">
+          <img src="/pwa-64x64.png" alt="Logo" className="mr-4 mb-4 sm:mb-0" />
+          <h1 className="text-xl font-bold">MuscleMate</h1>
         </Flex>
-      <Grid
-        columns="3" // Adjust the column distribution as needed
-        gap="4">
-        {/* Left column */}
-        <Box className="flex justify-center" height="9">
-          <p>Example information</p>
-        </Box>
-
-        {/* Middle column */}
-        <Box className="flex justify-center" height="9">
-          {/* Add your example information here */}
-          <p>Example information</p>
-        </Box>
-
-        {/* Right column */}
-        <Box className="flex justify-center" height="9">
-          {/* Add your example information here */}
-          <p>Example information</p>
-        </Box>
-      </Grid>
-    </Box>
+        <ul className="flex max-sm:flex-col gap-x-6 gap-y-2">
+          <li>
+            <Link to="/terms-conditions"
+              className="hover:text-gray-600 text-black text-base transition-all"
+            >
+              Términos y Condiciones
+            </Link>
+          </li>
+          <li>
+            <strong>musclemate33@gmail.com</strong>
+          </li>
+        </ul>
+      </div>
+    </footer>
   );
 };
 

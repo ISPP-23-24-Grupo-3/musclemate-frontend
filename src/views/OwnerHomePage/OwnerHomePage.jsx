@@ -16,7 +16,6 @@ export default function OwnerHomePage() {
           MuscleMate
         </Heading>
       </Flex>
-
       <Flex direction="column" justify="center" align="center" gap="4" className="mb-5">
         <Link to="../equipments">
           <Button size="4" variant="classic" className="mt-4">
@@ -41,6 +40,11 @@ export default function OwnerHomePage() {
         <Link to="../my-gyms">
           <Button size="4" variant="classic" className="mt-4">
             Mis Gimnasios
+          </Button>
+        </Link>
+        <Link to="../events">
+          <Button size="4" variant="classic" className="mt-4">
+            Mis Eventos
           </Button>
         </Link>
       </Flex>
