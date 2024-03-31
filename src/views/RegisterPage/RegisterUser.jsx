@@ -225,7 +225,7 @@ const UserRegister = () => {
                 required: messages.req,
                 maxLength: {
                   value: 255,
-                  message: "La direción no puede superar los 100 caracteres"
+                  message: "La direción no puede superar los 255 caracteres"
                 }
               })}
               name="address"
