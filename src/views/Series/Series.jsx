@@ -166,7 +166,7 @@ const Series = () => {
               <span className="text-red-500">{errors.reps?.message}</span>
               <Text>Peso: </Text>
               <TextField.Input {...register("peso", {
-                validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número positivo",
+                validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número entero positivo",
               })} ></TextField.Input>
               <span className="text-red-500">{errors.peso?.message}</span>
             </div>
@@ -207,15 +207,16 @@ const Series = () => {
                           color={`${errors[`reps${serie.id}`] ? "red" : "green"}`}
                           defaultValue={serie.reps}
                         {...register(`reps${serie.id}`, {
-                          validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número positivo",
+                          validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número entero positivo",
                         })}
                       ></TextField.Input>
-                      <span className="text-red-500">{errors[`reps${serie.id}`] && errors[`reps${serie.id}`].message}</span>                      Peso:
+                      <span className="text-red-500">{errors[`reps${serie.id}`] && errors[`reps${serie.id}`].message}</span>  
+                      Peso:
                       <TextField.Input
                           color={`${errors[`peso${serie.id}`] ? "red" : "green"}`}
                           defaultValue={serie.weight}
                           {...register(`peso${serie.id}`, {
-                            validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número positivo",
+                            validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número entero positivo",
                         })}
                       ></TextField.Input>
                       <span className="text-red-500">{errors[`peso${serie.id}`] && errors[`peso${serie.id}`].message}</span>                      <Button>Aceptar</Button>

@@ -433,7 +433,9 @@ const EditableWorkout = ({
               name="name"
               {...register("name", {
                 required: "Debes escribir un nombre",
-                validate: { unique: hasUniqueName },
+                validate: { unique: hasUniqueName,
+                            maxLength: value => value.length <= 100 || 'El valor no puede tener más de 100 caracteres'
+                          },
               })}
               color={errors.name && "red"}
               className={`${errors.name ? "!border-red-500" : undefined}`}
