@@ -35,6 +35,7 @@ import SuccessPage from "./views/SuccessPage";
 import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
 import MailVerification from "./views/VerificationPage/MailVerification";
 import ProfileClient from "./views/UserListing/ProfileClient";
+import AddEventsForm from "./views/EventsClasses/AddEvent";
 
 const ownerRoutes = [
   {
@@ -58,6 +59,10 @@ const ownerRoutes = [
     element: <EventList />,
   },
   {
+    path: "events/add",
+    element: <AddEventsForm/>
+  },
+  {
     path: "equipments",
     element: <EquipmentList />,
   },
@@ -79,17 +84,16 @@ const ownerRoutes = [
   },
   {
     path:"pricing",
-    element:<PricingPage/>
+    element: <PricingPage/>
   },
   {
     path:"subscriptions",
-    element:<SubscriptionsPage/>
+    element: <SubscriptionsPage/>
   },
   {
     path:"success",
     element: <SuccessPage/>
   }
-
 ];
 
 const userRoutes = [
