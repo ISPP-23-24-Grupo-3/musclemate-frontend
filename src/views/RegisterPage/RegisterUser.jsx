@@ -1,9 +1,8 @@
-import React,{useState, useEffect,useContext} from "react";
+import {useState, useEffect} from "react";
 import { HiUser, HiLockClosed, HiOutlineMail,HiPhone, } from "react-icons/hi";
 import { HiBuildingOffice2,HiHome,HiMiniCake,HiMiniIdentification   } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 
@@ -12,10 +11,8 @@ import { useNavigate } from "react-router";
 
 const UserRegister = () => {
 
-  const { user } = useContext(AuthContext);
   const [gyms, setGyms] = useState(null);
   const navigate = useNavigate();
-  const [selectedGym, setSelectedGym] = useState(null);
   const [errorMessageUser, setErrorMessageUser] = useState("");
   const [errorMessageMail, setErrorMessageMail] = useState("");
 
@@ -33,7 +30,7 @@ const UserRegister = () => {
 
 
 
-  const { register, handleSubmit, formState: { errors } } = useForm({values: {gym: selectedGym}},);
+  const { register, handleSubmit, formState: { errors } } = useForm({values: {gym: null}},);
 
   const onSubmit = async (formData) => {
     try {
@@ -60,12 +57,11 @@ const UserRegister = () => {
   
       if (!response.ok) {
         const responseData = await response.json();
-        setErrorMessageUser(responseData.username[0]);
-        setErrorMessageMail(responseData.email[0]);
+        setErrorMessageUser(responseData.username ? responseData.username[0]: '');
+        setErrorMessageMail(responseData.email ? responseData.email[0]: '');
         return;
       }
   
-      console.log('Usuario creado exitosamente');
       navigate('/owner/users');
     } catch (error) {
       console.error('Hubo un error al crear el usuario:', error);
