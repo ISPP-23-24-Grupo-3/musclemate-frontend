@@ -11,7 +11,7 @@ import {
 import { CgGym, CgSpinner, CgTrash } from "react-icons/cg";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuPencil } from "react-icons/lu";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
@@ -40,7 +40,7 @@ export const Routines = () => {
           "There was a problem while searching your routines. Please stand by.",
         );
       });
-  }, []);
+  }, [routines.length]);
 
   return (
     <Section className="md:m-0 m-5">
@@ -64,8 +64,7 @@ export const Routines = () => {
 const ListRoutines = ({ routines, set_routines }) => {
   const navigate = useNavigate();
   const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
-  const startRoutine = (routine) => navigate("start/" + routine.id);
-
+  const startRoutine = (routine) => navigate(`/user/routines/${routine.id}/workouts`, { state: { routineId: routine.id } });
   const deleteRoutine = (routine) => {
     if (
       window.confirm(
@@ -95,7 +94,7 @@ const ListRoutines = ({ routines, set_routines }) => {
         >
           <span className="flex gap-3 items-center">
             <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
-              {routine.name}
+              {routine.name} 
             </Text>
             {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
           </span>
@@ -174,16 +173,12 @@ const RoutineForm = ({ set_routines, routines }) => {
     <>
       <Collapsible.Root>
         <Collapsible.Trigger className="w-full">
-          <Button
-            className="w-full"
-            type="submit"
-            mb="5"
-            size="3"
-            variant="solid"
-          >
+          <span
+            className="w-full flex items-center justify-center bg-radixgreen rounded-lg p-3 mb-5 hover:bg-radixgreen/50 text-white text-lg"
+            type="submit">
             <IoMdAddCircleOutline className="size-6" />
             Añadir rutina
-          </Button>
+          </span>
         </Collapsible.Trigger>
         <Collapsible.Content>
           <form

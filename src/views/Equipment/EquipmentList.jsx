@@ -23,18 +23,24 @@ export default function MachineList() {
   const [sorting_reverse, set_sorting_reverse] = useState(false);
   const [search, set_search] = useState("");
   const [machines, setMachines] = useState([]);
-
+  const [selectedGym, setSelectedGym] = useState(null);
+  const [gyms, setGyms] = useState([]);
   const [machineRatings, setMachineRatings] = useState([]);
 
-  function getMachines() {
+  const[reviews, setReviews] = useState({});
+  const[issues, setIssues] = useState({});
+
+  useEffect(() => {
+    getFromApi("gyms/")
+    .then((response) => response.json())
+    .then((data) => setGyms(data));
+  }, [gyms]);
+
+  useEffect(() => {
     getFromApi("equipments/")
       .then((response) => response.json())
       .then((data) => setMachines(data));
-  }
-
-  useEffect(() => {
-    getMachines();
-  }, []);
+  }, [machines]);
 
   // Machine Ratings
   useEffect(() => {
@@ -67,23 +73,9 @@ export default function MachineList() {
 
   const SORTING_FUNCTIONS = {
     name: (a, b) => a.name.localeCompare(b.name),
-    issues: (a, b) => a.reviews.length - b.reviews.length,
-    reviews: (a, b) => a.issues.length - b.issues.length,
-    rating: (a, b) => {
-      const a_rating =
-        a.reviews
-          .map((r) => r.rating)
-          .reduce((previous, current) => {
-            return previous + current;
-          }, 0) / a.reviews.length;
-      const b_rating =
-        b.reviews
-          .map((r) => r.rating)
-          .reduce((previous, current) => {
-            return previous + current;
-          }, 0) / b.reviews.length;
-      return a_rating - b_rating;
-    },
+    reviews: (a, b) => a.reviews - b.reviews,
+    issues: (a, b) => a.issues - b.issues,
+    rating: (a, b) => a.rating - b.rating,
   };
 
   const addFilter = (filter) => set_filters([filter, ...filters]);
@@ -98,12 +90,35 @@ export default function MachineList() {
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
               : true
+              &&
+              (selectedGym === null || m.gym === selectedGym)
           )
           .sort(
             (a, b) =>
               SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1)
           )
       : [];
+
+  useEffect(() => {
+    for(let i = 0; i < machines.length; i++){
+      getFromApi(`assessments/equipment/${machines[i].id}/`)
+        .then((response) => response.json())
+        .then((data) => {
+          setReviews(prevReviews => ({
+            ...prevReviews,
+            [machines[i].id]: data.length
+          }));
+        });
+      getFromApi(`tickets/byEquipment/${machines[i].id}/`)
+        .then((response) => response.json())
+        .then((data) => {
+          setIssues(prevIssues => ({
+            ...prevIssues,
+            [machines[i].id]: data.length
+          }));
+        });
+    }
+  }), [machines];
 
   return (
     <>
@@ -127,7 +142,7 @@ export default function MachineList() {
           <Popover.Root>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
-                <Button radius="none" size="2" variant="soft" className="m-0">
+                <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
                   <HiOutlineFilter />
                 </Button>
               </Popover.Trigger>
@@ -150,6 +165,7 @@ export default function MachineList() {
               <div className="flex justify-between mb-2">
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
+                  name="reverse_sort"
                   onPressedChange={(p) => set_sorting_reverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -189,7 +205,7 @@ export default function MachineList() {
               </ToggleGroup.Root>
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
-              <span className="text-lg font-bold">Filtrar por</span>
+              <span className="text-lg font-bold">Filtrar por musculos</span>
               <div className="flex gap-3">
                 {MUSCLES.map((m) => (
                   <Toggle.Root
@@ -203,6 +219,21 @@ export default function MachineList() {
                   </Toggle.Root>
                 ))}
               </div>
+              <span className="text-lg font-bold">Filtrar por gimnasios</span>
+              <div className="flex gap-3">
+                {gyms.map((gym) => (
+                  <Toggle.Root
+                    key={gym.id}
+                    className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
+                      selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
+                      py-1 px-2 border border-radixgreen rounded-full`}
+                    onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
+                  >
+                    {gym.name}
+                  </Toggle.Root>
+                ))}
+              </div>
+              
             </Popover.Content>
           </Popover.Root>
         </div>
@@ -214,18 +245,7 @@ export default function MachineList() {
           </Button>
         </Link>
 
-
-
         {filtered_machine_list.map((machine) => {
-          const ratings = machine?.reviews?.map((review) => review.rating);
-          const avg_rating =
-            ratings?.reduce((previous, current) => {
-              return previous + current;
-            }, 0) / ratings?.length;
-
-          const issues = machine.issues?.length;
-          const reviews = machine.reviews?.length;
-
           const machineRatingData = machineRatings.find(
             (ratingData) => ratingData.id === machine.id
           );
@@ -234,6 +254,7 @@ export default function MachineList() {
           return (
             <Link to={`${machine.id}`} key={machine.id}>
               <Button
+                name = "maquina"
                 key={machine.id}
                 variant="soft"
                 size="3"
@@ -252,7 +273,7 @@ export default function MachineList() {
                     >
                       <path d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z" />
                     </svg>
-                    {reviews ? reviews : 0} reseñas
+                    {reviews[machine.id] ? reviews[machine.id] : 0} reseñas
                   </span>
                   <span className="text-red-500/80">
                     <svg
@@ -267,7 +288,7 @@ export default function MachineList() {
                         fillRule="evenodd"
                       />
                     </svg>
-                    {issues ? issues : 0} incidencias
+                    {issues[machine.id] ? issues[machine.id] : 0} incidencias
                   </span>
                 </div>
               </Button>
