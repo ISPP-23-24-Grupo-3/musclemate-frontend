@@ -42,11 +42,18 @@ const Header = () => {
           <div className="flex ml-auto lg:order-1 gap-4 sm:mb-0 mb-4">
             {user ? (
               <>
-                <Link to="/profile">
-                  <Button size="3" variant="surface" color="green">
-                    {user.username}
-                  </Button>
-                </Link>
+              {user.rol === "client" ? (
+                <Link to="user/profile">
+                <Button size="3" variant="surface" color="green">
+                  {user.username}
+                </Button>
+              </Link>) : (
+                <Button size="3" variant="surface" color="green">
+                  {user.username}
+                </Button>
+              )
+                }
+                
                 <Link to="/">
                   <Button
                     size="3"
@@ -72,7 +79,7 @@ const Header = () => {
                 </Link>
               </>
             )}
-            <button className="lg:hidden ml-4 mr-4" onClick={handleMenu}>
+            <button className={`lg:hidden ${user ? "" : "hidden"} ml-4 mr-4`} onClick={handleMenu}>
               <svg
                 className="w-7 h-7"
                 fill="#000"
@@ -126,6 +133,22 @@ const Header = () => {
                     Tickets
                   </Link>
                 </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/pricing"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Planes
+                  </Link>
+                </li>
+                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                  <Link
+                    to="/owner/subscriptions"
+                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                  >
+                    Subscripciones
+                  </Link>
+                </li>
               </>
             ) : user?.rol === "client" ? (
               <>
@@ -143,14 +166,6 @@ const Header = () => {
                     className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
                   >
                     Crear ticket
-                  </Link>
-                </li>
-                <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
-                  <Link
-                    to="/user/profile"
-                    className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
-                  >
-                    Mi Perfil
                   </Link>
                 </li>
               </>

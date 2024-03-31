@@ -23,8 +23,19 @@ export default function MachineList() {
   const [sorting_reverse, set_sorting_reverse] = useState(false);
   const [search, set_search] = useState("");
   const [machines, setMachines] = useState([]);
-
+  const [selectedGym, setSelectedGym] = useState(null);
+  const [gyms, setGyms] = useState([]);
   const [machineRatings, setMachineRatings] = useState([]);
+
+  const getGyms = () => {
+    getFromApi("gyms/")
+      .then((response) => response.json())
+      .then((data) => setGyms(data));
+  };
+
+  useEffect(() => {
+    getGyms();
+  }, []);
 
   function getMachines() {
     getFromApi("equipments/")
@@ -98,6 +109,8 @@ export default function MachineList() {
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
               : true
+              &&
+              (selectedGym === null || m.gym === selectedGym)
           )
           .sort(
             (a, b) =>
@@ -127,7 +140,7 @@ export default function MachineList() {
           <Popover.Root>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
-                <Button radius="none" size="2" variant="soft" className="m-0">
+                <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
                   <HiOutlineFilter />
                 </Button>
               </Popover.Trigger>
@@ -150,6 +163,7 @@ export default function MachineList() {
               <div className="flex justify-between mb-2">
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
+                  name="reverse_sort"
                   onPressedChange={(p) => set_sorting_reverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -189,7 +203,7 @@ export default function MachineList() {
               </ToggleGroup.Root>
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
-              <span className="text-lg font-bold">Filtrar por</span>
+              <span className="text-lg font-bold">Filtrar por musculos</span>
               <div className="flex gap-3">
                 {MUSCLES.map((m) => (
                   <Toggle.Root
@@ -203,6 +217,21 @@ export default function MachineList() {
                   </Toggle.Root>
                 ))}
               </div>
+              <span className="text-lg font-bold">Filtrar por gimnasios</span>
+              <div className="flex gap-3">
+                {gyms.map((gym) => (
+                  <Toggle.Root
+                    key={gym.id}
+                    className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
+                      selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
+                      py-1 px-2 border border-radixgreen rounded-full`}
+                    onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
+                  >
+                    {gym.name}
+                  </Toggle.Root>
+                ))}
+              </div>
+              
             </Popover.Content>
           </Popover.Root>
         </div>
@@ -234,6 +263,7 @@ export default function MachineList() {
           return (
             <Link to={`${machine.id}`} key={machine.id}>
               <Button
+                name = "maquina"
                 key={machine.id}
                 variant="soft"
                 size="3"

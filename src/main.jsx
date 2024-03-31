@@ -26,6 +26,9 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
+import PricingPage from "./views/PricingPage/PricingPage";
+import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
+import SuccessPage from "./views/SuccessPage";
 import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
 import MailVerification from "./views/VerificationPage/MailVerification";
 import ProfileClient from "./views/UserListing/ProfileClient";
@@ -71,6 +74,17 @@ const ownerRoutes = [
   {
     path: "events",
     element: <AddEventsForm/>
+  }
+    path:"pricing",
+    element:<PricingPage/>
+  },
+  {
+    path:"subscriptions",
+    element:<SubscriptionsPage/>
+  },
+  {
+    path:"success",
+    element: <SuccessPage/>
   }
 ];
 
