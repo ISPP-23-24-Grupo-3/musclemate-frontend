@@ -1,9 +1,8 @@
-import React,{useState, useEffect,useContext} from "react";
+import {useState, useEffect} from "react";
 import { HiUser, HiLockClosed, HiOutlineMail,HiPhone, } from "react-icons/hi";
 import { HiBuildingOffice2,HiHome,HiMiniCake,HiMiniIdentification   } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
-import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 
@@ -12,11 +11,10 @@ import { useNavigate } from "react-router";
 
 const UserRegister = () => {
 
-  const { user } = useContext(AuthContext);
   const [gyms, setGyms] = useState(null);
   const navigate = useNavigate();
-  const [selectedGym, setSelectedGym] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessageUser, setErrorMessageUser] = useState("");
+  const [errorMessageMail, setErrorMessageMail] = useState("");
 
   async function getGyms() {
   
@@ -32,7 +30,7 @@ const UserRegister = () => {
 
 
 
-  const { register, handleSubmit, formState: { errors } } = useForm({values: {gym: selectedGym}},);
+  const { register, handleSubmit, formState: { errors } } = useForm({values: {gym: null}},);
 
   const onSubmit = async (formData) => {
     try {
@@ -59,11 +57,11 @@ const UserRegister = () => {
   
       if (!response.ok) {
         const responseData = await response.json();
-        setErrorMessage(responseData.username[0]);
+        setErrorMessageUser(responseData.username ? responseData.username[0]: '');
+        setErrorMessageMail(responseData.email ? responseData.email[0]: '');
         return;
       }
   
-      console.log('Usuario creado exitosamente');
       navigate('/owner/users');
     } catch (error) {
       console.error('Hubo un error al crear el usuario:', error);
@@ -75,12 +73,14 @@ const UserRegister = () => {
     name: "El nombre de usuario tiene que ser mayor a 8 caracteres",
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
-    phoneNumber: "Tiene que ser un numero de 9 cifras"
+    phoneNumber: "Tiene que ser un número de 9 cifras",
+    zipCode:"Tiene que ser un númeroo de 5 cifras"
   };
 
   const patterns = {
     mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
     phoneNumber: /^\d{9}$/,
+    zipCode: /^\d{5}$/,
   };
 
   return (
@@ -95,7 +95,11 @@ const UserRegister = () => {
             <label htmlFor="name">Nombre</label>
             <input
               {...register("name", {
-                required: messages.req
+                required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "El nombre no puede superar los 100 caracteres"
+                }
               })}
               name="name"
               type="text"
@@ -114,7 +118,11 @@ const UserRegister = () => {
             <label htmlFor="lastName">Apellidos</label>
             <input
               {...register("lastName", {
-                required: messages.req
+                required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "Los apellidos no puede superar los 100 caracteres"
+                }
               })}
               name="lastName"
               type="text"
@@ -147,6 +155,7 @@ const UserRegister = () => {
           {errors.email && (
             <p className="text-red-500">{errors.email.message}</p>
           )}
+          {errorMessageMail && <p className="text-red-500 mt-1 ml-3">{errorMessageMail}</p>}
 
           <div className="relative flex items-center">
             <HiMiniCake className="w-6 h-6 text-radixgreen mr-3" />
@@ -169,7 +178,9 @@ const UserRegister = () => {
               <HiMiniIdentification className="w-6 h-6 text-radixgreen mr-3" />
               <label htmlFor="gender">Género</label>
               <select
-                {...register("gender")}
+                {...register("gender",{
+                  required: messages.req
+                })}
                 name="gender"
                 className={`w-full px-4 py-3 border rounded-lg ${
                   errors.gender ? 'border-red-500' : 'border-radixgreen'
@@ -195,7 +206,7 @@ const UserRegister = () => {
                 pattern: { value: patterns.phoneNumber, message: messages.phoneNumber}
               })}
               name="phoneNumber"
-              type="number"
+              type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.phoneNumber ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
@@ -212,6 +223,10 @@ const UserRegister = () => {
             <input
               {...register("address", {
                 required: messages.req,
+                maxLength: {
+                  value: 255,
+                  message: "La direción no puede superar los 255 caracteres"
+                }
               })}
               name="address"
               type="text"
@@ -231,6 +246,10 @@ const UserRegister = () => {
             <input
               {...register("city", {
                 required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "La ciudad no puede superar los 100 caracteres"
+                }
               })}
               name="city"
               type="text"
@@ -248,13 +267,10 @@ const UserRegister = () => {
             <input
               {...register("zipCode", {
                 required: messages.req,
-                minLength: {
-                  value: 5,
-                  message: "El código postal tiene que estar compuesto por 5 dígitos"
-                }
+                pattern: { value: patterns.zipCode, message: messages.zipCode}
               })}
               name="zipCode"
-              type="number"
+              type="text"
               className={`w-full px-4 py-3 border rounded-lg ${
                 errors.zipCode ? 'border-red-500' : 'border-radixgreen'
               } bg-white text-black`}
@@ -271,6 +287,10 @@ const UserRegister = () => {
             <input
               {...register("username", {
                 required: messages.req,
+                maxLength: {
+                  value: 150,
+                  message: "El nombre de usuario no puede superar los 150 caracteres"
+                }
               })}
               name="username"
               type="text"
@@ -283,7 +303,7 @@ const UserRegister = () => {
           {errors.username && (
             <p className="text-red-500 absolute mt-1 ml-3">{errors.username.message}</p>
           )}
-          {errorMessage && <p className="text-red-500 mt-1 ml-3">{errorMessage}</p>}
+          {errorMessageUser && <p className="text-red-500 mt-1 ml-3">{errorMessageUser}</p>}
 
 
           <div className="relative flex items-center mb-4">  
@@ -295,6 +315,10 @@ const UserRegister = () => {
                 minLength: {
                   value: 10,
                   message: "La contraseña debe tener más de 10 caracteres"
+                },
+                maxLength: {
+                  value: 128,
+                  message: "La contraseña no puede superar los 128 caracteres"
                 }
               })}
               name="password"
