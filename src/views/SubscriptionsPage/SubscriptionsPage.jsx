@@ -3,16 +3,17 @@ import React, { useContext, useEffect, useState } from "react";
 
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { getFromApi } from "../../utils/functions/api";
+import { getFromApi, putToApi } from "../../utils/functions/api";
 import { CreateCheckoutSession } from "../../utils/functions/stripe";
 import { useLocation } from "react-router";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import AuthContext from "../../utils/context/AuthContext";
 import Stripe from "stripe";
+import { Link } from "react-router-dom";
 
-const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY
+const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
-const stripe = new Stripe(STRIPE_SECRET_KEY)
+const stripe = new Stripe(STRIPE_SECRET_KEY);
 
 function Gym({
   id,
@@ -24,11 +25,10 @@ function Gym({
   email,
   subscription_plan,
   handleCheck,
-  subscription_plan_id,
-  notSubscribedGyms
+  notSubscribedGyms,
 }) {
   const location = useLocation();
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   async function handleClick() {
     const owner = await getFromApi(`owners/detail/${user.username}/`);
@@ -52,11 +52,10 @@ function Gym({
       });
       console.log("Subscription updated successfully");
     }
+    await putToApi(`gyms/update/${id}/`, { subscription_plan: "free" });
     notSubscribedGyms(id);
   }
 
-
- 
   return (
     <div className="border border-radixgreen rounded-lg w-full">
       <div className="space-y-1.5 p-4 flex flex-col items-center gap-1">
@@ -66,29 +65,42 @@ function Gym({
       </div>
       <div className="p-4">
         <dl className="grid grid-cols-2 gap-3 text-sm">
-          <strong className="text-radixgreen">Address:</strong>
+          <strong className="text-radixgreen">Dirección:</strong>
           <div>{address}</div>
-          <strong className="text-radixgreen">Postal Code:</strong>
+          <strong className="text-radixgreen">Código Postal</strong>
           <div>{zip_code}</div>
-          <strong className="text-radixgreen">Phone:</strong>
+          <strong className="text-radixgreen">Teléfono:</strong>
           <div>{phone_number}</div>
           <strong className="text-radixgreen">Email:</strong>
           <div>{email}</div>
+          {subscription_plan && (
+            <>
+            <strong className="text-radixgreen">Plan de suscripción:</strong>
+            <div>{subscription_plan}</div>
+            </>
+          )}
+          
         </dl>
-        {location.state?.subscription_plan ? <div className="flex justify-center items-center mt-5">
-        <Checkbox.Root
-          className="w-6 h-6 border border-black rounded-sm flex items-center justify-center"
-          onCheckedChange={() => handleCheck(id, location.state?.subscription_plan)}
-        >
-          <Checkbox.Indicator className="bg-radixgreen w-full h-full flex justify-center items-center" >
-            <CheckIcon color="white" />
-          </Checkbox.Indicator>
-        </Checkbox.Root>
-        </div>
-        : <div className="flex justify-center items-center mt-5"> 
-        <Button color="red" onClick={() => handleClick(id)}>Cancelar suscripción</Button>
-        </div>}
-        
+        {location.state?.subscription_plan ? (
+          <div className="flex justify-center items-center mt-5">
+            <Checkbox.Root
+              className="w-6 h-6 border border-black rounded-sm flex items-center justify-center"
+              onCheckedChange={() =>
+                handleCheck(id, location.state?.subscription_plan)
+              }
+            >
+              <Checkbox.Indicator className="bg-radixgreen w-full h-full flex justify-center items-center">
+                <CheckIcon color="white" />
+              </Checkbox.Indicator>
+            </Checkbox.Root>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center mt-5">
+            <Button color="red" onClick={() => handleClick(id)}>
+              Cancelar suscripción
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -153,9 +165,16 @@ function SubscriptionsPage() {
     const response = await getFromApi("gyms/");
     if (response.ok) {
       const data = await response.json();
+      if (!location.state?.subscription_plan) {
+        setGyms(data.filter((gym) => gym.subscription_plan !== "free"));
+        if (gyms.length === 0) {
+          setError("No tienes gimnasios suscritos.");
+        }
+      }else{
       setGyms(data);
+      }
     } else {
-      alert("Error al obtener los gimnasios.");
+      setError("Error al cargar los gimnasios.");
     }
   };
 
@@ -169,26 +188,42 @@ function SubscriptionsPage() {
       <div className="flex flex-col items-center justify-center space-y-4 m-5">
         <div className="text-center ">
           <Heading size="5" className="text-radixgreen !mt-8 !mb-3 text-center">
-            {location.state?.subscription_plan ? "Selecciona tus gimnasios" : "Gestiona tus gimnasios suscritos"}
+            {location.state?.subscription_plan
+              ? "Selecciona tus gimnasios"
+              : "Gestiona tus gimnasios suscritos"}
           </Heading>
         </div>
+      {!location.state?.subscription_plan ? (
+      <>
+        {error && 
+        <>
+        <p className="text-red-500">{error}</p>
+        <Link to="/owner/pricing">
+          <Button color="radixgreen">Ver planes de suscripción</Button>
+        </Link>
+        </>
+        }
+      </>
+      ) : null}
+
         <div className="flex flex-col gap-3 md:grid md:grid-cols-2">
-        {gyms.map((gym) => (
-          <Gym
-            key={gym.id}
-            id={gym.id}
-            name={gym.name}
-            address={gym.address}
-            zip_code={gym.zip_code}
-            descripcion={gym.descripcion}
-            phone_number={gym.phone_number}
-            email={gym.email}
-            subscription_plan={gym.subscription_plan ? gym.subscription_plan : null}
-            subscription_plan_id={gym.subscription_plan_id ? gym.subscription_plan_id : null}
-            notSubscribedGyms={notSubscribedGyms}
-            handleCheck={handleCheck}
-          />
-        ))}
+          {gyms.map((gym) => (
+            <Gym
+              key={gym.id}
+              id={gym.id}
+              name={gym.name}
+              address={gym.address}
+              zip_code={gym.zip_code}
+              descripcion={gym.descripcion}
+              phone_number={gym.phone_number}
+              email={gym.email}
+              subscription_plan={
+                gym.subscription_plan !== "free" ? gym.subscription_plan : null
+              }
+              notSubscribedGyms={notSubscribedGyms}
+              handleCheck={handleCheck}
+            />
+          ))}
         </div>
         {location.state?.priceId && (
           <div className="flex flex-col justify-center items-center m-5 w-full">

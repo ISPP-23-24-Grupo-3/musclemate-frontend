@@ -292,7 +292,8 @@ const EditableWorkout = ({
   defaultWorkout,
   other_workouts,
 }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext); // Obtenemos la información del usuario del contexto de autorización
+
   const [clientId, setClientId] = useState(null);
   const clientUsername = user?.username;
 

@@ -21,7 +21,7 @@ function SuccessPage() {
          const customer = await stripe.customers.retrieve(session.customer, {
             expand: ['subscriptions']
         })
-        await putToApi(`owners/update/${user.user_id}/`, {
+        await putToApi(`owners/update/${user.username}/`, {
             "customer_id": customer.id
         })
         const gymsPromises = gymnSubscription.map(gym => {
