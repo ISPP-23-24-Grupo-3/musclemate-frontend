@@ -8,7 +8,7 @@ const EditWorkout = () => {
   const routineId = location.state.routineId;
   const [nombre, setNombre] = useState('');
   const [workouts, setWorkouts] = useState([]);
-  const [equipoNames, setEquipoNames] = useState({});
+  const [equipoNames, setEquipoNames] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
   const navigate = useNavigate(); 
 
@@ -52,12 +52,23 @@ const EditWorkout = () => {
     navigate(`/user/workout/${workoutId}/series`); 
   };
 
+  const equipoN = async (equipo) => {
+    let equipoName = [];
+    if (equipo) {
+      const response = await getFromApi("equipments/detail/"+ Number(equipo) +"/");
+      const data = await response.json();
+      equipoName.push(data.name);
+    }
+    equipoName = equipoName.join(", ");
+    return equipoName;
+  };
+
   useEffect(() => {
     const fetchEquipoNames = async () => {
       const newEquipoNames = {};
-      for (const workout of workouts) {
-        const names = await equipo(workout.equipment);
-        newEquipoNames[workout.id] = names;
+      for (let i = 0; i < workouts.length; i++) {
+        const equipoNamesForWorkout = await Promise.all(workouts[i].equipment.map(equipoN));
+        newEquipoNames[workouts[i].id] = equipoNamesForWorkout.join(", ");
       }
       setEquipoNames(newEquipoNames);
     };
@@ -65,17 +76,7 @@ const EditWorkout = () => {
     fetchEquipoNames();
   }, [workouts]);
 
-  const equipo = async (equipo) => {
-    let equipoName = [];
-    if (equipo) {
-      for (let i = 0; i < equipo.length; i++) {
-        const response = await getFromApi("equipments/detail/"+ Number(equipo[i]) +"/");
-        const data = await response.json();
-        equipoName.push(data.name);
-      }
-    }
-    return equipoName;
-  };
+  
 
   return (
     <div className="max-w-lg mx-auto mt-8 m-5">
@@ -93,7 +94,7 @@ const EditWorkout = () => {
                   </div>
                   <div>
                     <p className="text-radixgreen font-bold mb-1">
-                      Máquina: <span className="text-black">{ equipoNames[workout.equipment] || 'Sin asignar'}</span>
+                      Máquina: <span className="text-black">{ equipoNames[workout.id] || 'Sin asignar'}</span>
                     </p>
                   </div>
                 </div>
