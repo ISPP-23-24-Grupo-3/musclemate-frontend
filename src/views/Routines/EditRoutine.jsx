@@ -20,6 +20,7 @@ import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 import AuthContext from "../../utils/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 import PropTypes from "prop-types";
 import {
@@ -82,17 +83,19 @@ export const EditRoutine = () => {
   }, [routineId]);
 
   const { register, handleSubmit, setValue } = useForm();
+  const navigate = useNavigate();
+  const startRoutine = () => navigate(`/user/routines/${routineId}/workouts`, { state: { routineId: routineId } });
 
   return (
     <>
       <Section className="!pt-1">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Heading className={editing_name ? "hidden" : undefined}>
+        <div className="flex justify-around items-center pt-8">
+          <div className="flex items-center gap-3 pt-2 mb-3">
+            <Heading className={`${editing_name ? "hidden" : undefined} text-radixgreen`}>
               {routine.name}
             </Heading>
             <form
-              className={`${!editing_name ? "hidden" : undefined} flex gap-5`}
+              className={`${!editing_name ? "hidden" : undefined} flex gap-3`}
               onSubmit={handleSubmit((r) => {
                 updateName(r.name);
                 set_editing_name(false);
@@ -112,8 +115,8 @@ export const EditRoutine = () => {
               <LuPencil />
             </IconButton>
           </div>
-          <Button size="3">
-            <CgGym className="size-7" />
+          <Button size="3" onClick={startRoutine}>
+            <CgGym className="size-7"/>
             Entrenar
           </Button>
         </div>
@@ -133,7 +136,7 @@ export const EditRoutine = () => {
             </Button>
           </div>
         </div>
-        <Heading as="h2">Ejercicios</Heading>
+        <Heading as="h2" className="text-radixgreen font-bold">Ejercicios</Heading>
         <Flex direction="column" gap="3" className="mt-4">
           <EditableWorkout
             workouts={workouts}
@@ -265,8 +268,8 @@ const WorkoutInfo = ({ workout, equipments }) => {
   return (
     <>
       <Flex direction="column" className="w-1/5">
-        <Text weight="bold">Ejercicio</Text>
-        <Text>{workout.name}</Text>
+        <Text style={{fontStyle:"italic"}}>Nombre</Text>
+        <Text weight="bold" style={{fontSize:22}}>{workout.name}</Text>
       </Flex>
       <Flex direction="column" className="w-1/5 items-end">
         <Text weight="bold">Máquinas</Text>
@@ -296,20 +299,20 @@ const EditableWorkout = ({
 
   useEffect(() => {
     if (clientUsername) {
-      getFromApi("clients/detail/" + clientUsername + "/")
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setClientId(data.id);
-        });
+      getFromApi("clients/detail/"+ clientUsername +"/" )
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setClientId(data.id);
+      });
     }
   }, [clientUsername]);
 
   const addWorkout = (workout) => {
     const parsed_workout = {
       ...workout,
-      equipment: workout.equipment.map((e) => e.value),
+      equipment: workout.equipment.map((e) => Number(e.value)),
       client: clientId, // Asignamos el ID del usuario al workout
     };
     const temp_workout = {
@@ -344,7 +347,12 @@ const EditableWorkout = ({
   const editWorkout = (workout, id) => {
     const parsed_workout = {
       ...workout,
-      equipment: workout.equipment.map((e) => e.value),
+      equipment: Array.isArray(workout.equipment) && workout.equipment.length
+        ? workout.equipment.map((e) => Number(e.value)).filter((e) => !isNaN(e) && e !== null).length
+          ? workout.equipment.map((e) => Number(e.value)).filter((e) => !isNaN(e) && e !== null)
+          : []
+        : [],
+      client: clientId,
     };
     const temp_workout = { ...parsed_workout, temp_id: Date.now() };
 
@@ -352,6 +360,7 @@ const EditableWorkout = ({
       // The list component uses the ID as key, so it needs to be given
       c_workouts.map((w) => (w.id == id ? { ...temp_workout, id: id } : w)),
     );
+
     putToApi(`workouts/update/${id}/`, parsed_workout)
       .then(async (r) => {
         if (r.ok) {
@@ -365,7 +374,6 @@ const EditableWorkout = ({
             w.temp_id == temp_workout.temp_id ? updatedWorkout : w,
           ),
         );
-        console.log("updated: ", updatedWorkout);
       })
       .catch((e) => {
         set_workout((c_workouts) =>
@@ -404,12 +412,12 @@ const EditableWorkout = ({
     values: {
       routine: [routine.id],
       name: defaultWorkout?.name,
-      equipment: Array.isArray(defaultWorkout?.equipment)
+      equipment:
+        Array.isArray(defaultWorkout?.equipment)
         ? defaultWorkout?.equipment.length > 1
           ? defaultWorkout?.equipment.map((e) => ({ value: e + "" }))
           : { value: defaultWorkout?.equipment[0] + "" }
-        : [],
-    },
+        : []   },
   });
 
   return (
@@ -425,7 +433,9 @@ const EditableWorkout = ({
               name="name"
               {...register("name", {
                 required: "Debes escribir un nombre",
-                validate: { unique: hasUniqueName },
+                validate: { unique: hasUniqueName,
+                            maxLength: value => value.length <= 100 || 'El valor no puede tener más de 100 caracteres'
+                          },
               })}
               color={errors.name && "red"}
               className={`${errors.name ? "!border-red-500" : undefined}`}
@@ -468,16 +478,15 @@ const EquipmentSelect = ({ equipment, control }) => {
           <Controller
             control={control}
             name={`equipment.${index}.value`}
-            render={({ field: { onChange, value, defaultValue } }) => (
+            render={({ field }) => (
               <Select.Root
-                onValueChange={onChange}
-                value={value}
-                defaultValue={defaultValue}
+                onValueChange={field.onChange}
+                value={field.value}
               >
                 <Select.Trigger placeholder="Selecciona una máquina" />
                 <Select.Content>
                   {equipment.map((e) => (
-                    <Select.Item key={e.id} value={"" + e.id}>
+                    <Select.Item key={e.id} value={e.id.toString()}>
                       {e.name}
                     </Select.Item>
                   ))}
