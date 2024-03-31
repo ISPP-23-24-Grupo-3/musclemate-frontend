@@ -21,11 +21,30 @@ const CreateGym = () => {
           password: formData.password
         }
       });
+
+      const data = await response.json();
+      
       if (response.ok) {
         setSuccessMessage("¡Gimnasio creado exitosamente!");
         setErrorMessage("");
       } else {
-        setErrorMessage("Error al crear el gimnasio. Por favor, inténtelo de nuevo más tarde.");
+        let errorMessage = "Error al crear el gimnasio. Por favor, inténtelo de nuevo más tarde.";
+        if (data.email) {
+          errorMessage = data.email[0]; // Mensaje de error específico del campo de correo electrónico
+        } else if (data.userCustom && data.userCustom.username) {
+          errorMessage = data.userCustom.username[0]; // Mensaje de error específico del campo de nombre de usuario
+        } else if (data.name) {
+          errorMessage = data.name[0]; // Mensaje de error específico del campo de nombre
+        } else if (data.address) {
+          errorMessage = data.address[0]; // Mensaje de error específico del campo de dirección
+        } else if (data.zip_code) {
+          errorMessage = data.zip_code[0]; // Mensaje de error específico del campo de código postal
+        } else if (data.descripcion) {
+          errorMessage = data.descripcion[0]; // Mensaje de error específico del campo de descripción
+        } else if (data.phone_number) {
+          errorMessage = data.phone_number[0]; // Mensaje de error específico del campo de número de teléfono
+        }
+        setErrorMessage(errorMessage);
         setSuccessMessage(""); 
       }
     } catch (error) {
@@ -92,7 +111,7 @@ const CreateGym = () => {
             {errors.phone_number && <p className="text-red-500">{errors.phone_number.message}</p>}
           </div>
           <div>
-            <label htmlFor="email" className="text-gray-800">Email:</label>
+            <label htmlFor="email" className="text-gray-800">Correo Electrónico:</label>
             <input
               {...register("email", { required: "Este campo es obligatorio" })}
               type="email"
