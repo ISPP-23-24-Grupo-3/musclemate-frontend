@@ -29,6 +29,11 @@ export default function ClientHomePage() {
             Crear un ticket
           </Button>
         </Link>
+        <Link to="../events">
+          <Button size="4" variant="classic" className="mt-4">
+            Eventos
+          </Button>
+        </Link>
         <Link to="../profile">
           <Button size="4" variant="classic" className="mt-4">
             Mi Perfil

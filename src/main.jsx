@@ -26,6 +26,7 @@ import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
+import EventList from "./views/EventsClasses/EventList";
 import EditWorkout from "./views/Workouts/EditWorkout";
 import Series from "./views/Series/Series";
 import PricingPage from "./views/PricingPage/PricingPage";
@@ -51,6 +52,10 @@ const ownerRoutes = [
   {
     path: "users/:userId/profile",
     element: <Profile />,
+  },
+  {
+    path: "events",
+    element: <EventList />,
   },
   {
     path: "equipments",
@@ -94,6 +99,7 @@ const userRoutes = [
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> },
+  { path: "events", element: <EventList /> },
   { path: "routines/:routineId/workouts", element: <EditWorkout /> },
   { path: "workout/:workoutId/series", element: <Series /> },
   { path: "profile", element: <ProfileClient /> }, 
