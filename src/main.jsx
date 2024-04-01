@@ -37,6 +37,7 @@ import MailVerification from "./views/VerificationPage/MailVerification";
 import ProfileClient from "./views/UserListing/ProfileClient";
 import AddEventsForm from "./views/EventsClasses/AddEvent";
 import CreateGym from "./views/Gyms/CreateGym";
+import GymDetails from "./views/Gyms/GymDetails";
 
 const ownerRoutes = [
   {
@@ -98,7 +99,11 @@ const ownerRoutes = [
   {
     path: "gyms/add",
     element : <CreateGym />
-  }
+  },
+  {
+    path: "gyms/:gymId",
+    element: <GymDetails />,
+  },
 ];
 
 const userRoutes = [

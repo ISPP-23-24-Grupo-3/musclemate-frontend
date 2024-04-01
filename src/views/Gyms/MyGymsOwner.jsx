@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { IoMdAddCircleOutline, IoMdSearch} from "react-icons/io";
+import { IoMdAddCircleOutline, IoMdSearch } from "react-icons/io";
 import { Button, TextField, Heading } from "@radix-ui/themes";
 import { getFromApi } from "../../utils/functions/api";
-import { Link } from "react-router-dom"; // Importa Link desde react-router-dom
+import { Link } from "react-router-dom";
 
 const MyGymsOwner = () => {
   const [gyms, setGyms] = useState([]);
@@ -31,16 +31,15 @@ const MyGymsOwner = () => {
   }, []);
 
   const filteredGyms = gyms.filter((gym) =>
-  gym.name.toLowerCase().includes(search.toLowerCase())
-);
-
-  const handleLinkClick = (event) => {
-    event.preventDefault();
-  };
+    gym.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <>
-      <Heading size="8" className="text-radixgreen !mt-8 !mb-3 text-center md:text-left">
+      <Heading
+        size="8"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+      >
         Mis Gimnasios
       </Heading>
 
@@ -55,10 +54,9 @@ const MyGymsOwner = () => {
               onChange={(e) => setSearch(e.target.value)}
             ></TextField.Input>
           </TextField.Root>
-
         </div>
 
-        <Link to="/owner/gyms/add"> {/* Usa Link en lugar de Button */}
+        <Link to="/owner/gyms/add">
           <Button size="3" className="w-full">
             <IoMdAddCircleOutline className="size-6" />
             Crear Nuevo Gimnasio
@@ -72,17 +70,26 @@ const MyGymsOwner = () => {
         ) : filteredGyms.length === 0 ? (
           <p>No se encontraron gimnasios.</p>
         ) : (
-          filteredGyms.map((gym) => (
-            <div key={gym.id} className="flex flex-col">
-              <Button key={gym.id} variant="soft" size="3" className="flex !justify-between !h-fit !p-2 !px-4" onClick={handleLinkClick}>
-                <div className="flex flex-col">
-                  <p className="font-semibold">{gym.name}</p>
+          <div className="flex flex-col" style={{ width: "100%" }}>
+            {filteredGyms.map((gym, index) => (
+              <Link key={gym.id} to={`/owner/gyms/${gym.id}`}>
+                <div style={{ width: "100%", marginBottom: "10px" }}>
+                  <Button
+                    variant="soft"
+                    size="3"
+                    className="w-full flex !justify-between !h-fit !p-2 !px-4"
+                  >
+                    <div className="flex flex-col">
+                      <p className="font-semibold">{gym.name}</p>
+                    </div>
+                  </Button>
                 </div>
-              </Button>
-            </div>
-          ))
+              </Link>
+            ))}
+          </div>
         )}
-      </div><br/>
+      </div>
+      <br />
     </>
   );
 };
