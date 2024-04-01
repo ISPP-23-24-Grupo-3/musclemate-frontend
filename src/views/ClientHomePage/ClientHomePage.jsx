@@ -39,6 +39,11 @@ export default function ClientHomePage() {
             Mi Perfil
           </Button>
         </Link>
+        <Link to="../equipmentsClient">
+          <Button size="4" variant="classic" className="mt-4">
+            Maquinas del gimnasio
+          </Button>
+        </Link>
       </Flex>
     </>
   )
