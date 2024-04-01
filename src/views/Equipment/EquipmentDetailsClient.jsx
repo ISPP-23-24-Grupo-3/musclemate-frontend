@@ -119,7 +119,7 @@ const EquipmentDetailsClient = () => {
   useEffect(() => {
     const fetchTicketsByClient = async () => {
       try {
-        const response = await getFromApi(`tickets/byClient/${clientId}/`);
+        const response = await getFromApi(`tickets/byEquipment/${equipmentId}/`);
         if (response.ok) {
           const data = await response.json();
           setApiTickets(data);
