@@ -99,26 +99,26 @@ export default function MachineList() {
           )
       : [];
 
-  useEffect(() => {
-    for(let i = 0; i < machines.length; i++){
-      getFromApi(`assessments/equipment/${machines[i].id}/`)
-        .then((response) => response.json())
-        .then((data) => {
-          setReviews(prevReviews => ({
-            ...prevReviews,
-            [machines[i].id]: data.length
-          }));
-        });
-      getFromApi(`tickets/byEquipment/${machines[i].id}/`)
-        .then((response) => response.json())
-        .then((data) => {
-          setIssues(prevIssues => ({
-            ...prevIssues,
-            [machines[i].id]: data.length
-          }));
-        });
-    }
-  }), [machines];
+ // useEffect(() => {
+ //   for(let i = 0; i < machines.length; i++){
+ //     getFromApi(`assessments/equipment/${machines[i].id}/`)
+ //       .then((response) => response.json())
+ //       .then((data) => {
+ //         setReviews(prevReviews => ({
+ //           ...prevReviews,
+ //           [machines[i].id]: data.length
+ //         }));
+ //       });
+ //     getFromApi(`tickets/byEquipment/${machines[i].id}/`)
+ //       .then((response) => response.json())
+ //       .then((data) => {
+ //         setIssues(prevIssues => ({
+ //           ...prevIssues,
+ //           [machines[i].id]: data.length
+ //         }));
+ //      });
+ //   }
+ // }), [machines];
 
   return (
     <>

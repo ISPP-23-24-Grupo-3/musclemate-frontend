@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getFromApi, putToApi } from "../../utils/functions/api";
+import { getFromApi, putToApi, deleteFromApi } from "../../utils/functions/api";
 import { Button, Heading, TextField } from "@radix-ui/themes";
 
 import Rating from "../../components/Rating";
@@ -23,6 +23,7 @@ export default function EquipmentDetails() {
 
   const [editMode, setEditMode] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   // Opciones de grupo muscular
   const muscularGroupOptions = [
@@ -267,6 +268,26 @@ export default function EquipmentDetails() {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      const response = await deleteFromApi(`equipments/delete/${equipmentId}/`);
+      if (response.ok) {
+        // Si la eliminación es exitosa, mostramos el mensaje de éxito
+        setDeleteSuccess(true);
+        return;
+      }
+      // Si la respuesta no fue exitosa, se ejecutará el código a continuación
+    } catch (error) {
+      // Si hay un error durante la solicitud, se ejecutará el código a continuación
+      setError("Error al eliminar el equipo.");
+      return;
+    }
+    // Si la ejecución llega a este punto, significa que hubo un problema durante la eliminación
+    setError("Error al eliminar el equipo."); // Muestra un mensaje de error genérico
+  };
+
+  
+
   if (error) {
     return (
       <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">
@@ -285,6 +306,15 @@ export default function EquipmentDetails() {
 
   return (
     <div className="mt-8 max-w-xl mx-auto">
+      {deleteSuccess && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Éxito!</strong>
+          <span className="block sm:inline"> El equipo ha sido eliminado correctamente.</span>
+          <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={() => setDeleteSuccess(false)}>
+            <svg className="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z"/></svg>
+          </span>
+        </div>
+      )}
       <div className="p-10 border border-radixgreen rounded md:m-0 m-5">
         <Heading
           size="7"
@@ -398,15 +428,21 @@ export default function EquipmentDetails() {
           </div>
         )}
         {!editMode && (
-          <div className="mt-4 text-center">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={toggleEditMode}
-            >
-              Editar
-            </button>
-          </div>
-        )}
+        <div className="mt-4 text-center">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+            onClick={toggleEditMode}
+          >
+            Editar
+          </button>
+          <button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleDelete}
+          >
+            Eliminar
+          </button>
+        </div>
+      )}
       </div>
       <div className="mt-8 text-center md:m-0 m-5">
         <Heading
