@@ -15,6 +15,7 @@ import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
 import Users from "./views/UserListing/Users";
 import Profile from "./views/UserListing/Profile";
 import EquipmentList from "./views/Equipment/EquipmentList";
+import EquipmentListClient from "./views/Equipment/EquipmentListClient";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
 import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
@@ -69,6 +70,10 @@ const ownerRoutes = [
     element: <EquipmentList />,
   },
   {
+    path: "equipmentsClient",
+    element: <EquipmentListClient />,
+  },
+  {
     path: "equipments/add",
     element: <EquipmentForm />,
   },
@@ -116,7 +121,9 @@ const userRoutes = [
   { path: "events", element: <EventList /> },
   { path: "routines/:routineId/workouts", element: <EditWorkout /> },
   { path: "workout/:workoutId/series", element: <Series /> },
-  { path: "profile", element: <ProfileClient /> }, 
+  { path: "profile", element: <ProfileClient /> },
+  { path: "equipments", element: <EquipmentList /> },
+  { path: "equipmentsClient", element: <EquipmentListClient /> }, 
 ];
 
 const router = createBrowserRouter([
