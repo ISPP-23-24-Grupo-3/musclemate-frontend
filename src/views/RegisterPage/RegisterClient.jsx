@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiUser, HiLockClosed, HiOutlineMail, HiPhone } from "react-icons/hi";
 import { HiHome } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button } from "@radix-ui/themes";
 import { postToApiRegister } from "../../utils/functions/api";
-import { useNavigate } from "react-router";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const ClientRegister = () => {
-
   const [isChecked, setIsChecked] = useState(false);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -32,15 +31,15 @@ const ClientRegister = () => {
         }
       };
 
-      if (isChecked) {
-        const response = await postToApiRegister('owners/create/', requestBody);
-        if (!response.ok) {
-          throw new Error('Error al crear propietario');
-        }
+      const response = await postToApiRegister('owners/create/', requestBody);
+      if (response.ok) {
         console.log('Propietario creado exitosamente');
-        navigate('/login');
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000); // Espera 2 segundos antes de redirigir
       } else {
-        throw new Error('Debes aceptar los Términos y Condiciones para registrarte');
+        throw new Error('Error al crear propietario');
       }
     } catch (error) {
       setError(error.message);
@@ -59,6 +58,16 @@ const ClientRegister = () => {
     mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
   };
 
+  useEffect(() => {
+    let redirectTimer;
+    if (success) {
+      redirectTimer = setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Espera 2 segundos antes de redirigir
+    }
+    return () => clearTimeout(redirectTimer);
+  }, [success, navigate]);
+
   return (
     <div className="flex flex-col mt-3 md:flex-row justify-center items-center min-h-screen md:m-0 m-5">
       <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl mb-8 md:mb-0 md:mr-8">
@@ -67,8 +76,13 @@ const ClientRegister = () => {
             Registro de nuevo propietario
           </h2>
           {error && (
-          <div className="text-red-500">{error}</div>
-        )}
+            <div className="text-red-500">{error}</div>
+          )}
+          {success && (
+            <div className="bg-green-200 text-green-800 p-3 rounded mb-4">
+              Registro completado
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="relative flex items-center mb-4">
               <HiUser className="w-6 h-6 text-radixgreen mr-3" />
@@ -193,8 +207,11 @@ const ClientRegister = () => {
                 style={{ marginLeft: "3rem" }}
               />
             </div>
-            <br></br>
-            <input type="checkbox" onChange={() => setIsChecked(!isChecked)} /><p>Acepta los <Link to="/terms-conditions" style={{ color: "blue" }}>Términos y Condiciones</Link></p>
+
+            <div className="flex items-center mb-4">
+              <input type="checkbox" onChange={() => setIsChecked(!isChecked)} className="mr-2" />
+              <p>Acepta los <Link to="/terms-conditions" className="text-blue-500">Términos y Condiciones</Link></p>
+            </div>
 
             <Button
               type="submit"
@@ -205,8 +222,6 @@ const ClientRegister = () => {
             >
               Registrarse
             </Button>
-
-
           </form>
         </div>
       </div>
