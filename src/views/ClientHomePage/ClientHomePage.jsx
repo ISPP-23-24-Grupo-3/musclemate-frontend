@@ -5,7 +5,7 @@ import { RoutineList } from "../../components/Routines/RoutineList";
 export default function ClientHomePage() {
   return (
     <>
-      <div className="flex my-8 gap-5 mx-10 flex-wrap">
+      <div className="flex flex-wrap gap-4">
         <div>
           <Heading as="h1" className="!mb-3">
             <Link href="./routines">Tus Rutinas</Link>

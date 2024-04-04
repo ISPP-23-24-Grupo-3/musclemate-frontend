@@ -63,7 +63,7 @@ const ownerRoutes = [
   },
   {
     path: "events/add",
-    element: <AddEventsForm/>
+    element: <AddEventsForm />,
   },
   {
     path: "equipments",
@@ -90,20 +90,20 @@ const ownerRoutes = [
     element: <MyGymsOwner />,
   },
   {
-    path:"pricing",
-    element: <PricingPage/>
+    path: "pricing",
+    element: <PricingPage />,
   },
   {
-    path:"subscriptions",
-    element: <SubscriptionsPage/>
+    path: "subscriptions",
+    element: <SubscriptionsPage />,
   },
   {
-    path:"success",
-    element: <SuccessPage/>
+    path: "success",
+    element: <SuccessPage />,
   },
   {
     path: "gyms/add",
-    element : <CreateGym />
+    element: <CreateGym />,
   },
   {
     path: "gyms/:gymId",
@@ -123,7 +123,7 @@ const userRoutes = [
   { path: "workout/:workoutId/series", element: <Series /> },
   { path: "profile", element: <ProfileClient /> },
   { path: "equipments", element: <EquipmentList /> },
-  { path: "equipmentsClient", element: <EquipmentListClient /> }, 
+  { path: "equipmentsClient", element: <EquipmentListClient /> },
 ];
 
 const router = createBrowserRouter([
@@ -156,11 +156,10 @@ const router = createBrowserRouter([
       {
         path: "/terms-conditions",
         element: <TermsConditions />,
-       },
-       {
+      },
+      {
         path: "/verify",
-        element: <MailVerification />
-
+        element: <MailVerification />,
       },
     ],
     errorElement: <ErrorPage />,
@@ -172,5 +171,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

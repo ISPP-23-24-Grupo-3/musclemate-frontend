@@ -1,35 +1,29 @@
-import React ,{useState, useEffect,useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@radix-ui/themes";
+import { Button, Select, TextArea, TextField } from "@radix-ui/themes";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
+import { FormContainer } from "../../components/Form";
 
 const GymMachineForm = () => {
-
-
-
   const { user } = useContext(AuthContext);
-  const [gyms, setGyms] = useState(null)
+  const [gyms, setGyms] = useState(null);
   const [machines, setMachines] = useState(null);
   const [selectedGym, setSelectedGym] = useState(null);
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
 
   async function getGyms() {
-  
-          const responseGym = await getFromApi('gyms/');
-          return responseGym.json();
-         
+    const responseGym = await getFromApi("gyms/");
+    return responseGym.json();
   }
 
   useEffect(() => {
-    getGyms().then(gyms => setGyms(gyms)).catch(error => console.log(error));
-    }, []);
+    getGyms()
+      .then((gyms) => setGyms(gyms))
+      .catch((error) => console.log(error));
+  }, []);
 
-
- 
-  
   /*
   useEffect(() => {
     const selectedGym = async() => {
@@ -46,21 +40,24 @@ const GymMachineForm = () => {
     },[selectedGym]);
 */
 
-  const { register, handleSubmit, formState: { errors } } = useForm( {values: {gym: selectedGym}},);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ values: { gym: selectedGym } });
 
   const onSubmit = async (machineInfo) => {
     try {
-      const response = await postToApi('equipments/create/',
-        machineInfo);
-  
+      const response = await postToApi("equipments/create/", machineInfo);
+
       if (!response.ok) {
-        throw new Error('Error al agregar la máquina');
+        throw new Error("Error al agregar la máquina");
       }
-  
-      console.log('Máquina agregada exitosamente');
-      navigate('/owner/equipments')
+
+      console.log("Máquina agregada exitosamente");
+      navigate("/owner/equipments");
     } catch (error) {
-      console.error('Hubo un error al agregar la máquina:', error);
+      console.error("Hubo un error al agregar la máquina:", error);
     }
   };
 
@@ -75,117 +72,124 @@ const GymMachineForm = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
+      <FormContainer>
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Agregar máquina de gimnasio
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex items-center mb-4">
-            <label htmlFor="name" className="mr-3">Nombre de la máquina</label>
-            <input
-              {...register("name", { required: messages.req, minLength: { value: 5, message: messages.name } })}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+          <div className="flex flex-col">
+            <label htmlFor="name" className="mr-3">
+              Nombre de la máquina
+            </label>
+            <TextField.Input
+              {...register("name", {
+                required: messages.req,
+                minLength: { value: 5, message: messages.name },
+              })}
               name="name"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.name ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              
+              className={`${errors.name && "!border-red-500"}`}
             />
+            {errors.name && (
+              <p className="text-red-500">{errors.name.message}</p>
+            )}
           </div>
-          {errors.name && (
-            <p className="text-red-500">{errors.name.message}</p>
-          )}
 
-          <div className="flex items-center mb-4">
-            <label htmlFor="brand" className="mr-3">Marca</label>
-            <input
-              {...register("brand", { required: messages.req, minLength: { value: 3, message: messages.brand } })}
+          <div className="flex flex-col">
+            <label htmlFor="brand" className="mr-3">
+              Marca
+            </label>
+            <TextField.Input
+              {...register("brand", {
+                required: messages.req,
+                minLength: { value: 3, message: messages.brand },
+              })}
               name="brand"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.brand ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "7.5rem" }}
+              className={`${errors.brand && "!border-red-500"}`}
             />
+            {errors.brand && (
+              <p className="text-red-500">{errors.brand.message}</p>
+            )}
           </div>
-          {errors.brand && (
-            <p className="text-red-500">{errors.brand.message}</p>
-          )}
 
-          <div className="flex items-center mb-4">
-            <label htmlFor="serial_number" className="mr-3">Número de referencia</label>
-            <input
+          <div className="flex flex-col">
+            <label htmlFor="serial_number" className="mr-3">
+              Número de referencia
+            </label>
+            <TextField.Input
               {...register("serial_number", { required: messages.req })}
               name="serial_number"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.reference ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "0.4rem" }}
+              className={`${errors.serial_number && "!border-red-500"}`}
             />
+            {errors.serial_number && (
+              <p className="text-red-500">{errors.serial_number.message}</p>
+            )}
           </div>
-          {errors.reference && (
-            <p className="text-red-500">{errors.reference.message}</p>
-          )}
 
-          <div className="flex items-center mb-4">
-            <label htmlFor="description" className="mr-3">Descripción</label>
-            <textarea
-              {...register("description", { required: messages.req, minLength: { value: 10, message: messages.description } })}
+          <div className="flex flex-col">
+            <label htmlFor="description" className="mr-3">
+              Descripción
+            </label>
+            <TextArea
+              {...register("description", {
+                required: messages.req,
+                minLength: { value: 10, message: messages.description },
+              })}
               name="description"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.description ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
               rows="4"
+              className={`${errors.description && "!border-red-500"}`}
             />
+            {errors.description && (
+              <p className="text-red-500">{errors.description.message}</p>
+            )}
           </div>
-          {errors.description && (
-            <p className="text-red-500">{errors.description.message}</p>
-          )}
 
-          <div className="flex items-center mb-4">
-            <label htmlFor="muscular_group" className="mr-3">Grupo muscular</label>
-            <select
+          <div className="flex flex-col">
+            <label htmlFor="muscular_group">Grupo muscular</label>
+            <Select.Root
               {...register("muscular_group", { required: messages.req })}
               name="muscular_group"
               type="text"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.muscularGroup ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
+              className={`${errors.muscular_group && "!border-red-500"}`}
               style={{ marginLeft: "3rem" }}
-              
             >
-            <option value="">Selecciona un grupo muscular</option>
-            <option value="arms">Brazos</option>
-            <option value="legs">Piernas</option>
-            <option value="core">Abdominales</option>
-            <option value="chest">Pecho</option>
-            <option value="back">Espalda</option>
-            <option value="shoulders">Hombros</option>
-            <option value="other">Otros</option>
-            </select>
+              <Select.Trigger placeholder="Selecciona un grupo muscular" />
+              <Select.Content position="popper">
+                <Select.Item value="arms">Brazos</Select.Item>
+                <Select.Item value="legs">Piernas</Select.Item>
+                <Select.Item value="core">Abdominales</Select.Item>
+                <Select.Item value="chest">Pecho</Select.Item>
+                <Select.Item value="back">Espalda</Select.Item>
+                <Select.Item value="shoulders">Hombros</Select.Item>
+                <Select.Item value="other">Otros</Select.Item>
+              </Select.Content>
+            </Select.Root>
+            {errors.muscular_group && (
+              <p className="text-red-500">{errors.muscular_group.message}</p>
+            )}
           </div>
-          {errors.muscularGroup && (
-            <p className="text-red-500">{errors.muscularGroup.message}</p>
-          )}
 
-          <div className="flex items-center mb-4">
-          <label htmlFor="gym" className="mr-3">Gimnasio</label>
-          <select
-            {...register("gym", { required: messages.req })}
-            name="gym"
-            className={`flex-1 px-4 py-3 border rounded-lg ${
-              errors.gym ? 'border-red-500' : 'border-radixgreen'
-            } bg-white text-black`}
-          >
-            <option value="">Seleccionar gimnasio</option>
-            {gyms && gyms.map(gym=><option key={gym.id} value={gym.id}>{gym.name}</option>)}
-            
-          </select>
-        </div>
-        {errors.gym && (
-          <p className="text-red-500">{errors.gym.message}</p>
-        )}
+          <div className="flex flex-col ">
+            <label htmlFor="gym">Gimnasio</label>
+            <Select.Root
+              {...register("gym", { required: messages.req })}
+              name="gym"
+              className={`${errors.gym && "!border-red-500"} `}
+            >
+              <Select.Trigger placeholder="Seleccionar gimnasio"></Select.Trigger>
+              <Select.Content position="popper">
+                {gyms &&
+                  gyms.map((gym) => (
+                    <Select.Item key={gym.id} value={gym.id.toString()}>
+                      {gym.name}
+                    </Select.Item>
+                  ))}
+              </Select.Content>
+            </Select.Root>
+            {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+          </div>
 
           <Button
             type="submit"
@@ -197,9 +201,10 @@ const GymMachineForm = () => {
             Agregar máquina
           </Button>
         </form>
-      </div>
+      </FormContainer>
     </div>
   );
-        };
+};
 
 export default GymMachineForm;
+
