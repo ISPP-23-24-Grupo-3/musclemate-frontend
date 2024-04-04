@@ -16,11 +16,7 @@ const Footer = () => {
         </Flex>
         <ul className="flex max-sm:flex-col gap-x-6 gap-y-2">
           <li>
-            <RLink>
-              <Link to="/terms-conditions" className="text-base transition-all">
-                Términos y Condiciones
-              </Link>
-            </RLink>
+            <RLink href="/terms-conditions">Términos y Condiciones</RLink>
           </li>
           <li>
             <strong>musclemate33@gmail.com</strong>
