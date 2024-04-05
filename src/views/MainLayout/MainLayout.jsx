@@ -7,8 +7,8 @@ import { SubscriptionProvider } from "../../utils/context/SubscriptionContext";
 
 const MainLayout = ({ children }) => {
   return (
-    <SubscriptionProvider>
       <AuthProvider>
+      <SubscriptionProvider>
       <Theme>
         <div className="flex flex-col min-h-screen">
           <Header />
@@ -19,8 +19,8 @@ const MainLayout = ({ children }) => {
           <Footer />
         </div>
       </Theme>
+      </SubscriptionProvider>
     </AuthProvider>
-    </SubscriptionProvider>
   );
 };
 
