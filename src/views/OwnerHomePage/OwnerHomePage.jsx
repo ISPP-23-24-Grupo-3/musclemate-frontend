@@ -1,7 +1,11 @@
 import { Button, Flex, Heading } from "@radix-ui/themes";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
+import SubscriptionContext from "../../utils/context/SubscriptionContext";
+
 
 export default function OwnerHomePage() {
+
   return (
     <>
       <Flex align="center" justify="center" direction="row">
