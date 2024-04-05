@@ -28,6 +28,8 @@ const EquipmentDetailsClient = () => {
   const [clientId, setClientId] = useState(null);
   const [message, setMessage] = useState("");
 
+  const [gymPlan, setGymPlan] = useState("");
+
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
     switch (group) {
@@ -70,6 +72,22 @@ const EquipmentDetailsClient = () => {
         });
     }
   }, [clientUsername]);
+
+  // Datos de subscripción
+  useEffect(() => {
+    if (user) {
+        getFromApi("clients/detail/" + user.username + "/") 
+            .then((response) => response.json())
+            .then((data) => {
+              let gym = data.gym;
+              getFromApi("gyms/detail/" + gym + "/") 
+              .then((response) => response.json())
+              .then((data) => {
+                setGymPlan(data.subscription_plan);
+              });
+            });
+    }
+  }, [user]);
 
   // Machine Details
   useEffect(() => {
@@ -164,7 +182,7 @@ const EquipmentDetailsClient = () => {
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
           {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-
+  
         <div className="mb-1">
           <strong className="text-radixgreen">Tu Valoración:</strong>
           <div
@@ -175,8 +193,8 @@ const EquipmentDetailsClient = () => {
             }}
           >
             <Rating rating={actualRating} />
-
-            {valuationOn && isClient && (
+  
+            {valuationOn && isClient && gymPlan !== "free" && ( // Added condition gymPlan !== "free"
               <div style={{ display: "flex" }}>
                 <TextField.Input
                   type="number"
@@ -193,7 +211,7 @@ const EquipmentDetailsClient = () => {
                   max="5"
                   step="0.5"
                 />
-
+  
                 <Button
                   onClick={async () => {
                     if (hasValoration) {
@@ -218,13 +236,15 @@ const EquipmentDetailsClient = () => {
                 </Button>
               </div>
             )}
-
-            <Button
-              onClick={() => setValuationOn(!valuationOn)}
-              className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-            >
-              {valuationOn ? "Volver" : "Valorar"}
-            </Button>
+  
+            {isClient && gymPlan !== "free" && ( // Added condition gymPlan !== "free"
+              <Button
+                onClick={() => setValuationOn(!valuationOn)}
+                className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
+              >
+                {valuationOn ? "Volver" : "Valorar"}
+              </Button>
+            )}
           </div>
         </div>
         <div className="mt-4 flex justify-center items-center">

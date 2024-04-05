@@ -7,7 +7,7 @@ import { SubscriptionProvider } from "../../utils/context/SubscriptionContext";
 
 const MainLayout = ({ children }) => {
   return (
-      <AuthProvider>
+    <AuthProvider>
       <SubscriptionProvider>
       <Theme>
         <div className="flex flex-col min-h-screen">
