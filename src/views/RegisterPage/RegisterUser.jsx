@@ -200,7 +200,7 @@ const UserRegister = () => {
 
           <div className="flex flex-col">
             <label htmlFor="gender">Género</label>
-            <RHFSelect>
+            <RHFSelect {...register("gender", { required: messages.req })}>
               <Select.Trigger placeholder="Seleccionar..."></Select.Trigger>
               <Select.Content position="popper">
                 <Select.Item value="M">Masculino</Select.Item>
