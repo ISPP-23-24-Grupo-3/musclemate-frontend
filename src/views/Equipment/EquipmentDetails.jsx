@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getFromApi, putToApi, deleteFromApi } from "../../utils/functions/api";
-import { Button, Heading, TextArea, TextField } from "@radix-ui/themes";
+import {
+  Button,
+  Heading,
+  Select,
+  TextArea,
+  TextField,
+  TextFieldInput,
+} from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form.jsx";
 
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
+import { Checkbox } from "@radix-ui/themes";
 
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
@@ -244,7 +252,7 @@ export default function EquipmentDetails() {
   const handleInputChange = (e, field) => {
     setUpdatedDetails({
       ...updatedDetails,
-      [field]: e.target.value,
+      [field]: e,
     });
   };
 
@@ -380,21 +388,23 @@ export default function EquipmentDetails() {
             <strong className="text-radixgreen">Gimnasio:</strong>{" "}
             <span>{gymName || "No disponible"}</span>
           </div>
-          <div>
+          <div className={`flex ${editMode ? "flex-col" : "gap-1"}`}>
             <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
             {editMode ? (
-              <select
+              <Select.Root
                 name="muscular_group"
-                className="border border-gray-300 rounded px-2 py-1"
-                value={updatedDetails.muscular_group}
-                onChange={(e) => handleInputChange(e, "muscular_group")}
+                defaultValue={updatedDetails.muscular_group}
+                onValueChange={(e) => handleInputChange(e, "muscular_group")}
               >
-                {muscularGroupOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <Select.Trigger placeholder="Selecciona un grupo muscular" />
+                <Select.Content position="popper">
+                  {muscularGroupOptions.map((option) => (
+                    <Select.Item key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
             ) : (
               <span>
                 {translateMuscularGroup(machineDetails.muscular_group)}
@@ -404,10 +414,9 @@ export default function EquipmentDetails() {
           <div>
             <strong className="text-radixgreen">Número de Serie:</strong>{" "}
             {editMode ? (
-              <input
+              <TextField.Input
                 name="serial_number"
                 type="text"
-                className="border border-gray-300 rounded px-2 py-1"
                 value={updatedDetails.serial_number}
                 onChange={(e) => handleInputChange(e, "serial_number")}
               />
@@ -497,10 +506,10 @@ export default function EquipmentDetails() {
                     </p>
                   </div>
                   <div className="ml-auto">
-                    <input
+                    <Checkbox
                       type="checkbox"
                       checked={ticket.status}
-                      onChange={(e) => handleCheckboxChange(e, ticket.id)}
+                      onChange={(ch) => handleCheckboxChange(ch, ticket.id)}
                       className="mr-2"
                     />
                     <p className="text-radixgreen font-bold mb-1">

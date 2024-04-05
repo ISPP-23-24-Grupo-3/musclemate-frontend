@@ -3,6 +3,7 @@ import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
 import { Heading, TextField } from "@radix-ui/themes";
 import { IoMdSearch } from "react-icons/io";
+import { Checkbox } from "radix-ui";
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -19,7 +20,9 @@ const TicketManagement = () => {
         if (response.ok) {
           const data = await response.json();
           setAllTickets(data);
-          setFilteredTickets(data.sort((a, b) => new Date(b.date) - new Date(a.date))); // Ordenar por fecha
+          setFilteredTickets(
+            data.sort((a, b) => new Date(b.date) - new Date(a.date)),
+          ); // Ordenar por fecha
           setApiDataLoaded(true);
         } else {
           console.error("Error fetching API tickets:", response.status);
@@ -33,21 +36,23 @@ const TicketManagement = () => {
   }, []);
 
   useEffect(() => {
-    
     const filtered = allTickets.filter(
       (ticket) =>
         ticket.gym_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.equipment_name.toLowerCase().includes(searchTerm.toLowerCase())
+        ticket.equipment_name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-    setFilteredTickets(filtered.sort((a, b) => new Date(b.date) - new Date(a.date))); // Ordenar por fecha
+    setFilteredTickets(
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date)),
+    ); // Ordenar por fecha
   }, [searchTerm, allTickets]);
 
-  
   const indexOfLastTicket = currentPage * ticketsPerPage;
   const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
-  const currentTickets = filteredTickets.slice(indexOfFirstTicket, indexOfLastTicket);
+  const currentTickets = filteredTickets.slice(
+    indexOfFirstTicket,
+    indexOfLastTicket,
+  );
 
-  
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const toggleStatus = async (ticketId) => {
@@ -57,8 +62,8 @@ const TicketManagement = () => {
         const updatedTicket = await response.json();
         setAllTickets((prevTickets) =>
           prevTickets.map((ticket) =>
-            ticket.id === ticketId ? updatedTicket : ticket
-          )
+            ticket.id === ticketId ? updatedTicket : ticket,
+          ),
         );
       } else {
         console.error("Error updating ticket status:", response.status);
@@ -68,13 +73,12 @@ const TicketManagement = () => {
     }
   };
 
-  const handleCheckboxChange = async (event, ticketId) => {
-    const { checked } = event.target;
+  const handleCheckboxChange = async (checked, ticketId) => {
     try {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
         const updatedTicket = await response.json();
-        updatedTicket.status = checked; 
+        updatedTicket.status = checked;
         const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
           label: updatedTicket.label,
           description: updatedTicket.description,
@@ -84,11 +88,10 @@ const TicketManagement = () => {
           status: updatedTicket.status,
         });
         if (updateResponse.ok) {
-          
           setAllTickets((prevTickets) =>
             prevTickets.map((ticket) =>
-              ticket.id === ticketId ? updatedTicket : ticket
-            )
+              ticket.id === ticketId ? updatedTicket : ticket,
+            ),
           );
         } else {
           console.error("Error updating ticket status:", updateResponse.status);
@@ -187,11 +190,9 @@ const TicketManagement = () => {
                         {formatDate(ticket.date)}
                       </span>
                     </p>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={ticket.status}
-                      onChange={(e) => handleCheckboxChange(e, ticket.id)}
-                      className="mr-2"
+                      onChange={(c) => handleCheckboxChange(c, ticket.id)}
                     />
                     <p className="text-radixgreen font-bold mb-1">
                       <span
@@ -226,22 +227,30 @@ const TicketManagement = () => {
             </button>
           </li>
           {filteredTickets.length > 0 &&
-            Array.from({ length: Math.ceil(filteredTickets.length / ticketsPerPage) }, (_, i) => (
-              <li key={i} className="mr-2">
-                <button
-                  onClick={() => paginate(i + 1)}
-                  className={`px-3 py-1 rounded-lg ${
-                    currentPage === i + 1 ? "bg-radixgreen text-white" : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              </li>
-            ))}
+            Array.from(
+              { length: Math.ceil(filteredTickets.length / ticketsPerPage) },
+              (_, i) => (
+                <li key={i} className="mr-2">
+                  <button
+                    onClick={() => paginate(i + 1)}
+                    className={`px-3 py-1 rounded-lg ${
+                      currentPage === i + 1
+                        ? "bg-radixgreen text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                </li>
+              ),
+            )}
           <li>
             <button
               onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === Math.ceil(filteredTickets.length / ticketsPerPage)}
+              disabled={
+                currentPage ===
+                Math.ceil(filteredTickets.length / ticketsPerPage)
+              }
               className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
             >
               Siguiente

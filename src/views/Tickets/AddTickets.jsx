@@ -2,6 +2,8 @@ import React, { useState, useContext, useEffect } from "react";
 import { postToApi, getFromApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
+import { Button, Select, TextArea, TextField } from "@radix-ui/themes";
+import { EquipmentSelect } from "../../components/Equipments";
 
 const AddTickets = () => {
   const { user } = useContext(AuthContext);
@@ -10,11 +12,11 @@ const AddTickets = () => {
   const [equipmentId, setEquipmentId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [equipmentOptions, setEquipmentOptions] = useState([]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      console.log(equipmentId);
       const response = await postToApi("tickets/create/", {
         label,
         description,
@@ -42,91 +44,46 @@ const AddTickets = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchEquipmentOptions = async () => {
-      try {
-        const response = await getFromApi("equipments/");
-        if (response.ok) {
-          const data = await response.json();
-          setEquipmentOptions(
-            data.map((equipment) => ({
-              value: equipment.id,
-              label: equipment.name,
-            })),
-          );
-        } else {
-          setErrorMessage(
-            "Error al cargar las máquinas. Por favor, inténtelo de nuevo más tarde.",
-          );
-        }
-      } catch (error) {
-        setErrorMessage(
-          "Error de red o del servidor. Por favor, inténtelo de nuevo más tarde.",
-        );
-      }
-    };
-
-    fetchEquipmentOptions();
-  }, []);
-
   return (
     <div className="mt-8 flex justify-center mb-8">
-      <FormContainer>
+      <FormContainer className="w-1/2">
         <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
           Crear Ticket
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="label" className="text-gray-800">
-              Asunto:
-            </label>
-            <input
+            <label htmlFor="label">Asunto:</label>
+            <TextField.Input
               type="text"
               id="label"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-radixgreen"
             />
           </div>
           <div>
-            <label htmlFor="description" className="text-gray-800">
-              Descripción:
-            </label>
-            <textarea
+            <label htmlFor="description">Descripción:</label>
+            <TextArea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-radixgreen resize-none h-40"
-            ></textarea>
+            ></TextArea>
           </div>
-          <div>
+          <div className="flex flex-col">
             <label htmlFor="equipmentId" className="text-gray-800">
               Equipo:
             </label>
-            <select
+            <EquipmentSelect
               id="equipmentId"
-              value={equipmentId}
-              onChange={(e) => setEquipmentId(e.target.value)}
-              className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-1 focus:outline-none focus:border-radixgreen"
-            >
-              <option value="">Selecciona una máquina</option>
-              {equipmentOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(eq) => setEquipmentId(eq)}
+            />
           </div>
           {successMessage && (
             <div className="text-green-700">{successMessage}</div>
           )}
           {errorMessage && <div className="text-red-700">{errorMessage}</div>}
-          <button
-            type="submit"
-            className="bg-radixgreen text-white px-6 py-3 rounded-md hover:bg-opacity-80 focus:outline-none"
-          >
+          <Button className="w-full" type="submit">
             Agregar Ticket
-          </button>
+          </Button>
         </form>
       </FormContainer>
     </div>
