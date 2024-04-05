@@ -94,8 +94,7 @@ const Profile = () => {
                         <hr className="border-radixgreen"/>
                     </div>
                     <p className="text-radixgreen text-xl capitalize font-bold mt-5">Nombre: 
-                    {editMode ? (
-                        <>
+                        {editMode ? (
                             <input
                                 type="text"
                                 className="text-black"
@@ -103,6 +102,12 @@ const Profile = () => {
                                 onChange={(e) => handleInputChange(e, "name")}
                                 placeholder="Nombre"
                             />
+                        ) : (
+                         <span className="text-black/60">{user ? user.name : "Cargando..."}</span>
+                        )}
+                    </p>
+                    <p className="text-radixgreen text-xl font-bold mt-3">Apellidos: 
+                        {editMode ? (
                             <input
                                 type="text"
                                 className="text-black"
@@ -110,9 +115,8 @@ const Profile = () => {
                                 onChange={(e) => handleInputChange(e, "lastName")}
                                 placeholder="Apellido"
                             />
-                        </>
                         ) : (
-                            <span className="text-black/60">{user ? user.name+" "+user.lastName : "Cargando..."}</span>
+                            <span className="text-black/60">{user ? user.lastName : "Cargando..."}</span>
                         )}
                     </p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Fecha de Nacimiento: 
@@ -127,7 +131,7 @@ const Profile = () => {
                             <span className="text-black/60">{user ? user.birth : "Cargando..."}</span>
                         )}
                     </p>
-                    <p className="text-radixgreen text-xl font-bold mt-3">Mail: 
+                    <p className="text-radixgreen text-xl font-bold mt-3">Email: 
                         {editMode ? (
                             <input
                                 type="email"
@@ -176,7 +180,7 @@ const Profile = () => {
                         )}
                     </p>
                     <div>
-                        <p className={user && user.register ? "bg-amber-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center" : "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>
+                        <p className={user && user.register ? "bg-green-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center" : "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>
                             Estado de Matrícula: {user ? user.register ? "Activa" : "Caducada" : "Cargando..."}
                         </p>
                         {editMode ? (

@@ -36,14 +36,15 @@ const ProfileClient = () => {
                         <p className="text-radixgreen text-3xl font-bold mt-5 mb-2">Información del Usuario</p>
                         <hr className="border-radixgreen"/>
                     </div>
-                    <p className="text-radixgreen text-xl capitalize font-bold mt-5">Nombre: <span className="text-black/60">{userProfile ? userProfile.name+" "+userProfile.lastName : "Cargando..."}</span></p>
+                    <p className="text-radixgreen text-xl capitalize font-bold mt-5">Nombre: <span className="text-black/60">{userProfile ? userProfile.name : "Cargando..."}</span></p>
+                    <p className="text-radixgreen text-xl font-bold mt-3">Apellidos: <span className="text-black/60">{userProfile ? userProfile.lastName : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Fecha de Nacimiento: <span className="text-black/60">{userProfile ? userProfile.birth : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Mail: <span className="text-black/60">{userProfile ? userProfile.email : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl font-bold mt-3">Número de Teléfono: <span className="text-black/60">{userProfile ? userProfile.phoneNumber : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl capitalize font-bold mt-3">Dirección: <span className="text-black/60">{userProfile ? userProfile.address : "Cargando..."}</span></p>
                     <p className="text-radixgreen text-xl capitalize font-bold mt-3">Población: <span className="text-black/60">{userProfile ? userProfile.city : "Cargando..."}</span></p>
                     <div>
-                        <p className={userProfile && userProfile.register ? "bg-amber-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center" : "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>
+                        <p className={userProfile && userProfile.register ? "bg-green-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center" : "bg-red-500/80 border border-radixgreen rounded-3xl text-white text-xl font-bold mt-5 p-3" + " text-center"}>
                             Estado de Matrícula: {userProfile ? userProfile.register ? "Activa" : "Caducada" : "Cargando..."}
                         </p>
                     </div>
