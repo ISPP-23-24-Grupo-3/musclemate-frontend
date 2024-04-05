@@ -14,6 +14,7 @@ import { FormContainer } from "../../components/Form.jsx";
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 import { Checkbox } from "@radix-ui/themes";
+import { RHFSelect } from "../../components/RHFSelect.jsx";
 
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
@@ -391,20 +392,19 @@ export default function EquipmentDetails() {
           <div className={`flex ${editMode ? "flex-col" : "gap-1"}`}>
             <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
             {editMode ? (
-              <Select.Root
+              <RHFSelect
                 name="muscular_group"
                 defaultValue={updatedDetails.muscular_group}
-                onValueChange={(e) => handleInputChange(e, "muscular_group")}
+                onChange={(e) =>
+                  handleInputChange(e.target.value, "muscular_group")
+                }
               >
-                <Select.Trigger placeholder="Selecciona un grupo muscular" />
-                <Select.Content position="popper">
-                  {muscularGroupOptions.map((option) => (
-                    <Select.Item key={option.value} value={option.value}>
-                      {option.label}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
+                {muscularGroupOptions.map((option) => (
+                  <Select.Item key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Item>
+                ))}
+              </RHFSelect>
             ) : (
               <span>
                 {translateMuscularGroup(machineDetails.muscular_group)}

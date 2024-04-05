@@ -5,6 +5,8 @@ import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
+import { GymSelect } from "../../components/Gyms";
+import { RHFSelect } from "../../components/RHFSelect";
 
 const AddEventsForm = () => {
   const { user } = useContext(AuthContext);
@@ -170,18 +172,14 @@ const AddEventsForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="intensity">Intensidad del evento</label>
-            <Select.Root
-              {...register("intensity", { required: messages.req })}
-              name="intensity"
-              type="text"
-            >
+            <RHFSelect {...register("intensity", { required: messages.req })}>
               <Select.Trigger placeholder="Selecciona una intensidad"></Select.Trigger>
               <Select.Content position="popper">
                 <Select.Item value="L">Low</Select.Item>
                 <Select.Item value="M">Medium</Select.Item>
                 <Select.Item value="H">High</Select.Item>
               </Select.Content>
-            </Select.Root>
+            </RHFSelect>
             {errors.intensity && (
               <p className="text-red-500">{errors.intensity.message}</p>
             )}
@@ -189,20 +187,7 @@ const AddEventsForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="gym">Gimnasio</label>
-            <Select.Root
-              {...register("gym", { required: messages.req })}
-              name="gym"
-            >
-              <Select.Trigger placeholder="Seleccionar gimnasio"></Select.Trigger>
-              <Select.Content position="popper">
-                {gyms &&
-                  gyms.map((gym) => (
-                    <Select.Item key={gym.id} value={gym.id.toString()}>
-                      {gym.name}
-                    </Select.Item>
-                  ))}
-              </Select.Content>
-            </Select.Root>
+            <GymSelect {...register("gym", { required: messages.req })} />
             {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
           </div>
 

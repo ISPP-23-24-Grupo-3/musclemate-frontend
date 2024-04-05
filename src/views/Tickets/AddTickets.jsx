@@ -16,7 +16,6 @@ const AddTickets = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log(equipmentId);
       const response = await postToApi("tickets/create/", {
         label,
         description,
@@ -74,7 +73,7 @@ const AddTickets = () => {
             </label>
             <EquipmentSelect
               id="equipmentId"
-              onChange={(eq) => setEquipmentId(eq)}
+              onChange={(eq) => setEquipmentId(eq.target.value)}
             />
           </div>
           {successMessage && (

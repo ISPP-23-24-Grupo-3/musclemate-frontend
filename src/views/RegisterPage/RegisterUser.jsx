@@ -23,7 +23,6 @@ const UserRegister = () => {
   async function getGyms() {
     const responseGym = await getFromApi("gyms/");
     const gymsData = await responseGym.json();
-    console.log(gymsData);
     return gymsData;
   }
 
@@ -200,13 +199,13 @@ const UserRegister = () => {
 
           <div className="flex flex-col">
             <label htmlFor="gender">Género</label>
-            <RHFSelect {...register("gender", { required: messages.req })}>
-              <Select.Trigger placeholder="Seleccionar..."></Select.Trigger>
-              <Select.Content position="popper">
-                <Select.Item value="M">Masculino</Select.Item>
-                <Select.Item value="F">Femenino</Select.Item>
-                <Select.Item value="O">Otro</Select.Item>
-              </Select.Content>
+            <RHFSelect
+              placeholder="Seleccionar..."
+              {...register("gender", { required: messages.req })}
+            >
+              <Select.Item value="M">Masculino</Select.Item>
+              <Select.Item value="F">Femenino</Select.Item>
+              <Select.Item value="O">Otro</Select.Item>
             </RHFSelect>
             {errors.gender && (
               <p className="text-red-500">{errors.gender.message}</p>

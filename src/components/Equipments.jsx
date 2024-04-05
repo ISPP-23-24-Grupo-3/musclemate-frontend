@@ -4,7 +4,7 @@ import * as PropTypes from "prop-types";
 import { Select } from "@radix-ui/themes";
 import { RHFSelect } from "./RHFSelect";
 
-export const EquipmentSelect = ({ props, ref }) => {
+export const EquipmentSelect = (props) => {
   const [equipment, set_equipment] = useState([]);
 
   useEffect(() => {
@@ -20,15 +20,12 @@ export const EquipmentSelect = ({ props, ref }) => {
   }, []);
 
   return (
-    <RHFSelect {...props}>
-      <Select.Trigger placeholder="Selecciona una máquina"></Select.Trigger>
-      <Select.Content position="popper">
-        {equipment.map((e) => (
-          <Select.Item key={e.id} value={e.id.toString()}>
-            {e.name}
-          </Select.Item>
-        ))}
-      </Select.Content>
+    <RHFSelect {...props} placeholder="Selecciona una máquina">
+      {equipment.map((e) => (
+        <Select.Item key={e.id} value={e.id.toString()}>
+          {e.name}
+        </Select.Item>
+      ))}
     </RHFSelect>
   );
 };

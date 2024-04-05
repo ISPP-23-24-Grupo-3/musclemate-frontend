@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
 import { Select } from "@radix-ui/themes";
+import React from "react";
 
 export const RHFSelect = ({
   children,
   className,
   defaultValue,
+  placeholder,
   name,
   onChange,
-  ref,
 }) => {
   return (
     <Select.Root
@@ -16,7 +17,8 @@ export const RHFSelect = ({
       name={name}
       onValueChange={(v) => onChange({ target: { name, value: v } })}
     >
-      {children}
+      <Select.Trigger placeholder={placeholder} />
+      <Select.Content position="popper">{children}</Select.Content>
     </Select.Root>
   );
 };

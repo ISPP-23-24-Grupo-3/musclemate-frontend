@@ -21,6 +21,7 @@ import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 import AuthContext from "../../utils/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { EquipmentSelect as EquipmentSel } from "../../components/Equipments";
 
 import PropTypes from "prop-types";
 import {
@@ -92,83 +93,81 @@ export const EditRoutine = () => {
 
   return (
     <>
-      <Section className="!pt-1">
-        <div className="flex justify-around items-center pt-8">
-          <div className="flex items-center gap-3 pt-2 mb-3">
-            <Heading
-              className={`${editing_name ? "hidden" : undefined} text-radixgreen`}
-            >
-              {routine.name}
-            </Heading>
-            <form
-              className={`${!editing_name ? "hidden" : undefined} flex gap-3`}
-              onSubmit={handleSubmit((r) => {
-                updateName(r.name);
-                set_editing_name(false);
-              })}
-            >
-              <TextField.Input {...register("name", { required: true })} />
-              <Button>Aceptar</Button>
-            </form>
-            <IconButton
-              className={editing_name ? "!hidden" : undefined}
-              radius="full"
-              onClick={() => {
-                set_editing_name(true);
-                setValue("name", routine.name);
-              }}
-            >
-              <LuPencil />
-            </IconButton>
-          </div>
-          <Button size="3" onClick={startRoutine}>
-            <CgGym className="size-7" />
-            Entrenar
+      <div className="flex justify-around items-center">
+        <div className="flex items-center gap-3 pt-2 mb-3">
+          <Heading
+            className={`${editing_name ? "hidden" : undefined} text-radixgreen`}
+          >
+            {routine.name}
+          </Heading>
+          <form
+            className={`${!editing_name ? "hidden" : undefined} flex gap-3`}
+            onSubmit={handleSubmit((r) => {
+              updateName(r.name);
+              set_editing_name(false);
+            })}
+          >
+            <TextField.Input {...register("name", { required: true })} />
+            <Button>Aceptar</Button>
+          </form>
+          <IconButton
+            className={editing_name ? "!hidden" : undefined}
+            radius="full"
+            onClick={() => {
+              set_editing_name(true);
+              setValue("name", routine.name);
+            }}
+          >
+            <LuPencil />
+          </IconButton>
+        </div>
+        <Button size="3" onClick={startRoutine}>
+          <CgGym className="size-7" />
+          Entrenar
+        </Button>
+      </div>
+      <div className="bg-radixgreen/40 p-4 rounded-lg">
+        <Heading className="!mb-2">Añadir ejercicio</Heading>
+        <div className="place-content-around gap-20 flex">
+          <Button
+            className="flex-1"
+            variant="surface"
+            onClick={() => set_hide_form(!hide_form)}
+          >
+            Manualmente
+          </Button>
+          <Button className="flex-1" variant="surface">
+            <BsQrCodeScan className="size-5" />
+            Escanea con QR
           </Button>
         </div>
-        <div className="my-4 bg-radixgreen/40 p-4 rounded-lg">
-          <Heading className="!mb-2">Añadir ejercicio</Heading>
-          <div className="place-content-around gap-20 flex">
-            <Button
-              className="flex-1"
-              variant="surface"
-              onClick={() => set_hide_form(!hide_form)}
-            >
-              Manualmente
-            </Button>
-            <Button className="flex-1" variant="surface">
-              <BsQrCodeScan className="size-5" />
-              Escanea con QR
-            </Button>
-          </div>
-        </div>
-        <Heading as="h2" className="text-radixgreen font-bold">
-          Ejercicios
-        </Heading>
-        <Flex direction="column" gap="3" className="mt-4">
-          {!hide_form && (
-            <FormContainer>
-              <EditableWorkout
-                workouts={workouts}
-                set_workout={set_workouts}
-                hideForm={hide_form}
-                setHideForm={set_hide_form}
-                routine={routine}
-                equipment={equipment}
-                other_workouts={other_workouts}
-              />
-            </FormContainer>
-          )}
+      </div>
+      <Heading as="h2" className="text-radixgreen font-bold">
+        Ejercicios
+      </Heading>
+      <Flex direction="column" gap="3" className="mt-4">
+        {!hide_form && (
+          <FormContainer>
+            <EditableWorkout
+              workouts={workouts}
+              set_workout={set_workouts}
+              hideForm={hide_form}
+              setHideForm={set_hide_form}
+              routine={routine}
+              equipment={equipment}
+              other_workouts={other_workouts}
+            />
+          </FormContainer>
+        )}
 
-          <WorkoutList
-            workouts={workouts}
-            equipments={equipment}
-            set_workouts={set_workouts}
-            routine={routine}
-            other_workouts={other_workouts}
-          />
-        </Flex>
-      </Section>
+        <WorkoutList
+          workouts={workouts}
+          equipments={equipment}
+          set_workouts={set_workouts}
+          routine={routine}
+          other_workouts={other_workouts}
+        />
+      </Flex>
     </>
   );
 };
@@ -303,7 +302,6 @@ const EditableWorkout = ({
   hideForm,
   setHideForm,
   routine,
-  equipment,
   defaultWorkout,
   other_workouts,
 }) => {
@@ -431,10 +429,17 @@ const EditableWorkout = ({
     values: {
       routine: [routine.id],
       name: defaultWorkout?.name,
-      equipment: Array.isArray(defaultWorkout?.equipment)
-        ? defaultWorkout?.equipment.length > 1
-          ? defaultWorkout?.equipment.map((e) => ({ value: e + "" }))
-          : { value: defaultWorkout?.equipment[0] + "" }
+      // equipment: Array.isArray(defaultWorkout?.equipment)
+      //   ? defaultWorkout?.equipment.length > 1
+      //     ? defaultWorkout?.equipment.map((e) => ({ value: e + "" }))
+      //     : { value: defaultWorkout?.equipment[0] + "" }
+      //   : [],
+      equipment: defaultWorkout?.equipment
+        ? defaultWorkout.equipment.map((e) => {
+            return {
+              value: e.toString(),
+            };
+          })
         : [],
     },
   });
@@ -464,7 +469,7 @@ const EditableWorkout = ({
             ></TextField.Input>
           </Flex>
           <div className="w-1/5 items-end flex flex-col gap-2">
-            <EquipmentSelect equipment={equipment} control={control} />
+            <EquipmentSelect register={register} control={control} />
           </div>
         </Flex>
         <div className="flex items-center gap-3 pt-2">
@@ -476,7 +481,7 @@ const EditableWorkout = ({
   );
 };
 
-const EquipmentSelect = ({ equipment, control }) => {
+const EquipmentSelect = ({ control, register, defaultValues }) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "equipment",
@@ -497,22 +502,7 @@ const EquipmentSelect = ({ equipment, control }) => {
       </div>
       {fields.map((f, index) => (
         <div key={f.id} className="flex items-center gap-3">
-          <Controller
-            control={control}
-            name={`equipment.${index}.value`}
-            render={({ field }) => (
-              <Select.Root onValueChange={field.onChange} value={field.value}>
-                <Select.Trigger placeholder="Selecciona una máquina" />
-                <Select.Content>
-                  {equipment.map((e) => (
-                    <Select.Item key={e.id} value={e.id.toString()}>
-                      {e.name}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-            )}
-          />
+          <EquipmentSel {...register(`equipment.${index}.value`)} />
           <IconButton
             radius="full"
             size="1"

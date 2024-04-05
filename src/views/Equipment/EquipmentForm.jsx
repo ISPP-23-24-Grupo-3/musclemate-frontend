@@ -6,17 +6,16 @@ import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
 import { GymSelect } from "../../components/Gyms";
+import { RHFSelect } from "../../components/RHFSelect";
 
 const GymMachineForm = () => {
-  const [selectedGym, setSelectedGym] = useState(null);
-  const [selectedMuscle, setSelectedMuscle] = useState(null);
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ values: { gym: selectedGym, muscular_group: selectedMuscle } });
+  } = useForm();
 
   const onSubmit = async (machineInfo) => {
     try {
@@ -116,21 +115,18 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="muscular_group">Grupo muscular</label>
-            <Select.Root
+            <RHFSelect
+              placeholder="Selecciona un grupo muscular"
               {...register("muscular_group", { required: messages.req })}
-              onValueChange={(value) => setSelectedMuscle(value)}
             >
-              <Select.Trigger placeholder="Selecciona un grupo muscular" />
-              <Select.Content position="popper">
-                <Select.Item value="arms">Brazos</Select.Item>
-                <Select.Item value="legs">Piernas</Select.Item>
-                <Select.Item value="core">Abdominales</Select.Item>
-                <Select.Item value="chest">Pecho</Select.Item>
-                <Select.Item value="back">Espalda</Select.Item>
-                <Select.Item value="shoulders">Hombros</Select.Item>
-                <Select.Item value="other">Otros</Select.Item>
-              </Select.Content>
-            </Select.Root>
+              <Select.Item value="arms">Brazos</Select.Item>
+              <Select.Item value="legs">Piernas</Select.Item>
+              <Select.Item value="core">Abdominales</Select.Item>
+              <Select.Item value="chest">Pecho</Select.Item>
+              <Select.Item value="back">Espalda</Select.Item>
+              <Select.Item value="shoulders">Hombros</Select.Item>
+              <Select.Item value="other">Otros</Select.Item>
+            </RHFSelect>
             {errors.muscular_group && (
               <p className="text-red-500">{errors.muscular_group.message}</p>
             )}
@@ -138,10 +134,7 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col ">
             <label htmlFor="gym">Gimnasio</label>
-            <GymSelect
-              {...register("gym", { required: messages.req })}
-              onChange={(g) => setSelectedGym(g)}
-            />
+            <GymSelect {...register("gym", { required: messages.req })} />
             {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
           </div>
 

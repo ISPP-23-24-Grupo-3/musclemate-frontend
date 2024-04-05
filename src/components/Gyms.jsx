@@ -19,16 +19,13 @@ export const GymSelect = (props) => {
   }, []);
 
   return (
-    <RHFSelect {...props}>
-      <Select.Trigger placeholder="Seleccionar gimnasio"></Select.Trigger>
-      <Select.Content position="popper">
-        {gyms &&
-          gyms.map((gym) => (
-            <Select.Item key={gym.id} value={gym.id.toString()}>
-              {gym.name}
-            </Select.Item>
-          ))}
-      </Select.Content>
+    <RHFSelect {...props} placeholder="Seleccionar gimnasio">
+      {gyms &&
+        gyms.map((gym) => (
+          <Select.Item key={gym.id} value={gym.id.toString()}>
+            {gym.name}
+          </Select.Item>
+        ))}
     </RHFSelect>
   );
 };

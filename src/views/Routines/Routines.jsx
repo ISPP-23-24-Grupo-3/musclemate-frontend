@@ -41,7 +41,7 @@ export const Routines = () => {
           "There was a problem while searching your routines. Please stand by.",
         );
       });
-  }, [routines.length]);
+  }, []);
 
   return (
     <Section className="md:m-0 m-5">
