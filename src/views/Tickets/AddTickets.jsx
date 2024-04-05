@@ -74,7 +74,7 @@ const AddTickets = () => {
             </label>
             <EquipmentSelect
               id="equipmentId"
-              onValueChange={(eq) => setEquipmentId(eq)}
+              onChange={(eq) => setEquipmentId(eq)}
             />
           </div>
           {successMessage && (

@@ -5,46 +5,18 @@ import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
+import { GymSelect } from "../../components/Gyms";
 
 const GymMachineForm = () => {
-  const { user } = useContext(AuthContext);
-  const [gyms, setGyms] = useState(null);
-  const [machines, setMachines] = useState(null);
   const [selectedGym, setSelectedGym] = useState(null);
+  const [selectedMuscle, setSelectedMuscle] = useState(null);
   const navigate = useNavigate();
-
-  async function getGyms() {
-    const responseGym = await getFromApi("gyms/");
-    return responseGym.json();
-  }
-
-  useEffect(() => {
-    getGyms()
-      .then((gyms) => setGyms(gyms))
-      .catch((error) => console.log(error));
-  }, []);
-
-  /*
-  useEffect(() => {
-    const selectedGym = async() => {
-      try{
-        const machinesGym = await getFromApi(equipments/);
-        const machineResponse = await machinesGym.json();
-        const machinesGyms = machineResponse.filter(m=>m.gym==selectedGym)
-        setMachines(machinesGyms);
-      }catch(error) {
-        console.error('There was a problem with the fetch operation:', error);
-      }
-    };
-    selectedGym();
-    },[selectedGym]);
-*/
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ values: { gym: selectedGym } });
+  } = useForm({ values: { gym: selectedGym, muscular_group: selectedMuscle } });
 
   const onSubmit = async (machineInfo) => {
     try {
@@ -88,7 +60,6 @@ const GymMachineForm = () => {
               })}
               name="name"
               type="text"
-              className={`${errors.name && "!border-red-500"}`}
             />
             {errors.name && (
               <p className="text-red-500">{errors.name.message}</p>
@@ -106,7 +77,6 @@ const GymMachineForm = () => {
               })}
               name="brand"
               type="text"
-              className={`${errors.brand && "!border-red-500"}`}
             />
             {errors.brand && (
               <p className="text-red-500">{errors.brand.message}</p>
@@ -121,7 +91,6 @@ const GymMachineForm = () => {
               {...register("serial_number", { required: messages.req })}
               name="serial_number"
               type="text"
-              className={`${errors.serial_number && "!border-red-500"}`}
             />
             {errors.serial_number && (
               <p className="text-red-500">{errors.serial_number.message}</p>
@@ -139,7 +108,6 @@ const GymMachineForm = () => {
               })}
               name="description"
               rows="4"
-              className={`${errors.description && "!border-red-500"}`}
             />
             {errors.description && (
               <p className="text-red-500">{errors.description.message}</p>
@@ -150,10 +118,7 @@ const GymMachineForm = () => {
             <label htmlFor="muscular_group">Grupo muscular</label>
             <Select.Root
               {...register("muscular_group", { required: messages.req })}
-              name="muscular_group"
-              type="text"
-              className={`${errors.muscular_group && "!border-red-500"}`}
-              style={{ marginLeft: "3rem" }}
+              onValueChange={(value) => setSelectedMuscle(value)}
             >
               <Select.Trigger placeholder="Selecciona un grupo muscular" />
               <Select.Content position="popper">
@@ -173,21 +138,10 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col ">
             <label htmlFor="gym">Gimnasio</label>
-            <Select.Root
+            <GymSelect
               {...register("gym", { required: messages.req })}
-              name="gym"
-              className={`${errors.gym && "!border-red-500"} `}
-            >
-              <Select.Trigger placeholder="Seleccionar gimnasio"></Select.Trigger>
-              <Select.Content position="popper">
-                {gyms &&
-                  gyms.map((gym) => (
-                    <Select.Item key={gym.id} value={gym.id.toString()}>
-                      {gym.name}
-                    </Select.Item>
-                  ))}
-              </Select.Content>
-            </Select.Root>
+              onChange={(g) => setSelectedGym(g)}
+            />
             {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
           </div>
 
@@ -207,4 +161,3 @@ const GymMachineForm = () => {
 };
 
 export default GymMachineForm;
-

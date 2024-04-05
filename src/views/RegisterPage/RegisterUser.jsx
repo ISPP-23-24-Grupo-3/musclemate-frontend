@@ -11,6 +11,8 @@ import { Button, Select, TextField, TextFieldSlot } from "@radix-ui/themes";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
+import { GymSelect } from "../../components/Gyms";
+import { RHFSelect } from "../../components/RHFSelect";
 
 const UserRegister = () => {
   const [gyms, setGyms] = useState(null);
@@ -35,7 +37,7 @@ const UserRegister = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ values: { gym: null } });
+  } = useForm();
 
   const onSubmit = async (formData) => {
     try {
@@ -198,20 +200,14 @@ const UserRegister = () => {
 
           <div className="flex flex-col">
             <label htmlFor="gender">Género</label>
-            <Select.Root
-              {...register("gender", {
-                required: messages.req,
-              })}
-              name="gender"
-              className={`${errors.gender && "!border-red-500"} `}
-            >
+            <RHFSelect>
               <Select.Trigger placeholder="Seleccionar..."></Select.Trigger>
               <Select.Content position="popper">
                 <Select.Item value="M">Masculino</Select.Item>
                 <Select.Item value="F">Femenino</Select.Item>
                 <Select.Item value="O">Otro</Select.Item>
               </Select.Content>
-            </Select.Root>
+            </RHFSelect>
             {errors.gender && (
               <p className="text-red-500">{errors.gender.message}</p>
             )}
@@ -370,23 +366,7 @@ const UserRegister = () => {
             <label htmlFor="gym" className="mr-3">
               Gimnasio
             </label>
-            <Select.Root
-              {...register("gym", { required: messages.req })}
-              name="gym"
-              className={`flex-1 px-4 py-3 border rounded-lg ${
-                errors.gym ? "border-red-500" : "border-radixgreen"
-              } bg-white text-black`}
-            >
-              <Select.Trigger placeholder="Seleccionar gimnasio" />
-              <Select.Content position="popper">
-                {gyms &&
-                  gyms.map((gym) => (
-                    <option key={gym.id} value={gym.id}>
-                      {gym.name}
-                    </option>
-                  ))}
-              </Select.Content>
-            </Select.Root>
+            <GymSelect {...register("gym", { required: messages.req })} />
             {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
           </div>
 
