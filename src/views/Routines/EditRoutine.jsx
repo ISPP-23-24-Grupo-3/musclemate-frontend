@@ -29,6 +29,7 @@ import {
   postToApi,
   putToApi,
 } from "../../utils/functions/api";
+import { FormContainer } from "../../components/Form";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
@@ -131,7 +132,7 @@ export const EditRoutine = () => {
             <Button
               className="flex-1"
               variant="surface"
-              onClick={() => set_hide_form(false)}
+              onClick={() => set_hide_form(!hide_form)}
             >
               Manualmente
             </Button>
@@ -145,15 +146,20 @@ export const EditRoutine = () => {
           Ejercicios
         </Heading>
         <Flex direction="column" gap="3" className="mt-4">
-          <EditableWorkout
-            workouts={workouts}
-            set_workout={set_workouts}
-            hideForm={hide_form}
-            setHideForm={set_hide_form}
-            routine={routine}
-            equipment={equipment}
-            other_workouts={other_workouts}
-          />
+          {!hide_form && (
+            <FormContainer>
+              <EditableWorkout
+                workouts={workouts}
+                set_workout={set_workouts}
+                hideForm={hide_form}
+                setHideForm={set_hide_form}
+                routine={routine}
+                equipment={equipment}
+                other_workouts={other_workouts}
+              />
+            </FormContainer>
+          )}
+
           <WorkoutList
             workouts={workouts}
             equipments={equipment}
@@ -349,7 +355,6 @@ const EditableWorkout = ({
         set_workout((c_workouts) =>
           c_workouts.filter((w) => w.temp_id != temp_workout.temp_id),
         );
-        console.log("error: ", e);
       });
   };
 
