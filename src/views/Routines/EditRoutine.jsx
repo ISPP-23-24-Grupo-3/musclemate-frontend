@@ -500,7 +500,7 @@ const EditableWorkout = ({
       >
         <Flex justify="between">
           <Flex direction="column" className="w-1/5">
-            <Text weight="bold">Nombre del ejercicio</Text>
+            <span>Nombre del ejercicio</span>
             <TextField.Input
               name="name"
               {...register("name", {
