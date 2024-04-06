@@ -17,8 +17,8 @@ import { RHFSelect } from "../../components/RHFSelect";
 const UserRegister = () => {
   const [gyms, setGyms] = useState(null);
   const navigate = useNavigate();
-  const [errorMessageUser, setErrorMessageUser] = useState("");
-  const [errorMessageMail, setErrorMessageMail] = useState("");
+  const [errorMessageUser, setErrorMessageUser] = useState("Este nombre de usuario ya está en uso, prueba con otro");
+  const [errorMessageMail, setErrorMessageMail] = useState("Ya existe un usuario con este email");
 
   async function getGyms() {
     const responseGym = await getFromApi("gyms/");
@@ -82,7 +82,8 @@ const UserRegister = () => {
         setErrorMessageMail(responseData.email ? responseData.email[0] : "");
         return;
       }
-
+      setErrorMessageUser(null);
+      setErrorMessageMail(null);
       navigate("/owner/users");
     } catch (error) {
       console.error("Hubo un error al crear el usuario:", error);
