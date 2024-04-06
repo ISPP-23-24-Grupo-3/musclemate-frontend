@@ -167,9 +167,6 @@ function SubscriptionsPage() {
       const data = await response.json();
       if (!location.state?.subscription_plan) {
         setGyms(data.filter((gym) => gym.subscription_plan !== "free"));
-        if (gyms.length === 0) {
-          setError("No tienes gimnasios suscritos.");
-        }
       }else{
       setGyms(data);
       }
@@ -195,9 +192,9 @@ function SubscriptionsPage() {
         </div>
       {!location.state?.subscription_plan ? (
       <>
-        {error && 
+        {gyms.length === 0 &&
         <>
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">{"No tienes gimnasios suscritos a ningún plan."}</p>
         <Link to="/owner/pricing">
           <Button color="radixgreen">Ver planes de suscripción</Button>
         </Link>

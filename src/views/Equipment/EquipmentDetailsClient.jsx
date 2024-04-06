@@ -29,6 +29,8 @@ const EquipmentDetailsClient = () => {
   const [clientId, setClientId] = useState(null);
   const [message, setMessage] = useState("");
 
+  const [gymPlan, setGymPlan] = useState("");
+
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
     switch (group) {
@@ -71,6 +73,22 @@ const EquipmentDetailsClient = () => {
         });
     }
   }, [clientUsername]);
+
+  // Datos de subscripción
+  useEffect(() => {
+    if (user) {
+        getFromApi("clients/detail/" + user.username + "/") 
+            .then((response) => response.json())
+            .then((data) => {
+              let gym = data.gym;
+              getFromApi("gyms/detail/" + gym + "/") 
+              .then((response) => response.json())
+              .then((data) => {
+                setGymPlan(data.subscription_plan);
+              });
+            });
+    }
+  }, [user]);
 
   // Machine Details
   useEffect(() => {
@@ -177,7 +195,7 @@ const EquipmentDetailsClient = () => {
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
           {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-
+  
         <div className="mb-1">
           <strong className="text-radixgreen">Tu Valoración:</strong>
           <div
@@ -187,43 +205,50 @@ const EquipmentDetailsClient = () => {
               justifyContent: "space-between",
             }}
           >
-            <EditableRating
-              onChange={(e) => {
-                setActualRating(e);
-              }}
-            />
-
-            {isClient && (
-              <div style={{ display: "flex" }}>
-                <Button
-                  onClick={async () => {
-                    if (hasValoration) {
-                      await putToApi(
-                        "assessments/update/" + valuationId + "/",
-                        {
-                          stars: Number(actualRating),
-                          equipment: Number(equipmentId),
-                          client: Number(clientId),
-                        },
-                      );
-                    } else {
-                      await postToApi("assessments/create/", {
-                        stars: Number(actualRating),
-                        equipment: Number(equipmentId),
-                        client: Number(clientId),
-                      });
-                    }
-                    setValuationOn(false);
-                    setMessage("¡Valoración Enviada!");
+            {gymPlan === "free" ? (
+              <div className="text-red-700">La subscripción de tu gimnasio no incluye esta funcionalidad.</div>
+            ) : (
+              <>
+                <EditableRating
+                  onChange={(e) => {
+                    setActualRating(e);
                   }}
-                  className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-                >
-                  Enviar
-                </Button>
-              </div>
+                />
+  
+                {isClient && (
+                  <div style={{ display: "flex" }}>
+                    <Button
+                      onClick={async () => {
+                        if (hasValoration) {
+                          await putToApi(
+                            "assessments/update/" + valuationId + "/",
+                            {
+                              stars: Number(actualRating),
+                              equipment: Number(equipmentId),
+                              client: Number(clientId),
+                            },
+                          );
+                        } else {
+                          await postToApi("assessments/create/", {
+                            stars: Number(actualRating),
+                            equipment: Number(equipmentId),
+                            client: Number(clientId),
+                          });
+                        }
+                        setValuationOn(false);
+                        setMessage("¡Valoración Enviada!");
+                      }}
+                      className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
+                    >
+                      Enviar
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
+  
         <div className="mt-4 flex justify-center items-center">
           <strong className="text-radixgreen">
             {message && <div>{message}</div>}
