@@ -255,12 +255,16 @@ const ClientRegister = () => {
             </div>
 
             <div className="flex gap-3 items-center">
-              <Checkbox onChange={(c) => setIsChecked(c)}></Checkbox>
+            <Checkbox
+              checked={isChecked}
+              onCheckedChange={(e) => setIsChecked(e)}
+            ></Checkbox>
+
               <p>
-                Acepta los{" "}
-                <Link to="/terms-conditions">Términos y Condiciones</Link>
+                Acepta los <span className="text-blue-500"><Link to="/terms-conditions">Términos y Condiciones</Link></span>
               </p>
             </div>
+
             {error && <div className="text-red-500">{error}</div>}
 
             <Button
@@ -269,9 +273,11 @@ const ClientRegister = () => {
               variant="solid"
               color="green"
               className="w-full py-3"
+              disabled={!isChecked} // Deshabilita el botón si !isChecked es true
             >
               Registrarse
             </Button>
+
           </form>
         </div>
       </FormContainer>
