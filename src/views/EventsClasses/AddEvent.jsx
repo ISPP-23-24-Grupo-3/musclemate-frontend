@@ -172,13 +172,13 @@ const AddEventsForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="intensity">Intensidad del evento</label>
-            <RHFSelect {...register("intensity", { required: messages.req })}>
-              <Select.Trigger placeholder="Selecciona una intensidad"></Select.Trigger>
-              <Select.Content position="popper">
-                <Select.Item value="L">Low</Select.Item>
-                <Select.Item value="M">Medium</Select.Item>
-                <Select.Item value="H">High</Select.Item>
-              </Select.Content>
+            <RHFSelect
+              placeholder="Selecciona una intensidad"
+              {...register("intensity", { required: messages.req })}
+            >
+              <Select.Item value="L">Low</Select.Item>
+              <Select.Item value="M">Medium</Select.Item>
+              <Select.Item value="H">High</Select.Item>
             </RHFSelect>
             {errors.intensity && (
               <p className="text-red-500">{errors.intensity.message}</p>
