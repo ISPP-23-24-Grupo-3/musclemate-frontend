@@ -83,7 +83,6 @@ export const Routines = () => {
           La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
         </div>
       ) : (
-        <ListRoutines routines={routines} set_routines={setRoutines} workouts={workouts}/>
         <>
           <RoutineForm set_routines={setRoutines} routines={routines} />
   
