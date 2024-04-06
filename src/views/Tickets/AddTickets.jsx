@@ -67,7 +67,7 @@ const AddTickets = () => {
         </h2>
         {gymPlan === "free" ? (
           <div className="text-red-700">
-            La subscripción de tu gimnasio no incluye esta funcionalidad.
+            La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
