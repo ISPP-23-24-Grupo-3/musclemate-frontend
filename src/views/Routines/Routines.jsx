@@ -25,8 +25,16 @@ import {
 export const Routines = () => {
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
+  const [workouts, set_workouts] = useState([]);
 
   useEffect(() => {
+
+    const fetchWorkouts = async () => {
+      const response = await getFromApi("workouts/");
+      const fetchedWorkouts = await response.json();
+      return fetchedWorkouts;
+    };
+
     const fetchRoutines = async () => {
       const response = await getFromApi("routines/");
       const fetchedRoutines = await response.json();
@@ -40,6 +48,7 @@ export const Routines = () => {
           "There was a problem while searching your routines. Please stand by.",
         );
       });
+    fetchWorkouts().then((w) => set_workouts(w));
   }, [routines.length]);
 
   return (
@@ -55,13 +64,13 @@ export const Routines = () => {
       {error ? (
         <Error message={error} size="3" />
       ) : (
-        <ListRoutines routines={routines} set_routines={setRoutines} />
+        <ListRoutines routines={routines} set_routines={setRoutines} workouts={workouts}/>
       )}
     </Section>
   );
 };
 
-const ListRoutines = ({ routines, set_routines }) => {
+const ListRoutines = ({ routines, set_routines, workouts}) => {
   const navigate = useNavigate();
   const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
   const startRoutine = (routine) => navigate(`/user/routines/${routine.id}/workouts`, { state: { routineId: routine.id } });
@@ -81,9 +90,20 @@ const ListRoutines = ({ routines, set_routines }) => {
 
   if (routines.length === 0) {
     return (
-      <Info size="3" message="You don't have routines currently registered." />
+      <Info size="3" message="Aún no tienes rutinas creadas para mostrar" />
     );
   }
+
+  const getWorkoutsLength = (routineId) => {
+    let workoutLenght=0
+    for(const workout of workouts){
+      if(workout.routine==routineId){
+        workoutLenght+=1;
+      }
+    }
+    return workoutLenght;
+  };
+
   return (
     <Flex gap="4" direction="column">
       {routines.map((routine) => (
@@ -92,13 +112,18 @@ const ListRoutines = ({ routines, set_routines }) => {
           size="4"
           className="flex bg-radixgreen/10 items-center p-4 justify-between rounded-lg"
         >
-          <span className="flex gap-3 items-center">
+          <Flex direction="column" className="w-1/5">
+            <Text style={{fontStyle:"italic"}}>Nombre</Text>
             <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
-              {routine.name} 
+              {routine.name}
             </Text>
             {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
-          </span>
-          <span className="flex gap-3">
+          </Flex>
+          <Flex direction="column" className="w-1/5">
+            <Text style={{fontStyle:"italic"}}>Ejercicios creados</Text>
+            <Text weight="bold" style={{fontSize:22}}> {getWorkoutsLength(routine.id)}</Text>
+          </Flex>
+          <span className="flex gap-5">
             <IconButton
               size="3"
               radius="full"
@@ -106,6 +131,7 @@ const ListRoutines = ({ routines, set_routines }) => {
             >
               <CgGym className="size-6 rotate-30" />
             </IconButton>
+            <Text weight="bold">Comenzar</Text>
             <IconButton
               size="3"
               radius="full"
@@ -113,6 +139,7 @@ const ListRoutines = ({ routines, set_routines }) => {
             >
               <LuPencil className="size-5" />
             </IconButton>
+            <Text weight="bold">Editar</Text>
             <IconButton
               size="3"
               radius="full"
@@ -186,6 +213,7 @@ const RoutineForm = ({ set_routines, routines }) => {
             className={`rounded-lg mb-4 p-5 px-3 flex justify-between border border-radixgreen/30`}
           >
             <div className="flex gap-3">
+            <Text weight="bold">Nombre de la rutina</Text>
               <TextField.Input
                 color={`${errors.name ? "red" : "green"}`}
                 {...register("name", {
@@ -207,7 +235,7 @@ ListRoutines.propTypes = {
   routines: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }),
   ).isRequired,
 };
