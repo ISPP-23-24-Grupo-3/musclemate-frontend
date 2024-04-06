@@ -15,18 +15,21 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
+import { FormContainer } from "../../components/Form";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   getFromApi,
   postToApi,
   deleteFromApi,
 } from "../../utils/functions/api";
-import { FormContainer } from "../../components/Form";
+import AuthContext from "../../utils/context/AuthContext";
 
 export const Routines = () => {
+  const { user } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
   const [workouts, set_workouts] = useState([]);
+  const [gymPlan, setGymPlan] = useState("");
 
   useEffect(() => {
 
@@ -52,6 +55,21 @@ export const Routines = () => {
     fetchWorkouts().then((w) => set_workouts(w));
   }, [routines.length]);
 
+  useEffect(() => {
+    if (user) {
+        getFromApi("clients/detail/" + user.username + "/") 
+            .then((response) => response.json())
+            .then((data) => {
+              let gym = data.gym;
+              getFromApi("gyms/detail/" + gym + "/") 
+              .then((response) => response.json())
+              .then((data) => {
+                setGymPlan(data.subscription_plan);
+              });
+            });
+    }
+  }, [user]);
+
   return (
     <Section className="md:m-0 m-5">
       <div className="flex mb-3 justify-between">
@@ -59,13 +77,22 @@ export const Routines = () => {
           Mis Rutinas
         </Heading>
       </div>
-
-      <RoutineForm set_routines={setRoutines} routines={routines} />
-
-      {error ? (
-        <Error message={error} size="3" />
+  
+      {gymPlan === "free" ? (
+        <div className="text-red-700 text-center mb-4">
+          La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
+        </div>
       ) : (
         <ListRoutines routines={routines} set_routines={setRoutines} workouts={workouts}/>
+        <>
+          <RoutineForm set_routines={setRoutines} routines={routines} />
+  
+          {error ? (
+            <Error message={error} size="3" />
+          ) : (
+            <ListRoutines routines={routines} set_routines={setRoutines} workouts={workouts}/>
+          )}
+        </>
       )}
     </Section>
   );

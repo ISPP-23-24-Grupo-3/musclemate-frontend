@@ -12,6 +12,7 @@ const AddTickets = () => {
   const [equipmentId, setEquipmentId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [gymPlan, setGymPlan] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,47 +44,68 @@ const AddTickets = () => {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+        getFromApi("clients/detail/" + user.username + "/") 
+            .then((response) => response.json())
+            .then((data) => {
+              let gym = data.gym;
+              getFromApi("gyms/detail/" + gym + "/") 
+              .then((response) => response.json())
+              .then((data) => {
+                setGymPlan(data.subscription_plan);
+              });
+            });
+    }
+  }, [user]);
+
   return (
     <div className="mt-8 flex justify-center mb-8">
       <FormContainer className="w-1/2">
         <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
           Crear Ticket
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="label">Asunto:</label>
-            <TextField.Input
-              type="text"
-              id="label"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-            />
+        {gymPlan === "free" ? (
+          <div className="text-red-700">
+            La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
           </div>
-          <div>
-            <label htmlFor="description">Descripción:</label>
-            <TextArea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            ></TextArea>
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="equipmentId" className="text-gray-800">
-              Equipo:
-            </label>
-            <EquipmentSelect
-              id="equipmentId"
-              onChange={(eq) => setEquipmentId(eq.target.value)}
-            />
-          </div>
-          {successMessage && (
-            <div className="text-green-700">{successMessage}</div>
-          )}
-          {errorMessage && <div className="text-red-700">{errorMessage}</div>}
-          <Button className="w-full" type="submit">
-            Agregar Ticket
-          </Button>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="label">Asunto:</label>
+              <TextField.Input
+                type="text"
+                id="label"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="description">Descripción:</label>
+              <TextArea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              ></TextArea>
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="equipmentId" className="text-gray-800">
+                Equipo:
+              </label>
+              <EquipmentSelect
+                id="equipmentId"
+                onChange={(eq) => setEquipmentId(eq.target.value)}
+              />
+            </div>
+            {successMessage && (
+              <div className="text-green-700">{successMessage}</div>
+            )}
+            {errorMessage && <div className="text-red-700">{errorMessage}</div>}
+            <Button className="w-full" type="submit">
+              Agregar Ticket
+            </Button>
+          </form>
+        )}
       </FormContainer>
     </div>
   );
