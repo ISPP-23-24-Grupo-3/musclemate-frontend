@@ -18,6 +18,8 @@ import { RHFSelect } from "../../components/RHFSelect.jsx";
 export default function EquipmentDetails() {
     const { eventId } = useParams();
     const [eventDetails, setEventDetails] = useState(null);
+    const [isClickable, setIsClickable] = useState(null);
+    const [isNotice, setIsNotice] = useState(null);
     const [gymName, setGymName] = useState("No disponible"); // Cambio aquí
     const [error, setError] = useState(null);
 
@@ -59,16 +61,18 @@ export default function EquipmentDetails() {
                 if (response.ok) {
                     const data = await response.json();
                     setEventDetails(data);
+                    setIsClickable(data.isClickable);
+                    setIsNotice(data.isNotice);
                     if (data.gym) {
                         const gymId = data.gym;
                         const gymResponse = await getFromApi(`gyms/detail/${gymId}/`);
                         if (gymResponse.ok) {
-                          const gymData = await gymResponse.json();
-                          setGymName(gymData.name);
+                            const gymData = await gymResponse.json();
+                            setGymName(gymData.name);
                         } else {
-                          setGymName("Nombre de gimnasio no disponible");
+                            setGymName("Nombre de gimnasio no disponible");
                         }
-                      }
+                    }
 
                 } else {
                     setError("No se encontró el evento con la ID proporcionada.");
@@ -85,6 +89,24 @@ export default function EquipmentDetails() {
         setUpdatedDetails({
             ...updatedDetails,
             [field]: e,
+        });
+    };
+
+    const handleCheckChange = (field) => {
+        let updatedValue;
+        if (field === "isClickable") {
+            setIsClickable(!isClickable);
+            updatedValue = !isClickable; // Usar el valor actualizado
+        }
+
+        if (field === "isNotice") {
+            setIsNotice(!isNotice);
+            updatedValue = !isNotice; // Usar el valor actualizado
+        }
+
+        setUpdatedDetails({
+            ...updatedDetails,
+            [field]: updatedValue, // Usar el valor actualizado en setUpdatedDetails
         });
     };
 
@@ -294,7 +316,34 @@ export default function EquipmentDetails() {
                             </span>
                         )}
                     </div>
-                    
+                    <div className="flex gap-3 items-center">
+                        <strong className="text-radixgreen">Reservable:</strong>{" "}
+                        {editMode ? (
+                            <Checkbox
+                                checked={isClickable}
+                                onChange={() => handleCheckChange("isClickable")}
+                            ></Checkbox>
+                        ) : (
+                            <Checkbox
+                                checked={eventDetails.isClickable}
+                            ></Checkbox>
+                        )}
+                    </div>
+                    <div className="flex gap-3 items-center">
+                        <strong className="text-radixgreen">Noticia:</strong>{" "}
+                        {editMode ? (
+                            <Checkbox
+                                checked={isNotice}
+                                onChange={() => handleCheckChange("isNotice")}
+                            ></Checkbox>
+                        ) : (
+                            <Checkbox
+                                checked={eventDetails.isNotice}
+                            ></Checkbox>
+                        )}
+
+                    </div>
+
                     {editMode && (
                         <div className="flex gap-3 self-center">
                             <Button size="3" onClick={handleSaveChanges}>
@@ -320,6 +369,6 @@ export default function EquipmentDetails() {
                     )}
                 </div>
             </FormContainer>
-        </div>   
+        </div>
     );
 }
