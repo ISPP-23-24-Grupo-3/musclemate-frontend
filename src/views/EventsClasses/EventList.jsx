@@ -65,7 +65,7 @@ const EventList = () => {
     setSelectedEvent(null);
   };
 
-  const clearDateFilter = () =>{
+  const clearDateFilter = () => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       date: '',
@@ -81,13 +81,13 @@ const EventList = () => {
           : true
     )
     .filter(
-      (event) =>{
-        if(filters.date !== ''){
+      (event) => {
+        if (filters.date !== '') {
           const filterDate = new Date(filters.date);
           const eventDate = new Date(event.date);
-          return filterDate.toDateString()===eventDate.toDateString();
+          return filterDate.toDateString() === eventDate.toDateString();
 
-        }else{
+        } else {
           return true;
         }
       })
@@ -199,10 +199,9 @@ const EventList = () => {
         </Link>
 
         {filteredEventList.map((event) => (
-          <Popover.Root>
-            <Popover.Trigger>
+          <Link to={`${event.id}`} key={event.id}>
             <Button
-              key={event}
+              key={event.id}
               size="3"
               onClick={() => handleEventClick(event.id)}
               className="flex !justify-between !h-fit !p-2 !px-4 w-full"
@@ -213,26 +212,13 @@ const EventList = () => {
               </div>
               <div className="flex flex-col items-start gap-1">
                 <span>Capacidad: {event.capacity}</span>
-                <span>Instructor: {event.instructor}</span>
                 <span>Intensidad: {event.intensity}</span>
               </div>
             </Button>
-            </Popover.Trigger>
-            <Popover.Content side="bottom">
-              <div className="bg-white border border-gray-200 rounded-md p-4">
-                <p>Nombre: {selectedEvent!==null?selectedEvent.name:""}</p>
-                <p>Descripción: {selectedEvent!==null?selectedEvent.description:""}</p>
-                <p>Capacidad: {selectedEvent!==null?selectedEvent.capacity:""}</p>
-                <p>Instructor: {selectedEvent!==null?selectedEvent.instructor:""}</p>
-                <p>Fecha: {selectedEvent!==null?selectedEvent.date:""}</p>
-                <p>Duración: {selectedEvent!==null?selectedEvent.duration:""}</p>
-                <p>Intensidad: {selectedEvent!==null?selectedEvent.intensity:""}</p>
-              </div>
-            </Popover.Content>
-          </Popover.Root>
+          </Link>
         ))}
-          
-            
+
+
       </div>
     </>
   );
