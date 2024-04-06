@@ -1,8 +1,6 @@
-/* eslint react/prop-types: 0 */
 import {
   Button,
   IconButton,
-  Card,
   Flex,
   Heading,
   Text,
@@ -20,9 +18,7 @@ import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
 import AuthContext from "../../utils/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
-import { Label } from '@radix-ui/react-label';
-import { CheckIcon } from '@radix-ui/react-icons';
+
 import PropTypes from "prop-types";
 import {
   deleteFromApi,
@@ -30,6 +26,7 @@ import {
   postToApi,
   putToApi,
 } from "../../utils/functions/api";
+import { FormContainer } from "../../components/Form";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
@@ -77,7 +74,6 @@ export const EditRoutine = () => {
       );
     };
     const fetchRoutine = async (id) => {
-      console.log("una vez")
       try {
         const response = await getFromApi(`routines/detail/`+id+`/`);
         if (!response.ok) {
@@ -230,7 +226,7 @@ const Workout = ({
   equipments,
   routine,
   other_workouts,
-}) => {
+  }) => {
   const [editing, setEditing] = useState(false);
 
   const deleteWorkout = (workout) => {
@@ -310,8 +306,10 @@ const WorkoutInfo = ({ workout, equipments }) => {
   return (
     <>
       <Flex direction="column" className="w-1/5">
-        <Text style={{fontStyle:"italic"}}>Nombre</Text>
-        <Text weight="bold" style={{fontSize:22}}>{workout.name}</Text>
+        <Text style={{ fontStyle: "italic" }}>Nombre</Text>
+        <Text weight="bold" style={{ fontSize: 22 }}>
+          {workout.name}
+        </Text>
       </Flex>
       <Flex direction="column" className="w-1/5 items-end">
         <Text weight="bold">Máquinas</Text>
@@ -329,8 +327,8 @@ const EditableWorkout = ({
   set_workout,
   hideForm,
   setHideForm,
-  routine,
   equipment,
+  routine,
   defaultWorkout,
   other_workouts,
   }) => {
@@ -341,13 +339,13 @@ const EditableWorkout = ({
 
   useEffect(() => {
     if (clientUsername) {
-      getFromApi("clients/detail/"+ clientUsername +"/" )
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setClientId(data.id);
-      });
+      getFromApi("clients/detail/" + clientUsername + "/")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setClientId(data.id);
+        });
     }
   }, [clientUsername]);
 
@@ -358,12 +356,13 @@ const EditableWorkout = ({
         .filter((e) => e.value !== undefined) // Filtrar los equipos definidos
         .map((e) => Number(e.value))
     : [];
+    console.log(definedEquipment)
     const parsed_workout = {
       ...workout,
       client: clientId, // Asignamos el ID del usuario al workout
       equipment: definedEquipment.length > 0 ? definedEquipment : undefined,
     };
-    
+    console.log(parsed_workout)
     const temp_workout = {
       ...parsed_workout,
       temp_id: Date.now(),
@@ -390,18 +389,22 @@ const EditableWorkout = ({
         set_workout((c_workouts) =>
           c_workouts.filter((w) => w.temp_id != temp_workout.temp_id),
         );
-        console.log("error: ", e);
       });
   };
 
   const editWorkout = (workout, id) => {
     const parsed_workout = {
       ...workout,
-      equipment: Array.isArray(workout.equipment) && workout.equipment.length
-        ? workout.equipment.map((e) => Number(e.value)).filter((e) => !isNaN(e) && e !== null).length
-          ? workout.equipment.map((e) => Number(e.value)).filter((e) => !isNaN(e) && e !== null)
-          : []
-        : [],
+      equipment:
+        Array.isArray(workout.equipment) && workout.equipment.length
+          ? workout.equipment
+              .map((e) => Number(e.value))
+              .filter((e) => !isNaN(e) && e !== null).length
+            ? workout.equipment
+                .map((e) => Number(e.value))
+                .filter((e) => !isNaN(e) && e !== null)
+            : []
+          : [],
       client: clientId,
     };
     const temp_workout = { ...parsed_workout, temp_id: Date.now() };
@@ -488,7 +491,6 @@ const EditableWorkout = ({
       : [{ value: undefined }],
     },
   });
-
   return (
     <>
       <form
@@ -503,9 +505,12 @@ const EditableWorkout = ({
               name="name"
               {...register("name", {
                 required: "Debes escribir un nombre",
-                validate: { unique: hasUniqueName,
-                            maxLength: value => value.length <= 100 || 'El valor no puede tener más de 100 caracteres'
-                          },
+                validate: {
+                  unique: hasUniqueName,
+                  maxLength: (value) =>
+                    value.length <= 100 ||
+                    "El valor no puede tener más de 100 caracteres",
+                },
               })}
               color={errors.name && "red"}
               className={`${errors.name ? "!border-red-500" : undefined}`}
