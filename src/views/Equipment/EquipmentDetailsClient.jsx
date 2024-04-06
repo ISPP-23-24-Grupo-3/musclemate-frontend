@@ -3,12 +3,13 @@ import { useParams, Link } from "react-router-dom";
 import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
 import { Button, TextField } from "@radix-ui/themes";
 
-import Rating from "../../components/Rating";
+import Rating, { EditableRating } from "../../components/Rating";
 
 import { HiTicket } from "react-icons/hi";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
 import AuthContext from "../../utils/context/AuthContext";
+import { FormContainer } from "../../components/Form";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
@@ -93,15 +94,19 @@ const EquipmentDetailsClient = () => {
         })
         .then((data) => {
           const hasValor = data.some(
-            (valoration) => valoration.equipment === Number(equipmentId)
+            (valoration) => valoration.equipment === Number(equipmentId),
           );
           setHasValoration(hasValor);
           if (hasValor) {
             const valor = data
-              .filter((valoration) => valoration.equipment === Number(equipmentId))
+              .filter(
+                (valoration) => valoration.equipment === Number(equipmentId),
+              )
               .map((valoration) => valoration.stars);
             const valorationId = data
-              .filter((valoration) => valoration.equipment === Number(equipmentId))
+              .filter(
+                (valoration) => valoration.equipment === Number(equipmentId),
+              )
               .map((valoration) => valoration.id);
             setActualRating(valor);
             setValuationId(valorationId);
@@ -119,13 +124,18 @@ const EquipmentDetailsClient = () => {
   useEffect(() => {
     const fetchTicketsByClient = async () => {
       try {
-        const response = await getFromApi(`tickets/byEquipment/${equipmentId}/`);
+        const response = await getFromApi(
+          `tickets/byEquipment/${equipmentId}/`,
+        );
         if (response.ok) {
           const data = await response.json();
           setApiTickets(data);
           setApiDataLoaded(true);
         } else {
-          console.error("Error fetching API tickets by client:", response.statusText);
+          console.error(
+            "Error fetching API tickets by client:",
+            response.statusText,
+          );
         }
       } catch (error) {
         console.error("Error fetching API tickets by client:", error);
@@ -146,19 +156,22 @@ const EquipmentDetailsClient = () => {
   }
 
   return (
-    <div className="mt-8 max-w-xl mx-auto">
-      <div className="p-10 border border-radixgreen rounded">
+    <div className="max-w-xl mx-auto">
+      <FormContainer className="">
         <h2 className="mb-6 text-radixgreen font-bold text-3xl text-center">
           Detalles de la Máquina de Gimnasio
         </h2>
         <div className="mb-4">
-          <strong className="text-radixgreen">Nombre:</strong> {machineDetails.name}
+          <strong className="text-radixgreen">Nombre:</strong>{" "}
+          {machineDetails.name}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Descripción:</strong> {machineDetails.description}
+          <strong className="text-radixgreen">Descripción:</strong>{" "}
+          {machineDetails.description}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
+          <strong className="text-radixgreen">Marca:</strong>{" "}
+          {machineDetails.brand}
         </div>
         <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
@@ -174,34 +187,25 @@ const EquipmentDetailsClient = () => {
               justifyContent: "space-between",
             }}
           >
-            <Rating rating={actualRating} />
+            <EditableRating
+              onChange={(e) => {
+                setActualRating(e);
+              }}
+            />
 
-            {valuationOn && isClient && (
+            {isClient && (
               <div style={{ display: "flex" }}>
-                <TextField.Input
-                  type="number"
-                  value={actualRating}
-                  onChange={(e) => {
-                    e.target.value > 5
-                      ? (e.target.value = 5)
-                      : e.target.value < 0
-                      ? (e.target.value = 0)
-                      : e.target.value;
-                    setActualRating(e.target.value);
-                  }}
-                  min="0"
-                  max="5"
-                  step="0.5"
-                />
-
                 <Button
                   onClick={async () => {
                     if (hasValoration) {
-                      await putToApi("assessments/update/" + valuationId + "/", {
-                        stars: Number(actualRating),
-                        equipment: Number(equipmentId),
-                        client: Number(clientId),
-                      });
+                      await putToApi(
+                        "assessments/update/" + valuationId + "/",
+                        {
+                          stars: Number(actualRating),
+                          equipment: Number(equipmentId),
+                          client: Number(clientId),
+                        },
+                      );
                     } else {
                       await postToApi("assessments/create/", {
                         stars: Number(actualRating),
@@ -210,7 +214,7 @@ const EquipmentDetailsClient = () => {
                       });
                     }
                     setValuationOn(false);
-                    setMessage("Valoración Enviada!");
+                    setMessage("¡Valoración Enviada!");
                   }}
                   className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
                 >
@@ -218,13 +222,6 @@ const EquipmentDetailsClient = () => {
                 </Button>
               </div>
             )}
-
-            <Button
-              onClick={() => setValuationOn(!valuationOn)}
-              className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-            >
-              {valuationOn ? "Volver" : "Valorar"}
-            </Button>
           </div>
         </div>
         <div className="mt-4 flex justify-center items-center">
@@ -232,13 +229,13 @@ const EquipmentDetailsClient = () => {
             {message && <div>{message}</div>}
           </strong>
         </div>
-      </div>
+      </FormContainer>
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-semibold mb-2">Tickets</h2>
         <Link to="../add-tickets">
           <Button>
             <IoMdAddCircleOutline className="size-6" />
-              Añadir ticket
+            Añadir ticket
           </Button>
         </Link>
         <ul className="mt-4">
@@ -259,27 +256,36 @@ const EquipmentDetailsClient = () => {
                         {ticket.client.name} {ticket.client.lastName}
                       </span>
                       <span className="ml-7">
-                        Asunto: <span className="text-black">{ticket.label}</span>
+                        Asunto:{" "}
+                        <span className="text-black">{ticket.label}</span>
                       </span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
-                      Descripción: <span className="text-black">{ticket.description}</span>
+                      Descripción:{" "}
+                      <span className="text-black">{ticket.description}</span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
-                      Gimnasio: <span className="text-black">{ticket.gym_name}</span>
+                      Gimnasio:{" "}
+                      <span className="text-black">{ticket.gym_name}</span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
-                      Email: <span className="text-black">{ticket.client.email}</span>
+                      Email:{" "}
+                      <span className="text-black">{ticket.client.email}</span>
                     </p>
                     <p className="text-radixgreen font-bold mb-1">
-                      Fecha: <span className="text-black">{formatDate(ticket.date)}</span>
+                      Fecha:{" "}
+                      <span className="text-black">
+                        {formatDate(ticket.date)}
+                      </span>
                     </p>
                   </div>
                   <div className="ml-auto">
                     {ticket.status ? (
                       <span className="text-green-500 font-bold">Resuelto</span>
                     ) : (
-                      <span className="text-red-500 font-bold">No resuelto</span>
+                      <span className="text-red-500 font-bold">
+                        No resuelto
+                      </span>
                     )}
                   </div>
                 </div>
