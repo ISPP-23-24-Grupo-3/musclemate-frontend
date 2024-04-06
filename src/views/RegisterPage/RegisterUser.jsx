@@ -19,6 +19,16 @@ const UserRegister = () => {
   const navigate = useNavigate();
   const [errorMessageUser, setErrorMessageUser] = useState("");
   const [errorMessageMail, setErrorMessageMail] = useState("");
+  const [errorMessageDate, setErrorMessageDate] = useState("");
+
+  const handleEmailChange = () => {
+    setErrorMessageMail(null); // Limpiar el mensaje de error del email
+  };
+  
+  // Función para manejar cambios en el campo de nombre de usuario
+  const handleUsernameChange = () => {
+    setErrorMessageUser(null); // Limpiar el mensaje de error del nombre de usuario
+  };
 
   async function getGyms() {
     const responseGym = await getFromApi("gyms/");
@@ -55,6 +65,16 @@ const UserRegister = () => {
         gym,
       } = formData;
 
+      const birthDate = new Date(birth);
+      const currentDate = new Date();
+      if (birthDate > currentDate) {
+        setErrorMessageDate("La fecha de nacimiento no puede ser futura");
+        return;
+      } else {
+        // Si la fecha de nacimiento es válida, limpiar el mensaje de error
+        setErrorMessageDate(null);
+      }
+
       const requestBody = {
         name,
         lastName,
@@ -76,13 +96,12 @@ const UserRegister = () => {
 
       if (!response.ok) {
         const responseData = await response.json();
-        setErrorMessageUser(
-          responseData.username ? responseData.username[0] : "",
-        );
-        setErrorMessageMail(responseData.email ? responseData.email[0] : "");
+        setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
+        setErrorMessageMail("Ya existe un usuario con este email en uso");
         return;
       }
-
+      setErrorMessageUser(null);
+      setErrorMessageMail(null);
       navigate("/owner/users");
     } catch (error) {
       console.error("Hubo un error al crear el usuario:", error);
@@ -168,6 +187,7 @@ const UserRegister = () => {
                 })}
                 name="email"
                 type="email"
+                onChange={handleEmailChange} // Agregar evento onChange
               />
             </TextField.Root>
             {errors.email && (
@@ -194,6 +214,9 @@ const UserRegister = () => {
             </TextField.Root>
             {errors.birth && (
               <p className="text-red-500">{errors.birth.message}</p>
+            )}
+            {errorMessageDate && (
+              <p className="text-red-500">{errorMessageDate}</p>
             )}
           </div>
 
@@ -321,6 +344,7 @@ const UserRegister = () => {
                 })}
                 name="username"
                 type="text"
+                onChange={handleUsernameChange} // Agregar evento onChang
               />
             </TextField.Root>
             {errors.username && (
