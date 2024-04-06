@@ -269,7 +269,7 @@ export default function EquipmentDetails() {
                         {editMode ? (
                             <TextField.Input
                                 name="date"
-                                type="text"
+                                type="date"
                                 value={updatedDetails.date}
                                 onChange={(e) => handleInputChange(e.target.value, "date")}
                             />
@@ -321,7 +321,7 @@ export default function EquipmentDetails() {
                         {editMode ? (
                             <Checkbox
                                 checked={isClickable}
-                                onChange={() => handleCheckChange("isClickable")}
+                                onCheckedChange={() => handleCheckChange("isClickable")}
                             ></Checkbox>
                         ) : (
                             <Checkbox
@@ -334,7 +334,7 @@ export default function EquipmentDetails() {
                         {editMode ? (
                             <Checkbox
                                 checked={isNotice}
-                                onChange={() => handleCheckChange("isNotice")}
+                                onCheckedChange={() => handleCheckChange("isNotice")}
                             ></Checkbox>
                         ) : (
                             <Checkbox
