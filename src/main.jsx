@@ -40,6 +40,7 @@ import ProfileClient from "./views/UserListing/ProfileClient";
 import AddEventsForm from "./views/EventsClasses/AddEvent";
 import CreateGym from "./views/Gyms/CreateGym";
 import GymDetails from "./views/Gyms/GymDetails";
+import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
 
 const ownerRoutes = [
   {
@@ -109,6 +110,10 @@ const ownerRoutes = [
   {
     path: "gyms/:gymId",
     element: <GymDetails />,
+  },
+  {
+    path: "profile",
+    element: <ProfileOwner />,
   },
 ];
 
