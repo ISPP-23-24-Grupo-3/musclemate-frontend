@@ -1,6 +1,6 @@
 import { Badge, Button, Flex } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import AuthContext from "../../utils/context/AuthContext";
 import { useState } from "react";
 
@@ -10,9 +10,9 @@ const Header = () => {
     
     const [open, setOpen] = useState(false)
 
-    const handleMenu = () => {
+    const handleMenu = useCallback(() => {
       setOpen(!open)
-    }
+    }, [open])
 
     return (
       <header className="shadow-md sm:px-10 bg-white font-sans min-h-[70px]">

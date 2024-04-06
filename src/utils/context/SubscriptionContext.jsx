@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { createContext } from 'react'
 import { getFromApi } from '../functions/api';
 import AuthContext from './AuthContext';
@@ -20,11 +20,11 @@ export function SubscriptionProvider( {children} ) {
     const [gymnSubscription, setGymnSubscription] = useState(() =>
     localStorage.getItem('gymSubscription') ? JSON.parse(localStorage.getItem('gymSubscription')) : [])
 
-    function saveGymnSubscription() {
+    const saveGymnSubscription = useCallback(() => {
         localStorage.setItem('gymSubscription', JSON.stringify(gymnSubscription));
-    }
+    }, [gymnSubscription])
 
-    const getOwnerSubscription = async () => {
+    const getOwnerSubscription = useCallback(async () => {
         if (user.rol === 'owner') {
             const gyms = await getFromApi(`gyms/`)
             const gyms_list = await gyms.json()
@@ -33,12 +33,12 @@ export function SubscriptionProvider( {children} ) {
                 owner_plan: gymSubscription[0].subscription_plan})            
         }
         localStorage.setItem('ownerSubscription', JSON.stringify(ownerSubscription));
-    }
+    }, [ownerSubscription, user])
     
 
   
     return (
-    <SubscriptionContext.Provider value={{gymnSubscription, setGymnSubscription, saveGymnSubscription, getOwnerSubscription, ownerSubscription}} >
+    <SubscriptionContext.Provider value={useMemo(() => ({gymnSubscription, setGymnSubscription, saveGymnSubscription, getOwnerSubscription, ownerSubscription}), [getOwnerSubscription, gymnSubscription, ownerSubscription, saveGymnSubscription])} >
         {children}
     </SubscriptionContext.Provider>
   )

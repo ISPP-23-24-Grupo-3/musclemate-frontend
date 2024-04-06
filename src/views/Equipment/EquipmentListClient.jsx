@@ -228,7 +228,7 @@ export default function MachineList() {
           var value = machineRatingData ? machineRatingData.ratings : 0;
 
           return (
-            <Link to={`../equipments/${machine.id}`}>
+            <Link to={`../equipments/${machine.id}`} key={machine.id}>
               <Button
                 name = "maquina"
                 key={machine.id}

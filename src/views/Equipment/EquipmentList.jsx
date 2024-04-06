@@ -34,13 +34,13 @@ export default function MachineList() {
     getFromApi("gyms/")
     .then((response) => response.json())
     .then((data) => setGyms(data));
-  }, [gyms]);
+  }, []);
 
   useEffect(() => {
     getFromApi("equipments/")
       .then((response) => response.json())
       .then((data) => setMachines(data));
-  }, [machines]);
+  }, []);
 
   // Machine Ratings
   useEffect(() => {

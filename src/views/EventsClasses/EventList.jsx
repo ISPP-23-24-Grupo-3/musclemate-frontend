@@ -199,7 +199,7 @@ const EventList = () => {
         </Link>
 
         {filteredEventList.map((event) => (
-          <Popover.Root>
+          <Popover.Root key={event.id}>
             <Popover.Trigger>
             <Button
               key={event}
