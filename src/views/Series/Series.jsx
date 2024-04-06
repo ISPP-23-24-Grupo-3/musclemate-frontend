@@ -1,17 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { deleteFromApi, getFromApi, postToApi, putToApi } from '../../utils/functions/api';
 
-import { Button, TextField, Text, IconButton, Card } from "@radix-ui/themes";
+import { Button, TextField, Text, IconButton, Card, ScrollArea } from "@radix-ui/themes";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { useForm } from 'react-hook-form';
 
 import { LuPencil } from "react-icons/lu";
 import { CgTrash } from "react-icons/cg";
 
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
+
+
 const Series = () => {
   const { workoutId } = useParams();
   const [series, setSeries] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const [open, setOpen] = useState(false);
   const [nombre, setNombre] = useState('');
   const [timerOn, setTimerOn] = useState(false);
@@ -37,7 +63,12 @@ const Series = () => {
         const response = await getFromApi(`series/workout/${workoutId}/`);
         if (response.ok) {
           let data = await response.json();
-          data.sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordena las series por fecha
+          data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          const chartData = data.map(serie => ({
+            weight: serie.weight,
+            date: serie.date,
+          }));
+          setChartData(chartData.reverse());
           setSeries(data);
           setEditor(data.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {}));
           setApiDataLoaded(true);
@@ -146,6 +177,29 @@ const Series = () => {
     });
   }
 
+  useEffect(() => {
+    const fetchGraph = async () => {
+      try {
+        const response = await getFromApi(`series/workout/${workoutId}/`);
+        if (response.ok) {
+          let data = await response.json();
+          data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          const chartData = data.map(serie => ({
+            weight: serie.weight,
+            date: serie.date,
+          }));
+          setChartData(chartData.reverse());
+        } else {
+          console.error('Error fetching API series:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching API series:', error);
+      }
+    };
+
+    fetchGraph();
+  }, [series]);
+
   return (
     <div className="max-w-lg mx-auto mt-8 m-5">
       <h2 className="text-radixgreen mt-8 mb-3 md:text-center">Series del Entrenamiento {nombre.toUpperCase()}</h2>
@@ -183,13 +237,13 @@ const Series = () => {
         </Card>
       )}
       
-      <ul className='mt-5'>
+      <ScrollArea orientation="horizontal" style={{ marginTop: 30, whiteSpace: 'nowrap' }}>
         {apiDataLoaded && series.length > 0 ? (
           series.map((serie) => (
-            <li key={serie.id} className="bg-white shadow-md p-4 rounded-md mb-4">
+            <Card key={serie.id} style={{ display: 'inline-flex', backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 2, height: 5 }, shadowOpacity: 2, shadowRadius: 5, elevation: 5, padding: 4, borderWidth: 5, borderRadius: 4, marginRight: 5, }}>
               <div className="flex items-center mb-2">
-                <div className='flex justify-around w-full md:text-center'>
-                  <div className="mr-4">
+                <div className='flex justify-around w-full md:text-center '>
+                  <div className="mr-4 mt-2">
                     <p className={`${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1`}>
                       Repeticiones: <span className="text-black">{serie.reps}</span>
                     </p>
@@ -219,11 +273,12 @@ const Series = () => {
                             validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser un número entero positivo",
                         })}
                       ></TextField.Input>
-                      <span className="text-red-500">{errors[`peso${serie.id}`] && errors[`peso${serie.id}`].message}</span>                      <Button>Aceptar</Button>
+                      <span className="text-red-500">{errors[`peso${serie.id}`] && errors[`peso${serie.id}`].message}</span>                      
+                      <Button>Aceptar</Button>
                     </form>
 
                   </div>
-                  <div>
+                  <div className='mt-2 mr-2'>
                     <p className="text-radixgreen font-bold mb-1">
                       Fecha: <span className="text-black">{serie.date}</span>
                     </p>
@@ -231,7 +286,7 @@ const Series = () => {
                       Duracion: <span className="text-black">{formatDuration(serie.duration)}</span>
                     </p>
                   </div>
-                  <div>
+                  <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
                     <IconButton size="2" radius="full" onClick={() => setEditor(prev => ({ ...prev, [serie.id]: !prev[serie.id] }))}>
                       <LuPencil />
                     </IconButton>
@@ -241,12 +296,36 @@ const Series = () => {
                   </div>
                 </div>
               </div>
-            </li>
+            </Card>
           ))
         ) : (
           <p className="text-red-500">No hay series disponibles para este entrenamiento.</p>
         )}
-      </ul>
+      </ScrollArea>
+      <div className='mt-7'>
+        <Line 
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          }} 
+          data={{
+            labels: chartData.map((serie) => serie.date),
+            datasets: [
+              {
+                label: 'Mis Pesos',
+                data: chartData.map((serie) => serie.weight),
+                fill: true,
+                borderColor: 'rgb(48, 164, 108)', 
+                backgroundColor: 'rgba(48, 164, 108, 0.4)',
+              },
+            ],
+          }} 
+        />;
+      </div>
     </div>
   );
 };
