@@ -405,11 +405,13 @@ export default function EquipmentDetails() {
                         <strong className="text-radixgreen">Reservable:</strong>{" "}
                         {editMode ? (
                             <Checkbox
+                                name="isClickable"
                                 checked={isClickable}
                                 onCheckedChange={() => handleCheckChange("isClickable")}
                             ></Checkbox>
                         ) : (
                             <Checkbox
+                                name="isClickable"
                                 checked={eventDetails.isClickable}
                             ></Checkbox>
                         )}
@@ -418,11 +420,13 @@ export default function EquipmentDetails() {
                         <strong className="text-radixgreen">Noticia:</strong>{" "}
                         {editMode ? (
                             <Checkbox
+                                name="isNotice"
                                 checked={isNotice}
                                 onCheckedChange={() => handleCheckChange("isNotice")}
                             ></Checkbox>
                         ) : (
                             <Checkbox
+                                name="isNotice"
                                 checked={eventDetails.isNotice}
                             ></Checkbox>
                         )}
@@ -441,10 +445,11 @@ export default function EquipmentDetails() {
                     )}
                     {!editMode && (
                         <div className="flex gap-3 self-center">
-                            <Button size="3" onClick={toggleEditMode}>
+                            <Button name="editar" size="3" onClick={toggleEditMode}>
                                 Editar
                             </Button>
                             <button
+                                name="eliminar"
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                                 onClick={handleDelete}
                             >

@@ -115,7 +115,7 @@ const EventList = () => {
           <Popover.Root>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
-                <Button radius="none" size="2" variant="soft" className="m-0">
+                <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
                   <HiOutlineFilter />
                 </Button>
               </Popover.Trigger>
@@ -138,6 +138,7 @@ const EventList = () => {
               <div className="flex justify-between mb-2">
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
+                  name="reverse_sort"
                   onPressedChange={(p) => setSortingReverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -180,6 +181,7 @@ const EventList = () => {
                   <span className="text-lg font-bold">Filtrar por fecha:</span>
                   <TextField.Root>
                     <TextField.Input
+                      name="date_filter"
                       type="date"
                       onChange={(e) =>
                         setFilters({ ...filters, date: e.target.value })
@@ -201,6 +203,7 @@ const EventList = () => {
         {filteredEventList.map((event) => (
           <Link to={`${event.id}`} key={event.id}>
             <Button
+              name="event"
               key={event.id}
               size="3"
               onClick={() => handleEventClick(event.id)}
