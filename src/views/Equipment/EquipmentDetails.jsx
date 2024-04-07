@@ -253,6 +253,13 @@ export default function EquipmentDetails() {
   const handleInputChange = (e, field) => {
     setUpdatedDetails({
       ...updatedDetails,
+      [field]: e.target.value,
+    });
+  };
+
+  const handleInputChangeMuscular = (e, field) => {
+    setUpdatedDetails({
+      ...updatedDetails,
       [field]: e,
     });
   };
@@ -396,7 +403,7 @@ export default function EquipmentDetails() {
                 name="muscular_group"
                 defaultValue={updatedDetails.muscular_group}
                 onChange={(e) =>
-                  handleInputChange(e.target.value, "muscular_group")
+                  handleInputChangeMuscular(e.target.value, "muscular_group")
                 }
               >
                 {muscularGroupOptions.map((option) => (
