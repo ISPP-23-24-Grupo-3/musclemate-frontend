@@ -1,41 +1,80 @@
-import {useState, useEffect} from "react";
-import { HiUser, HiLockClosed, HiOutlineMail,HiPhone, } from "react-icons/hi";
-import { HiBuildingOffice2,HiHome,HiMiniCake,HiMiniIdentification   } from "react-icons/hi2";
+import { useState, useEffect } from "react";
+import { HiUser, HiLockClosed, HiOutlineMail, HiPhone } from "react-icons/hi";
+import {
+  HiBuildingOffice2,
+  HiHome,
+  HiMiniCake,
+  HiMiniIdentification,
+} from "react-icons/hi2";
 import { useForm } from "react-hook-form";
-import { Button } from "@radix-ui/themes";
+import { Button, Select, TextField, TextFieldSlot } from "@radix-ui/themes";
 import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
-
-
-
+import { FormContainer } from "../../components/Form";
+import { GymSelect } from "../../components/Gyms";
+import { RHFSelect } from "../../components/RHFSelect";
 
 const UserRegister = () => {
-
   const [gyms, setGyms] = useState(null);
   const navigate = useNavigate();
   const [errorMessageUser, setErrorMessageUser] = useState("");
   const [errorMessageMail, setErrorMessageMail] = useState("");
+  const [errorMessageDate, setErrorMessageDate] = useState("");
+
+  const handleEmailChange = () => {
+    setErrorMessageMail(null); // Limpiar el mensaje de error del email
+  };
+  
+  // Función para manejar cambios en el campo de nombre de usuario
+  const handleUsernameChange = () => {
+    setErrorMessageUser(null); // Limpiar el mensaje de error del nombre de usuario
+  };
 
   async function getGyms() {
-  
-    const responseGym = await getFromApi('gyms/');
+    const responseGym = await getFromApi("gyms/");
     const gymsData = await responseGym.json();
-    console.log(gymsData); 
     return gymsData;
   }
 
   useEffect(() => {
-    getGyms().then(gyms => setGyms(gyms)).catch(error => console.log(error));
-    }, []);
+    getGyms()
+      .then((gyms) => setGyms(gyms))
+      .catch((error) => console.log(error));
+  }, []);
 
-
-
-  const { register, handleSubmit, formState: { errors } } = useForm({values: {gym: null}},);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const onSubmit = async (formData) => {
     try {
-      const { name, lastName, email, birth, gender, phoneNumber, address, city, zipCode, username, password, gym } = formData;
-      
+      const {
+        name,
+        lastName,
+        email,
+        birth,
+        gender,
+        phoneNumber,
+        address,
+        city,
+        zipCode,
+        username,
+        password,
+        gym,
+      } = formData;
+
+      const birthDate = new Date(birth);
+      const currentDate = new Date();
+      if (birthDate > currentDate) {
+        setErrorMessageDate("La fecha de nacimiento no puede ser futura");
+        return;
+      } else {
+        // Si la fecha de nacimiento es válida, limpiar el mensaje de error
+        setErrorMessageDate(null);
+      }
+
       const requestBody = {
         name,
         lastName,
@@ -48,23 +87,24 @@ const UserRegister = () => {
         zipCode,
         userCustom: {
           username,
-          password
+          password,
         },
-        gym
+        gym,
       };
-      
-      const response = await postToApi('clients/create/', requestBody);
-  
+
+      const response = await postToApi("clients/create/", requestBody);
+
       if (!response.ok) {
         const responseData = await response.json();
-        setErrorMessageUser(responseData.username ? responseData.username[0]: '');
-        setErrorMessageMail(responseData.email ? responseData.email[0]: '');
+        setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
+        setErrorMessageMail("Ya existe un usuario con este email en uso");
         return;
       }
-  
-      navigate('/owner/users');
+      setErrorMessageUser(null);
+      setErrorMessageMail(null);
+      navigate("/owner/users");
     } catch (error) {
-      console.error('Hubo un error al crear el usuario:', error);
+      console.error("Hubo un error al crear el usuario:", error);
     }
   };
 
@@ -74,7 +114,7 @@ const UserRegister = () => {
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
     phoneNumber: "Tiene que ser un número de 9 cifras",
-    zipCode:"Tiene que ser un númeroo de 5 cifras"
+    zipCode: "Tiene que ser un númeroo de 5 cifras",
   };
 
   const patterns = {
@@ -84,273 +124,274 @@ const UserRegister = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen md:m-0 m-5">
-      <div className="max-w-2xl p-10 border border-radixgreen rounded-lg shadow-xl">
+    <div className="flex justify-center items-center">
+      <FormContainer>
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Registro de nuevo usuario
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="relative flex items-center">
-            <HiUser className="w-6 h-6 text-radixgreen mr-3" />
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+          <div>
             <label htmlFor="name">Nombre</label>
-            <input
-              {...register("name", {
-                required: messages.req,
-                maxLength: {
-                  value: 100,
-                  message: "El nombre no puede superar los 100 caracteres"
-                }
-              })}
-              name="name"
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.name ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "2.5rem" }}
-            />
+            <TextField.Root>
+              <TextField.Slot>
+                <HiUser className="size-6 text-radixgreen" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("name", {
+                  required: messages.req,
+                  maxLength: {
+                    value: 100,
+                    message: "El nombre no puede superar los 100 caracteres",
+                  },
+                })}
+                name="name"
+                type="text"
+              />
+            </TextField.Root>
+            {errors.name && (
+              <p className="text-red-500">{errors.name.message}</p>
+            )}
           </div>
-          {errors.name && (
-            <p className="text-red-500">{errors.name.message}</p>
-          )}
 
-          <div className="relative flex items-center">
-            <HiUser className="w-6 h-6 text-radixgreen mr-3" />
+          <div>
             <label htmlFor="lastName">Apellidos</label>
-            <input
+            <TextField.Root
               {...register("lastName", {
                 required: messages.req,
                 maxLength: {
                   value: 100,
-                  message: "Los apellidos no puede superar los 100 caracteres"
-                }
-              })}
-              name="lastName"
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.lastName ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "2rem" }}
-            />
-          </div>
-          {errors.lastName && (
-            <p className="text-red-500">{errors.lastName.message}</p>
-          )}
-
-          <div className="relative flex items-center">
-            <HiOutlineMail className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="email">Correo electrónico</label>
-            <input
-              {...register("email", {
-                required: messages.req,
-                pattern: { value: patterns.mail, message: messages.mail },
-              })}
-              name="email"
-              type="email"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.email ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "0.5rem" }}
-            />
-          </div>
-          {errors.email && (
-            <p className="text-red-500">{errors.email.message}</p>
-          )}
-          {errorMessageMail && <p className="text-red-500 mt-1 ml-3">{errorMessageMail}</p>}
-
-          <div className="relative flex items-center">
-            <HiMiniCake className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="birth">Fecha de nacimiento</label>
-            <input
-              {...register("birth", {
-                required: messages.req
-              })}
-              name="birth"
-              type="date"
-              className="w-full px-4 py-3 border rounded-lg g-white text-black"
-            />
-          </div>
-          {errors.birth && (
-          <p className="text-red-500">{errors.birth.message}</p>
-          )}
-
-
-          <div className="relative flex items-center">
-              <HiMiniIdentification className="w-6 h-6 text-radixgreen mr-3" />
-              <label htmlFor="gender">Género</label>
-              <select
-                {...register("gender",{
-                  required: messages.req
-                })}
-                name="gender"
-                className={`w-full px-4 py-3 border rounded-lg ${
-                  errors.gender ? 'border-red-500' : 'border-radixgreen'
-                } bg-white text-black`}
-                style={{ marginLeft: "3rem" }}
-              >
-                <option value="">Seleccionar...</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-                <option value="O">Otro</option>
-              </select>
-          </div>
-          {errors.gender && (
-            <p className="text-red-500">{errors.gender.message}</p>
-          )}
-
-          <div className="relative flex items-center">
-            <HiPhone className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="phoneNumber">Número de telefono</label>
-            <input
-              {...register("phoneNumber", {
-                required: messages.req,
-                pattern: { value: patterns.phoneNumber, message: messages.phoneNumber}
-              })}
-              name="phoneNumber"
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.phoneNumber ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "0rem" }}
-            />
-          </div>
-          {errors.phoneNumber && (
-          <p className="text-red-500">{errors.phoneNumber.message}</p>
-          )}
-
-          <div className="relative flex items-center">
-            <HiHome className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="address">Dirección</label>
-            <input
-              {...register("address", {
-                required: messages.req,
-                maxLength: {
-                  value: 255,
-                  message: "La direción no puede superar los 255 caracteres"
-                }
-              })}
-              name="address"
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.address ? "border-red-500" : "border-radixgreen"
-              } bg-white text-black`}
-              style={{ marginLeft: "2.10rem" }}
-            />
-          </div>
-          {errors.address && (
-            <p className="text-red-500">{errors.address.message}</p>
-          )}
-
-          <div className="relative flex items-center">
-            <HiBuildingOffice2 className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="city">Ciudad</label>
-            <input
-              {...register("city", {
-                required: messages.req,
-                maxLength: {
-                  value: 100,
-                  message: "La ciudad no puede superar los 100 caracteres"
-                }
-              })}
-              name="city"
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.city ? "border-red-500" : "border-radixgreen"
-              } bg-white text-black`}
-              style={{ marginLeft: "3.10rem" }}
-            />
-          </div>
-          {errors.city && <p className="text-red-500">{errors.city.message}</p>}
-
-          <div className="relative flex items-center">
-            <HiBuildingOffice2 className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="zipCode">Código Postal</label>
-            <input
-              {...register("zipCode", {
-                required: messages.req,
-                pattern: { value: patterns.zipCode, message: messages.zipCode}
-              })}
-              name="zipCode"
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg ${
-                errors.zipCode ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "3.10rem" }}
-            />
-          </div>
-          {errors.zipCode && (
-          <p className="text-red-500">{errors.zipCode.message}</p>
-          )}
-
-        <div className="relative flex items-center mb-4">
-          <HiHome className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="username" className="mr-3">Nombre de usuario</label>
-            <input
-              {...register("username", {
-                required: messages.req,
-                maxLength: {
-                  value: 150,
-                  message: "El nombre de usuario no puede superar los 150 caracteres"
-                }
-              })}
-              name="username"
-              type="text"
-              className={`w-full pl-4 pr-100000 px-4 py-3 border rounded-lg ${
-                errors.username ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "3rem" }}
-            />
-          </div>
-          {errors.username && (
-            <p className="text-red-500 absolute mt-1 ml-3">{errors.username.message}</p>
-          )}
-          {errorMessageUser && <p className="text-red-500 mt-1 ml-3">{errorMessageUser}</p>}
-
-
-          <div className="relative flex items-center mb-4">  
-          <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
-            <label htmlFor="password" className="mr-3">Contraseña</label>  
-            <input
-              {...register("password", {
-                required: messages.req,
-                minLength: {
-                  value: 10,
-                  message: "La contraseña debe tener más de 10 caracteres"
+                  message: "Los apellidos no puede superar los 100 caracteres",
                 },
-                maxLength: {
-                  value: 128,
-                  message: "La contraseña no puede superar los 128 caracteres"
-                }
               })}
-              name="password"
-              type="password"
-              className={`w-full pl-4 pr-100000 px-4 py-3 border rounded-lg ${
-                errors.password ? 'border-red-500' : 'border-radixgreen'
-              } bg-white text-black`}
-              style={{ marginLeft: "3rem" }}
-            />
+            >
+              <TextField.Slot>
+                <HiUser className="size-6 text-radixgreen" />
+              </TextField.Slot>
+              <TextField.Input name="lastName" type="text" />
+            </TextField.Root>
+            {errors.lastName && (
+              <p className="text-red-500">{errors.lastName.message}</p>
+            )}
           </div>
-          {errors.password && (
-          <p className="text-red-500">{errors.password.message}</p>
-          )}
 
-          <div className="flex items-center mb-4">
-          <label htmlFor="gym" className="mr-3">Gimnasio</label>
-          <select
-            {...register("gym", { required: messages.req })}
-            name="gym"
-            className={`flex-1 px-4 py-3 border rounded-lg ${
-              errors.gym ? 'border-red-500' : 'border-radixgreen'
-            } bg-white text-black`}
-          >
-            <option value="">Seleccionar gimnasio</option>
-            {gyms && gyms.map(gym=><option key={gym.id} value={gym.id}>{gym.name}</option>)}
-            
-          </select>
-        </div>
-        {errors.gym && (
-          <p className="text-red-500">{errors.gym.message}</p>
-          )}
-        
+          <div className="flex flex-col">
+            <label htmlFor="email">Correo electrónico</label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiOutlineMail className="size-6 text-radixgreen" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("email", {
+                  required: messages.req,
+                  pattern: { value: patterns.mail, message: messages.mail },
+                })}
+                name="email"
+                type="email"
+                onChange={handleEmailChange} // Agregar evento onChange
+              />
+            </TextField.Root>
+            {errors.email && (
+              <p className="text-red-500">{errors.email.message}</p>
+            )}
+            {errorMessageMail && (
+              <p className="text-red-500 mt-1 ml-3">{errorMessageMail}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="birth">Fecha de nacimiento</label>
+            <TextField.Root>
+              <TextFieldSlot>
+                <HiMiniCake className="size-6 text-radixgreen" />
+              </TextFieldSlot>
+              <TextField.Input
+                {...register("birth", {
+                  required: messages.req,
+                })}
+                name="birth"
+                type="date"
+              />
+            </TextField.Root>
+            {errors.birth && (
+              <p className="text-red-500">{errors.birth.message}</p>
+            )}
+            {errorMessageDate && (
+              <p className="text-red-500">{errorMessageDate}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="gender">Género</label>
+            <RHFSelect
+              placeholder="Seleccionar..."
+              {...register("gender", { required: messages.req })}
+            >
+              <Select.Item value="M">Masculino</Select.Item>
+              <Select.Item value="F">Femenino</Select.Item>
+              <Select.Item value="O">Otro</Select.Item>
+            </RHFSelect>
+            {errors.gender && (
+              <p className="text-red-500">{errors.gender.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="phoneNumber">Número de telefono</label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiPhone className="size-6 text-radixgreen" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("phoneNumber", {
+                  required: messages.req,
+                  pattern: {
+                    value: patterns.phoneNumber,
+                    message: messages.phoneNumber,
+                  },
+                })}
+                name="phoneNumber"
+              />
+            </TextField.Root>
+            {errors.phoneNumber && (
+              <p className="text-red-500">{errors.phoneNumber.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="address">Dirección</label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiHome className="size-6 text-radixgreen" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("address", {
+                  required: messages.req,
+                  maxLength: {
+                    value: 255,
+                    message: "La direción no puede superar los 255 caracteres",
+                  },
+                })}
+                name="address"
+              />
+            </TextField.Root>
+            {errors.address && (
+              <p className="text-red-500">{errors.address.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="city">Ciudad</label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiBuildingOffice2 className="size-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("city", {
+                  required: messages.req,
+                  maxLength: {
+                    value: 100,
+                    message: "La ciudad no puede superar los 100 caracteres",
+                  },
+                })}
+                name="city"
+                type="text"
+              />
+            </TextField.Root>
+            {errors.city && (
+              <p className="text-red-500">{errors.city.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="zipCode">Código Postal</label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiBuildingOffice2 className="size-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("zipCode", {
+                  required: messages.req,
+                  pattern: {
+                    value: patterns.zipCode,
+                    message: messages.zipCode,
+                  },
+                })}
+                name="zipCode"
+                type="text"
+              />
+            </TextField.Root>
+            {errors.zipCode && (
+              <p className="text-red-500">{errors.zipCode.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="username" className="mr-3">
+              Nombre de usuario
+            </label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiHome className="size-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("username", {
+                  required: messages.req,
+                  maxLength: {
+                    value: 150,
+                    message:
+                      "El nombre de usuario no puede superar los 150 caracteres",
+                  },
+                })}
+                name="username"
+                type="text"
+                onChange={handleUsernameChange} // Agregar evento onChang
+              />
+            </TextField.Root>
+            {errors.username && (
+              <p className="text-red-500">{errors.username.message}</p>
+            )}
+            {errorMessageUser && (
+              <p className="text-red-500 mt-1 ml-3">{errorMessageUser}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="password" className="mr-3">
+              Contraseña
+            </label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("password", {
+                  required: messages.req,
+                  minLength: {
+                    value: 10,
+                    message: "La contraseña debe tener más de 10 caracteres",
+                  },
+                  maxLength: {
+                    value: 128,
+                    message:
+                      "La contraseña no puede superar los 128 caracteres",
+                  },
+                })}
+                name="password"
+                type="password"
+              />
+            </TextField.Root>
+            {errors.password && (
+              <p className="text-red-500">{errors.password.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="gym" className="mr-3">
+              Gimnasio
+            </label>
+            <GymSelect {...register("gym", { required: messages.req })} />
+            {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+          </div>
 
           <Button
             type="submit"
@@ -362,7 +403,7 @@ const UserRegister = () => {
             Registrarse
           </Button>
         </form>
-      </div>
+      </FormContainer>
     </div>
   );
 };

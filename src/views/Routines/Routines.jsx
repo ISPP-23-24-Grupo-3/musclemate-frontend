@@ -15,16 +15,20 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Error, Info } from "../../components/Callouts/Callouts";
 import { useForm } from "react-hook-form";
+import { FormContainer } from "../../components/Form";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   getFromApi,
   postToApi,
   deleteFromApi,
 } from "../../utils/functions/api";
+import AuthContext from "../../utils/context/AuthContext";
 
 export const Routines = () => {
+  const { user } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
+  const [gymPlan, setGymPlan] = useState("");
 
   useEffect(() => {
     const fetchRoutines = async () => {
@@ -40,7 +44,22 @@ export const Routines = () => {
           "There was a problem while searching your routines. Please stand by.",
         );
       });
-  }, [routines.length]);
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+        getFromApi("clients/detail/" + user.username + "/") 
+            .then((response) => response.json())
+            .then((data) => {
+              let gym = data.gym;
+              getFromApi("gyms/detail/" + gym + "/") 
+              .then((response) => response.json())
+              .then((data) => {
+                setGymPlan(data.subscription_plan);
+              });
+            });
+    }
+  }, [user]);
 
   return (
     <Section className="md:m-0 m-5">
@@ -49,13 +68,21 @@ export const Routines = () => {
           Mis Rutinas
         </Heading>
       </div>
-
-      <RoutineForm set_routines={setRoutines} routines={routines} />
-
-      {error ? (
-        <Error message={error} size="3" />
+  
+      {gymPlan === "free" ? (
+        <div className="text-red-700 text-center mb-4">
+          La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
+        </div>
       ) : (
-        <ListRoutines routines={routines} set_routines={setRoutines} />
+        <>
+          <RoutineForm set_routines={setRoutines} routines={routines} />
+  
+          {error ? (
+            <Error message={error} size="3" />
+          ) : (
+            <ListRoutines routines={routines} set_routines={setRoutines} />
+          )}
+        </>
       )}
     </Section>
   );
@@ -64,7 +91,10 @@ export const Routines = () => {
 const ListRoutines = ({ routines, set_routines }) => {
   const navigate = useNavigate();
   const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
-  const startRoutine = (routine) => navigate(`/user/routines/${routine.id}/workouts`, { state: { routineId: routine.id } });
+  const startRoutine = (routine) =>
+    navigate(`/user/routines/${routine.id}/workouts`, {
+      state: { routineId: routine.id },
+    });
   const deleteRoutine = (routine) => {
     if (
       window.confirm(
@@ -94,7 +124,7 @@ const ListRoutines = ({ routines, set_routines }) => {
         >
           <span className="flex gap-3 items-center">
             <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
-              {routine.name} 
+              {routine.name}
             </Text>
             {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
           </span>
@@ -175,28 +205,32 @@ const RoutineForm = ({ set_routines, routines }) => {
         <Collapsible.Trigger className="w-full">
           <span
             className="w-full flex items-center justify-center bg-radixgreen rounded-lg p-3 mb-5 hover:bg-radixgreen/50 text-white text-lg"
-            type="submit">
+            type="submit"
+          >
             <IoMdAddCircleOutline className="size-6" />
             Añadir rutina
           </span>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className={`rounded-lg mb-4 p-5 px-3 flex justify-between border border-radixgreen/30`}
-          >
-            <div className="flex gap-3">
-              <TextField.Input
-                color={`${errors.name ? "red" : "green"}`}
-                {...register("name", {
-                  required: "Debes escribir un nombre",
-                  validate: { unique: isUnique },
-                })}
-              ></TextField.Input>
-              <span className="text-red-500">{errors.name?.message}</span>
-            </div>
-            <Button className="">Aceptar</Button>
-          </form>
+          <FormContainer className="mb-6">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className={`flex justify-between`}
+            >
+              <div className="flex flex-col gap-1">
+                <span>Nombre de la rutina</span>
+                <TextField.Input
+                  color={`${errors.name ? "red" : "green"}`}
+                  {...register("name", {
+                    required: "Debes escribir un nombre",
+                    validate: { unique: isUnique },
+                  })}
+                ></TextField.Input>
+                <span className="text-red-500">{errors.name?.message}</span>
+              </div>
+              <Button className="self-end">Aceptar</Button>
+            </form>
+          </FormContainer>
         </Collapsible.Content>
       </Collapsible.Root>
     </>

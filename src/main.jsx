@@ -28,6 +28,7 @@ import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 import EventList from "./views/EventsClasses/EventList";
+import EventListClient from "./views/EventsClasses/EventListClient";
 import EditWorkout from "./views/Workouts/EditWorkout";
 import Series from "./views/Series/Series";
 import PricingPage from "./views/PricingPage/PricingPage";
@@ -39,6 +40,8 @@ import ProfileClient from "./views/UserListing/ProfileClient";
 import AddEventsForm from "./views/EventsClasses/AddEvent";
 import CreateGym from "./views/Gyms/CreateGym";
 import GymDetails from "./views/Gyms/GymDetails";
+import EventDetails from "./views/EventsClasses/EventDetails"
+import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
 
 const ownerRoutes = [
   {
@@ -63,7 +66,11 @@ const ownerRoutes = [
   },
   {
     path: "events/add",
-    element: <AddEventsForm/>
+    element: <AddEventsForm />,
+  },
+  {
+    path: "events/:eventId",
+    element: <EventDetails />,
   },
   {
     path: "equipments",
@@ -90,24 +97,28 @@ const ownerRoutes = [
     element: <MyGymsOwner />,
   },
   {
-    path:"pricing",
-    element: <PricingPage/>
+    path: "pricing",
+    element: <PricingPage />,
   },
   {
-    path:"subscriptions",
-    element: <SubscriptionsPage/>
+    path: "subscriptions",
+    element: <SubscriptionsPage />,
   },
   {
-    path:"success",
-    element: <SuccessPage/>
+    path: "success",
+    element: <SuccessPage />,
   },
   {
     path: "gyms/add",
-    element : <CreateGym />
+    element: <CreateGym />,
   },
   {
     path: "gyms/:gymId",
     element: <GymDetails />,
+  },
+  {
+    path: "profile",
+    element: <ProfileOwner />,
   },
 ];
 
@@ -118,12 +129,12 @@ const userRoutes = [
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> },
-  { path: "events", element: <EventList /> },
+  { path: "events", element: <EventListClient /> },
   { path: "routines/:routineId/workouts", element: <EditWorkout /> },
   { path: "workout/:workoutId/series", element: <Series /> },
   { path: "profile", element: <ProfileClient /> },
   { path: "equipments", element: <EquipmentList /> },
-  { path: "equipmentsClient", element: <EquipmentListClient /> }, 
+  { path: "equipmentsClient", element: <EquipmentListClient /> },
 ];
 
 const router = createBrowserRouter([
@@ -156,11 +167,10 @@ const router = createBrowserRouter([
       {
         path: "/terms-conditions",
         element: <TermsConditions />,
-       },
-       {
+      },
+      {
         path: "/verify",
-        element: <MailVerification />
-
+        element: <MailVerification />,
       },
     ],
     errorElement: <ErrorPage />,
@@ -172,5 +182,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Theme accentColor="green">
       <RouterProvider router={router} />
     </Theme>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

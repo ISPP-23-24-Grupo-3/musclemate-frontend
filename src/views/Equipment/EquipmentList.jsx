@@ -26,9 +26,8 @@ export default function MachineList() {
   const [selectedGym, setSelectedGym] = useState(null);
   const [gyms, setGyms] = useState([]);
   const [machineRatings, setMachineRatings] = useState([]);
-
-  const[reviews, setReviews] = useState({});
-  const[issues, setIssues] = useState({});
+  const [reviews, setReviews] = useState({});
+  const [issues, setIssues] = useState({});
 
   useEffect(() => {
     getFromApi("gyms/")
@@ -53,11 +52,9 @@ export default function MachineList() {
               .filter((assessment) => assessment.equipment === machine.id)
               .map((rating) => rating.stars);
             const rating = actualRate(machineRatings, machineRatings.length);
-            // console.log(rating);
 
             return { id: machine.id, ratings: rating };
           });
-          // console.log(ratingsData);
           setMachineRatings(ratingsData);
         });
     }
@@ -73,52 +70,77 @@ export default function MachineList() {
 
   const SORTING_FUNCTIONS = {
     name: (a, b) => a.name.localeCompare(b.name),
-    reviews: (a, b) => a.reviews - b.reviews,
-    issues: (a, b) => a.issues - b.issues,
-    rating: (a, b) => a.rating - b.rating,
+    reviews: (a, b) => reviews[b.id] - reviews[a.id],
+    issues: (a, b) => issues[b.id] - issues[a.id],
+    rating: (a, b) => machineRatings.find((item) => item.id === b.id)?.ratings - machineRatings.find((item) => item.id === a.id)?.ratings,
   };
 
   const addFilter = (filter) => set_filters([filter, ...filters]);
-  const removeFilter = (filter) =>
-    set_filters(filters.filter((f) => f != filter));
+  const removeFilter = (filter) => set_filters(filters.filter((f) => f !== filter));
 
+  const removeAccents = (str) => {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  };
+  
   const filtered_machine_list =
     machines.length > 0
       ? machines
-          .filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
+          .filter((m) => removeAccents(m.name).includes(removeAccents(search)))
           .filter((m) =>
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
-              : true
-              &&
-              (selectedGym === null || m.gym === selectedGym)
+              : true && (selectedGym === null || m.gym === selectedGym)
           )
-          .sort(
-            (a, b) =>
-              SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1)
-          )
+          .sort((a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1))
       : [];
 
- // useEffect(() => {
- //   for(let i = 0; i < machines.length; i++){
- //     getFromApi(`assessments/equipment/${machines[i].id}/`)
- //       .then((response) => response.json())
- //       .then((data) => {
- //         setReviews(prevReviews => ({
- //           ...prevReviews,
- //           [machines[i].id]: data.length
- //         }));
- //       });
- //     getFromApi(`tickets/byEquipment/${machines[i].id}/`)
- //       .then((response) => response.json())
- //       .then((data) => {
- //         setIssues(prevIssues => ({
- //           ...prevIssues,
- //           [machines[i].id]: data.length
- //         }));
- //      });
- //   }
- // }), [machines];
+  useEffect(() => {
+    const promises = machines.map((machine) => {
+      const assessmentPromise = getFromApi(`assessments/equipment/${machine.id}/`).then((response) => response.json());
+      const ticketsPromise = getFromApi(`tickets/byEquipment/${machine.id}/`).then((response) => response.json());
+  
+      return Promise.all([assessmentPromise, ticketsPromise]).then(([assessments, tickets]) => ({
+        machineId: machine.id,
+        reviews: assessments.length,
+        issues: tickets.length
+      }));
+    });
+  
+    Promise.all(promises)
+      .then((results) => {
+        const reviewsData = {};
+        const issuesData = {};
+  
+        results.forEach((result) => {
+          reviewsData[result.machineId] = result.reviews;
+          issuesData[result.machineId] = result.issues;
+        });
+  
+        setReviews(reviewsData);
+        setIssues(issuesData);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, [machines]);
+
+  const handleSortingChangeReviews = (value) => {
+    set_sorting("reviews");
+    set_sorting_reverse(value === "desc");
+  };
+
+  const handleSortingChangeIssues = (value) => {
+    set_sorting("issues");
+    set_sorting_reverse(value === "desc");
+  };
+
+  const handleSortingChangeRating = (value) => {
+    set_sorting("rating");
+    set_sorting_reverse(value === "desc");
+  };
 
   return (
     <>
@@ -187,18 +209,21 @@ export default function MachineList() {
                 <ToggleGroup.Item
                   value="reviews"
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                  onValueChange={handleSortingChangeReviews}
                 >
                   Nº reseñas
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="issues"
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                  onValueChange={handleSortingChangeIssues}
                 >
                   Nº incidencias
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="rating"
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
+                  onValueChange={handleSortingChangeRating}
                 >
                   Valoración
                 </ToggleGroup.Item>
