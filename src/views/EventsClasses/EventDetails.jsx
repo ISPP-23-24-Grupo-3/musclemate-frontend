@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { HiOutlineUsers, HiOutlineTicket, HiOutlineBadgeCheck, HiOutlineInformationCircle, HiOutlineCalendar, HiOutlineClock, HiOutlineIdentification } from "react-icons/hi";
 import { getFromApi, putToApi, deleteFromApi } from "../../utils/functions/api";
 import {
     Button,
@@ -9,9 +10,7 @@ import {
     TextField,
 } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form.jsx";
-
-import Rating from "../../components/Rating";
-import { HiTicket } from "react-icons/hi";
+import { useForm } from "react-hook-form";
 import { Checkbox } from "@radix-ui/themes";
 import { RHFSelect } from "../../components/RHFSelect.jsx";
 
@@ -26,6 +25,19 @@ export default function EquipmentDetails() {
     const [editMode, setEditMode] = useState(false);
     const [updatedDetails, setUpdatedDetails] = useState(null);
     const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
+
+    const messages = {
+        req: "Este campo es obligatorio",
+        name: "El nombre del gimnasio tiene que ser mayor a 8 caracteres",
+        mail: "Debes introducir una dirección correcta",
+        password: "La contraseña tiene que ser mayor a 10 caracteres",
+    };
 
     // Opciones de grupo muscular
     const eventIntensityOptions = [
@@ -202,25 +214,50 @@ export default function EquipmentDetails() {
                     <div>
                         <strong className="text-radixgreen">Nombre:</strong>{" "}
                         {editMode ? (
-                            <TextField.Input
-                                name="name"
-                                type="text"
-                                className="border border-gray-300 rounded px-2 py-1"
-                                value={updatedDetails.name}
-                                onChange={(e) => handleInputChange(e.target.value, "name")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineBadgeCheck className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextField.Input
+                                    {...register("name", {
+                                        required: messages.req,
+                                        minLength: { value: 5, message: messages.name },
+                                    })}
+                                    name="name"
+                                    type="text"
+                                    className="border border-gray-300 rounded px-2 py-1"
+                                    value={updatedDetails.name}
+                                    onChange={(e) => handleInputChange(e.target.value, "name")}
+                                />
+                                {errors.name && (
+                                    <p className="text-red-500">{errors.name.message}</p>
+                                )}
+                            </TextField.Root>
                         ) : (
                             <span>{eventDetails.name}</span>
                         )}
+
                     </div>
                     <div>
                         <strong className="text-radixgreen">Descripción:</strong>{" "}
                         {editMode ? (
-                            <TextArea
-                                name="description"
-                                value={updatedDetails.description}
-                                onChange={(e) => handleInputChange(e.target.value, "description")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineInformationCircle className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextArea
+                                    {...register("description", {
+                                        required: messages.req,
+                                        minLength: { value: 10, message: messages.description },
+                                    })}
+                                    name="description"
+                                    value={updatedDetails.description}
+                                    onChange={(e) => handleInputChange(e.target.value, "description")}
+                                />
+                                {errors.description && (
+                                    <p className="text-red-500">{errors.description.message}</p>
+                                )}
+                            </TextField.Root>
                         ) : (
                             <span>{eventDetails.description}</span>
                         )}
@@ -228,12 +265,21 @@ export default function EquipmentDetails() {
                     <div>
                         <strong className="text-radixgreen">Aforo:</strong>{" "}
                         {editMode ? (
-                            <TextField.Input
-                                name="capacity"
-                                type="text"
-                                value={updatedDetails.capacity}
-                                onChange={(e) => handleInputChange(e.target.value, "capacity")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineUsers className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextField.Input
+                                    {...register("capacity", { required: messages.req })}
+                                    name="capacity"
+                                    type="number"
+                                    value={updatedDetails.capacity}
+                                    onChange={(e) => handleInputChange(e.target.value, "capacity")}
+                                />
+                                {errors.capacity && (
+                                    <p className="text-red-500">{errors.capacity.message}</p>
+                                )}
+                            </TextField.Root>
                         ) : (
                             <span>{eventDetails.capacity}</span>
                         )}
@@ -241,12 +287,20 @@ export default function EquipmentDetails() {
                     <div>
                         <strong className="text-radixgreen">Asistentes:</strong>{" "}
                         {editMode ? (
-                            <TextField.Input
-                                name="attendees"
-                                type="text"
-                                value={updatedDetails.attendees}
-                                onChange={(e) => handleInputChange(e.target.value, "attendees")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineTicket className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextField.Input
+                                    {...register("attendees")}
+                                    name="attendees"
+                                    type="number"
+                                    min="0" // Establecer el valor mínimo permitido
+                                    step="1"
+                                    value={updatedDetails.attendees}
+                                    onChange={(e) => handleInputChange(e.target.value, "attendees")}
+                                />
+                            </TextField.Root>
                         ) : (
                             <span>{eventDetails.attendees}</span>
                         )}
@@ -254,12 +308,21 @@ export default function EquipmentDetails() {
                     <div>
                         <strong className="text-radixgreen">Instructor:</strong>{" "}
                         {editMode ? (
-                            <TextField.Input
-                                name="instructor"
-                                type="text"
-                                value={updatedDetails.instructor}
-                                onChange={(e) => handleInputChange(e.target.value, "instructor")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineIdentification className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextField.Input
+                                    {...register("instructor", { required: messages.req })}
+                                    name="instructor"
+                                    type="text"
+                                    value={updatedDetails.instructor}
+                                    onChange={(e) => handleInputChange(e.target.value, "instructor")}
+                                />
+                                {errors.instructor && (
+                                    <p className="text-red-500">{errors.instructor.message}</p>
+                                )}
+                            </TextField.Root>
                         ) : (
                             <span>{eventDetails.instructor}</span>
                         )}
@@ -267,12 +330,23 @@ export default function EquipmentDetails() {
                     <div>
                         <strong className="text-radixgreen">Fecha:</strong>{" "}
                         {editMode ? (
-                            <TextField.Input
-                                name="date"
-                                type="date"
-                                value={updatedDetails.date}
-                                onChange={(e) => handleInputChange(e.target.value, "date")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineCalendar className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextField.Input
+                                    {...register("date", {
+                                        required: messages.req,
+                                    })}
+                                    name="date"
+                                    type="date"
+                                    value={updatedDetails.date}
+                                    onChange={(e) => handleInputChange(e.target.value, "date")}
+                                />
+                                {errors.date && (
+                                    <p className="text-red-500">{errors.date.message}</p>
+                                )}
+                            </TextField.Root>
                         ) : (
                             <span>{formatDate(eventDetails.date)}</span>
                         )}
@@ -280,12 +354,23 @@ export default function EquipmentDetails() {
                     <div>
                         <strong className="text-radixgreen">Duración:</strong>{" "}
                         {editMode ? (
-                            <TextField.Input
-                                name="duration"
-                                type="text"
-                                value={updatedDetails.duration}
-                                onChange={(e) => handleInputChange(e.target.value, "duration")}
-                            />
+                            <TextField.Root>
+                                <TextField.Slot>
+                                    <HiOutlineClock className="size-6 text-radixgreen" />
+                                </TextField.Slot>
+                                <TextField.Input
+                                    {...register("duration", {
+                                        required: "Este campo es obligatorio",
+                                    })}
+                                    name="duration"
+                                    type="text"
+                                    value={updatedDetails.duration}
+                                    onChange={(e) => handleInputChange(e.target.value, "duration")}
+                                />
+                                {errors.duration && (
+                                    <p className="text-red-500">{errors.duration.message}</p>
+                                )}
+                            </TextField.Root>
                         ) : (
                             <span>{eventDetails.duration}</span>
                         )}
