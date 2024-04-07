@@ -141,6 +141,7 @@ const EventList = () => {
                 <div className="flex justify-between mb-2">
                   <span className="text-lg font-bold">Ordenar por</span>
                   <Toggle.Root
+                    name="reverse_sort"
                     onPressedChange={(p) => setSortingReverse(p)}
                     className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                   >
