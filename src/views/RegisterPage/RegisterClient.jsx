@@ -46,17 +46,27 @@ const ClientRegister = () => {
       };
 
       const response = await postToApiRegister("owners/create/", requestBody);
+      const data = await response.json();
+
       if (response.ok) {
+        setError(null);
         console.log("Propietario creado exitosamente");
         setSuccess(true);
         setTimeout(() => {
           navigate("/login");
         }, 2000); // Espera 2 segundos antes de redirigir
       } else {
-        throw new Error("Error al crear propietario");
+        if (data.username) {
+          setError("Este nombre de usuario ya existe, prueba con otro");
+        } else if (data.email) {
+          setError("Ya existe un usuario con este email");
+        } else {
+          setError("Hubo un error al crear el propietario");
+        }
+        console.error("Hubo un error al crear el propietario:", data);
       }
     } catch (error) {
-      setError(error.message);
+      setError("Hubo un error al crear el propietario");
       console.error("Hubo un error al crear el propietario:", error);
     }
   };
@@ -65,6 +75,7 @@ const ClientRegister = () => {
     req: "Este campo es obligatorio",
     name: "El nombre del gimnasio tiene que ser mayor a 8 caracteres",
     mail: "Debes introducir una dirección correcta",
+    username: "Este nombre de usuario ya existe, prueba con otro",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
   };
 
@@ -89,7 +100,6 @@ const ClientRegister = () => {
           <h2 className="mb-3 text-radixgreen font-bold text-4xl text-center">
             Registro de nuevo propietario
           </h2>
-          {error && <div className="text-red-500">{error}</div>}
           {success && (
             <div className="bg-green-200 text-green-800 p-3 rounded mb-4">
               Registro completado
@@ -245,12 +255,17 @@ const ClientRegister = () => {
             </div>
 
             <div className="flex gap-3 items-center">
-              <Checkbox onChange={(c) => setIsChecked(c)}></Checkbox>
+            <Checkbox
+              checked={isChecked}
+              onCheckedChange={(e) => setIsChecked(e)}
+            ></Checkbox>
+
               <p>
-                Acepta los{" "}
-                <Link to="/terms-conditions">Términos y Condiciones</Link>
+                Acepta los <span className="text-blue-500"><Link to="/terms-conditions">Términos y Condiciones</Link></span>
               </p>
             </div>
+
+            {error && <div className="text-red-500">{error}</div>}
 
             <Button
               type="submit"
@@ -258,9 +273,11 @@ const ClientRegister = () => {
               variant="solid"
               color="green"
               className="w-full py-3"
+              disabled={!isChecked} // Deshabilita el botón si !isChecked es true
             >
               Registrarse
             </Button>
+
           </form>
         </div>
       </FormContainer>
