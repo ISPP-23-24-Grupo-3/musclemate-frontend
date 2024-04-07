@@ -30,7 +30,6 @@ import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 import EventList from "./views/EventsClasses/EventList";
 import EventListClient from "./views/EventsClasses/EventListClient";
 import EditWorkout from "./views/Workouts/EditWorkout";
-import Series from "./views/Series/Series";
 import PricingPage from "./views/PricingPage/PricingPage";
 import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
 import SuccessPage from "./views/SuccessPage";
@@ -126,7 +125,6 @@ const userRoutes = [
   { path: "add-tickets", element: <AddTickets /> },
   { path: "events", element: <EventListClient /> },
   { path: "routines/:routineId/workouts", element: <EditWorkout /> },
-  { path: "workout/:workoutId/series", element: <Series /> },
   { path: "profile", element: <ProfileClient /> },
   { path: "equipments", element: <EquipmentList /> },
   { path: "equipmentsClient", element: <EquipmentListClient /> },
