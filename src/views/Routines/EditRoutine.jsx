@@ -232,7 +232,7 @@ const Workout = ({
   const deleteWorkout = (workout) => {
       if (
         window.confirm(
-          `¿Estás seguro de que deseas borrar la rutina "${routine.name}"?`,
+          `¿Estás seguro de que deseas borrar el ejercicio "${workout.name}"?`,
         )
       ){
     deleteFromApi("workouts/delete/" + workout.id + "/").then((r) => {
