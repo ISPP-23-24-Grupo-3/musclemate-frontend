@@ -1,12 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { deleteFromApi, getFromApi, postToApi, putToApi } from '../../utils/functions/api';
 import { Button, TextField, Text, IconButton, Card } from "@radix-ui/themes";
+import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { useForm } from 'react-hook-form';
 import { LuPencil } from "react-icons/lu";
 import { CgTrash } from "react-icons/cg";
 
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
+
 export const Series = (workoutID) => {
+  const [chartData, setChartData] = useState([]);
   const [duration, setDuration] = useState(0);
   const workoutId = workoutID.workoutID
   const [series, setSeries] = useState([]);
@@ -18,6 +44,7 @@ export const Series = (workoutID) => {
   const [editor, setEditor] = useState(
     series.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {})
   );
+  const [showChart, setShowChart] = useState(false);
   const [showStartButton, setShowStartButton] = useState({});
   const [serieTimerOn, setSerieTimerOn] = useState({});
   const [editingSerieId, setEditingSerieId] = useState(null);
@@ -38,7 +65,12 @@ export const Series = (workoutID) => {
         const response = await getFromApi(`series/workout/${workoutId}/`);
         if (response.ok) {
           let data = await response.json();
-          data.sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordena las series por fecha
+          data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          const chartData = data.map(serie => ({
+            weight: serie.weight,
+            date: serie.date,
+          }));
+          setChartData(chartData.reverse());
           setSeries(data);
           setEditor(data.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {}));
           setApiDataLoaded(true);
@@ -50,6 +82,29 @@ export const Series = (workoutID) => {
 
     fetchSeries();
   }, [workoutId]);
+
+  useEffect(() => {
+    const fetchGraph = async () => {
+      try {
+        const response = await getFromApi(`series/workout/${workoutId}/`);
+        if (response.ok) {
+          let data = await response.json();
+          data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          const chartData = data.map(serie => ({
+            weight: serie.weight,
+            date: serie.date,
+          }));
+          setChartData(chartData.reverse());
+        } else {
+          console.error('Error fetching API series:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching API series:', error);
+      }
+    };
+
+    fetchGraph();
+  }, [series]);
 
   useEffect(() => {
     const fetchWorkout = async () => {
@@ -250,123 +305,186 @@ export const Series = (workoutID) => {
   };
 
   return (
-    <div className="mx-auto mt-1 m-5"> 
+    <>
+    <div className="mx-auto mt-1 m-5">
       <ul className='mt-1'>
-        {apiDataLoaded && series.length > 0 ? (
-          series.map((serie) => (
-            <li 
-              key={serie.id} className={`bg-white p-4 rounded-md mb-4 ${editor[serie.id] ? "editing" : ""}`}
-              style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px -2px 2px rgba(0, 0, 0, 0.1)" }}>
-              <div className="flex items-center mb-2">
-                <div className='flex justify-around w-full md:text-center'>
-                  <div>
-                    <div className="mt-2">
-                      <IconButton size="2" radius="full" onClick={() =>{setEditor(prev => ({ ...prev, [serie.id]: !prev[serie.id] })); startEditing(serie.id)}}>
-                        <LuPencil />
-                      </IconButton>
-                    </div>
-                    <div className="mt-3">
-                      <IconButton size="2" radius="full" color="red" onClick={() => deleteSerie(serie)}>
-                        <CgTrash />
-                      </IconButton>
-                    </div>
-                  </div>
-                  <div className="mr-4 flex items-center">
-                    <div>
-                      <p className={`text-radixgreen font-bold mb-1 mr-8 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
-                        Fecha de creación: <span className="text-black">{serie.date}</span>
-                      </p>
-                    </div>
-                    <div className={`${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 mr-4 text-xl`}>
-                      <p>Repeticiones: <span className="text-black">{serie.reps}</span></p>
-                    </div>
-                    <div className={`ml-8 ${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 text-xl`}>
-                      <p>Peso: <span className="text-black">{serie.weight}</span></p>
-                    </div>
-                  </div>
-                  <div className="mr-4">
-                    <form className={`${editor[serie.id] ? undefined : "hidden"} text-radixgreen font-bold`}
-                    onSubmit={handleSubmit((r) => {
-                      editSerie(serie.id, r[`reps${serie.id}`], r[`peso${serie.id}`]);
-                      setEditor(prev => ({ ...prev, [serie.id]: false }));
-                      })}>
-                      <div className="flex flex-col items-center">
-                        <div className="flex flex-wrap justify-center">
-                          <div className="mr-4 mb-2 text-xl">
-                            <p>Repeticiones:</p>
-                            <div className="w-32">
-                              <TextField.Input
-                                color={`${errors[`reps${serie.id}`] ? "red" : "green"}`}
-                                defaultValue={serie.reps}
-                                {...register(`reps${serie.id}`, {
-                                  validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
-                                })}
-                              />
-                              </div>   
-                          </div>
-                          <div className="mr-4 mb-2 text-xl">
-                            <p>Peso:</p>
-                            <div className="w-32">
-                              <TextField.Input
-                                className="w-30"
-                                color={`${errors[`peso${serie.id}`] ? "red" : "green"}`}
-                                defaultValue={serie.weight}
-                                {...register(`peso${serie.id}`, {
-                                  validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
-                                })}
-                              />
+        <ScrollArea.Root className="w-full h-[420px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA4 bg-white">
+          <ScrollArea.Viewport className="w-full h-full rounded">
+            {apiDataLoaded && series.length > 0 ? (
+              series.map((serie) => (
+                <li 
+                  key={serie.id} className={`bg-white p-4 rounded-md mb-4 ${editor[serie.id] ? "editing" : ""}`}
+                  style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px -2px 2px rgba(0, 0, 0, 0.1)" }}>
+                  <div className="flex items-center mb-2">
+                    <div className='flex justify-around w-full md:text-center'>
+                      <div>
+                        <div className="mt-2">
+                          <IconButton size="2" radius="full" onClick={() =>{setEditor(prev => ({ ...prev, [serie.id]: !prev[serie.id] })); startEditing(serie.id)}}>
+                            <LuPencil />
+                          </IconButton>
+                        </div>
+                        <div className="mt-3">
+                          <IconButton size="2" radius="full" color="red" onClick={() => deleteSerie(serie)}>
+                            <CgTrash />
+                          </IconButton>
+                        </div>
+                      </div>
+                      <div className="mr-4 flex items-center">
+                        <div>
+                          <p className={`text-radixgreen font-bold mb-1 mr-8 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
+                            Fecha de creación: <span className="text-black">{serie.date}</span>
+                          </p>
+                        </div>
+                        <div className={`${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 mr-4 text-xl`}>
+                          <p>Repeticiones: <span className="text-black">{serie.reps}</span></p>
+                        </div>
+                        <div className={`ml-8 ${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 text-xl`}>
+                          <p>Peso: <span className="text-black">{serie.weight}</span></p>
+                        </div>
+                      </div>
+                      <div className="mr-4">
+                        <form className={`${editor[serie.id] ? undefined : "hidden"} text-radixgreen font-bold`}
+                        onSubmit={handleSubmit((r) => {
+                          editSerie(serie.id, r[`reps${serie.id}`], r[`peso${serie.id}`]);
+                          setEditor(prev => ({ ...prev, [serie.id]: false }));
+                          })}>
+                          <div className="flex flex-col items-center">
+                            <div className="flex flex-wrap justify-center">
+                              <div className="mr-4 mb-2 text-xl">
+                                <p>Repeticiones:</p>
+                                <div className="w-32">
+                                  <TextField.Input
+                                    color={`${errors[`reps${serie.id}`] ? "red" : "green"}`}
+                                    defaultValue={serie.reps}
+                                    {...register(`reps${serie.id}`, {
+                                      validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                                    })}
+                                  />
+                                  </div>   
+                              </div>
+                              <div className="mr-4 mb-2 text-xl">
+                                <p>Peso:</p>
+                                <div className="w-32">
+                                  <TextField.Input
+                                    className="w-30"
+                                    color={`${errors[`peso${serie.id}`] ? "red" : "green"}`}
+                                    defaultValue={serie.weight}
+                                    {...register(`peso${serie.id}`, {
+                                      validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                                    })}
+                                  />
+                                </div>
+                              </div>
+                              <div className="mr-4 mb-2 text-xl">
+                                <p>Duración:</p>
+                                <div className="w-32">
+                                  <TextField.Input
+                                    color={`${errors[`durationn${serie.id}`] ? "red" : "green"}`}
+                                    defaultValue={duration === 0 ? serie.duration : duration}
+                                    onChange={(e) =>{ setDuration(e.target.value)}}
+                                    {...register(`durationn${serie.id}`, {
+                                      validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                                    })}
+                                  />
+                                </div>
+                              </div>
                             </div>
+                            <span className={`${errors[`reps${serie.id}`] || errors[`peso${serie.id}`]
+                            || errors[`durationn${serie.id}`] ? "text-red-500" : "hidden"} block mb-2`}>
+                              Todos los campos deben ser 0 o números enteros positivos
+                            </span>
+                            <Button>Aceptar</Button>
                           </div>
-                          <div className="mr-4 mb-2 text-xl">
-                            <p>Duración:</p>
-                            <div className="w-32">
-                              <TextField.Input
-                                color={`${errors[`durationn${serie.id}`] ? "red" : "green"}`}
-                                defaultValue={duration === 0 ? serie.duration : duration}
-                                onChange={(e) =>{ setDuration(e.target.value)}}
-                                {...register(`durationn${serie.id}`, {
-                                  validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
-                                })}
-                              />
-                            </div>
+                        </form>
+                      </div>
+                        <div className="flex items-center">
+                          <div>
+                            <p className="text-radixgreen font-bold mb-1">
+                            </p>
+                            <p className={`text-radixgreen font-bold mb-1 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
+                              Duración: <span className="text-black">{formatDuration(serie.duration)}</span>
+                            </p>
                           </div>
                         </div>
-                        <span className={`${errors[`reps${serie.id}`] || errors[`peso${serie.id}`]
-                        || errors[`durationn${serie.id}`] ? "text-red-500" : "hidden"} block mb-2`}>
-                          Todos los campos deben ser 0 o números enteros positivos
-                        </span>
-                        <Button>Aceptar</Button>
+                        {open ? null : (
+                          <div className='flex flex-col space-y-2 justify-center'>
+                          <Button onClick={() => serieTimerOn[serie.id] ? stopSerieTimer(serie.id) : startSerieTimer(serie.id)} className='mt-5' size="3">
+                            {serieTimerOn[serie.id] ? "Parar" : "Empezar"}
+                          </Button>
+                        </div>
+                        )}
                       </div>
-                    </form>
-                  </div>
-                  <div className="flex items-center">
-                    <div>
-                      <p className="text-radixgreen font-bold mb-1">
-                      </p>
-                      <p className={`text-radixgreen font-bold mb-1 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
-                        Duración: <span className="text-black">{formatDuration(serie.duration)}</span>
-                      </p>
                     </div>
-                  </div>
-                  {open ? null : (
-                    <div className='flex flex-col space-y-2 justify-center'>
-                    <Button onClick={() => serieTimerOn[serie.id] ? stopSerieTimer(serie.id) : startSerieTimer(serie.id)} className='mt-5' size="3">
-                      {serieTimerOn[serie.id] ? "Parar" : "Empezar"}
-                    </Button>
-                  </div>
-                  )}
-                </div>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p className="text-red-500">No hay series disponibles para este entrenamiento.</p>
-        )}
-      </ul>
-      <Button onClick={() => setOpen(!open)} className='w-full mb-1' size="4">
-        <Text>Crear Serie</Text>
-        <IoMdAddCircleOutline />
-      </Button>
+                  </li>
+                ))
+              ) : (
+                <p className="text-red-500">No hay series disponibles para este entrenamiento.</p>
+              )}
+              </ScrollArea.Viewport>
+              <ScrollArea.Scrollbar
+                className="flex select-none touch-none p-0.5 bg-blackA3 transition-colors duration-[160ms] ease-out hover:bg-blackA5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                orientation="vertical"
+              >
+                <ScrollArea.Thumb style={{
+                  position: 'relative',
+                  width: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  borderRadius: '8px'}} 
+                />
+              </ScrollArea.Scrollbar>
+              <ScrollArea.Scrollbar
+                className="flex select-none touch-none p-0.5 bg-blackA3 transition-colors duration-[160ms] ease-out hover:bg-blackA5 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                orientation="horizontal"
+              >
+                <ScrollArea.Thumb 
+                  style={{
+                    position: 'relative',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    borderRadius: '8px'
+                  }}
+                />
+              </ScrollArea.Scrollbar>
+            <ScrollArea.Corner className="bg-blackA5" />
+          </ScrollArea.Root>
+        </ul>
+      {showChart==true ? 
+        <div className='mt-7'>
+          <Line 
+            options={{
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            }} 
+            data={{
+              labels: chartData.map((serie) => serie.date),
+              datasets: [
+                {
+                  label: 'Mis Pesos',
+                  data: chartData.map((serie) => serie.weight),
+                  fill: true,
+                  borderColor: 'rgb(48, 164, 108)', 
+                  backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                },
+              ],
+            }} 
+          />
+        </div>
+      : undefined
+      }
+      
+      <div className="flex space-x-4 mt-5 mr-4">
+        <Button onClick={() => setShowChart(!showChart)} className='w-1/2' size="4">
+          <Text>Mostrar gráfica de la evolución</Text>
+        </Button>
+        <Button onClick={() => setOpen(!open)} className='w-1/2' size="4">
+          <Text>Crear Serie</Text>
+          <IoMdAddCircleOutline />
+        </Button>
+      </div>
       {open && (
         <Card className='mt-5 mb-8 shadow-lg border-2 border-radixgreen'>
           <div className="flex flex-col items-center">
@@ -400,6 +518,7 @@ export const Series = (workoutID) => {
         </Card>
       )}
     </div>
+  </>
   );
 };
 
