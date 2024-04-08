@@ -21,7 +21,7 @@ const EventList = () => {
   const [search, setSearch] = useState('');
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const {getOwnerSubscription, ownerSubscription } = useContext(SubscriptionContext)
+  const { getOwnerSubscription, ownerSubscription } = useContext(SubscriptionContext)
 
   useEffect(() => {
     getEvents();
@@ -66,11 +66,7 @@ const EventList = () => {
 
   };
 
-  const handleClosePopover = () => {
-    setSelectedEvent(null);
-  };
-
-  const clearDateFilter = () =>{
+  const clearDateFilter = () => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       date: '',
@@ -86,13 +82,13 @@ const EventList = () => {
           : true
     )
     .filter(
-      (event) =>{
-        if(filters.date !== ''){
+      (event) => {
+        if (filters.date !== '') {
           const filterDate = new Date(filters.date);
           const eventDate = new Date(event.date);
-          return filterDate.toDateString()===eventDate.toDateString();
+          return filterDate.toDateString() === eventDate.toDateString();
 
-        }else{
+        } else {
           return true;
         }
       })
@@ -122,7 +118,7 @@ const EventList = () => {
             <Popover.Root>
               <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
                 <Popover.Trigger>
-                  <Button radius="none" size="2" variant="soft" className="m-0">
+                  <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
                     <HiOutlineFilter />
                   </Button>
                 </Popover.Trigger>
@@ -145,6 +141,7 @@ const EventList = () => {
                 <div className="flex justify-between mb-2">
                   <span className="text-lg font-bold">Ordenar por</span>
                   <Toggle.Root
+                    name="reverse_sort"
                     onPressedChange={(p) => setSortingReverse(p)}
                     className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                   >
@@ -187,6 +184,7 @@ const EventList = () => {
                     <span className="text-lg font-bold">Filtrar por fecha:</span>
                     <TextField.Root>
                       <TextField.Input
+                      name="date_filter"
                         type="date"
                         onChange={(e) =>
                           setFilters({ ...filters, date: e.target.value })
@@ -205,39 +203,28 @@ const EventList = () => {
             </Button>
           </Link>
 
-          {filteredEventList.map((event) => (
-            <Popover.Root>
-              <Popover.Trigger>
-              <Button
-                key={event}
-                size="3"
-                onClick={() => handleEventClick(event.id)}
-                className="flex !justify-between !h-fit !p-2 !px-4 w-full"
-              >
-                <div className="flex flex-col justify-between items-start">
-                  <p className="font-semibold">{event.name}</p>
-                  <p>{event.date}</p>
-                </div>
-                <div className="flex flex-col items-start gap-1">
-                  <span>Capacidad: {event.capacity}</span>
-                  <span>Instructor: {event.instructor}</span>
-                  <span>Intensidad: {event.intensity}</span>
-                </div>
-              </Button>
-              </Popover.Trigger>
-              <Popover.Content side="bottom">
-                <div className="bg-white border border-gray-200 rounded-md p-4">
-                  <p>Nombre: {selectedEvent!==null?selectedEvent.name:""}</p>
-                  <p>Descripción: {selectedEvent!==null?selectedEvent.description:""}</p>
-                  <p>Capacidad: {selectedEvent!==null?selectedEvent.capacity:""}</p>
-                  <p>Instructor: {selectedEvent!==null?selectedEvent.instructor:""}</p>
-                  <p>Fecha: {selectedEvent!==null?selectedEvent.date:""}</p>
-                  <p>Duración: {selectedEvent!==null?selectedEvent.duration:""}</p>
-                  <p>Intensidad: {selectedEvent!==null?selectedEvent.intensity:""}</p>
-                </div>
-              </Popover.Content>
-            </Popover.Root>
-          ))}
+{
+  filteredEventList.map((event) => (
+    <Link to={`${event.id}`} key={event.id}>
+      <Button
+        name="event"
+        key={event.id}
+        size="3"
+        onClick={() => handleEventClick(event.id)}
+        className="flex !justify-between !h-fit !p-2 !px-4 w-full"
+      >
+        <div className="flex flex-col justify-between items-start">
+          <p className="font-semibold">{event.name}</p>
+          <p>{event.date}</p>
+        </div>
+        <div className="flex flex-col items-start gap-1">
+          <span>Capacidad: {event.capacity}</span>
+          <span>Intensidad: {event.intensity}</span>
+        </div>
+      </Button>
+    </Link>
+  ))
+}
             
               
         </div>) : (
