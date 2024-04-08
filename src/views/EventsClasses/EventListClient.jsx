@@ -193,37 +193,24 @@ const EventListClient = () => {
         </div>
 
         {filteredEventList.map((event) => (
-          <Popover.Root>
-            <Popover.Trigger>
-            <Button
-              key={event}
-              size="3"
-              onClick={() => handleEventClick(event.id)}
-              className="flex !justify-between !h-fit !p-2 !px-4 w-full"
-            >
-              <div className="flex flex-col justify-between items-start">
-                <p className="font-semibold">{event.name}</p>
-                <p>{event.date}</p>
-              </div>
-              <div className="flex flex-col items-start gap-1">
-                <span>Capacidad: {event.capacity}</span>
-                <span>Instructor: {event.instructor}</span>
-                <span>Intensidad: {event.intensity}</span>
-              </div>
-            </Button>
-            </Popover.Trigger>
-            <Popover.Content side="bottom">
-              <div className="bg-white border border-gray-200 rounded-md p-4">
-                <p>Nombre: {selectedEvent!==null?selectedEvent.name:""}</p>
-                <p>Descripción: {selectedEvent!==null?selectedEvent.description:""}</p>
-                <p>Capacidad: {selectedEvent!==null?selectedEvent.capacity:""}</p>
-                <p>Instructor: {selectedEvent!==null?selectedEvent.instructor:""}</p>
-                <p>Fecha: {selectedEvent!==null?selectedEvent.date:""}</p>
-                <p>Duración: {selectedEvent!==null?selectedEvent.duration:""}</p>
-                <p>Intensidad: {selectedEvent!==null?selectedEvent.intensity:""}</p>
-              </div>
-            </Popover.Content>
-          </Popover.Root>
+          <Link to={`/user/reservations/${event.id}`} key={event.id}>
+          <Button
+            name="event"
+            key={event.id}
+            size="3"
+            onClick={() => handleEventClick(event.id)}
+            className="flex !justify-between !h-fit !p-2 !px-4 w-full"
+          >
+            <div className="flex flex-col justify-between items-start">
+              <p className="font-semibold">{event.name}</p>
+              <p>{event.date}</p>
+            </div>
+            <div className="flex flex-col items-start gap-1">
+              <span>Capacidad: {event.capacity}</span>
+              <span>Intensidad: {event.intensity}</span>
+            </div>
+          </Button>
+        </Link>
         ))}
           
             
