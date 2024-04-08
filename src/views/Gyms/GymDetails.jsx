@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getFromApi, deleteFromApi } from "../../utils/functions/api";
 import { Button, Heading } from "@radix-ui/themes";
 
@@ -90,9 +90,16 @@ export default function GymDetails() {
           <strong className="text-radixgreen">Descripción:</strong>{" "}
           {gymDetails.descripcion}
         </div>
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center space-x-10">
+        <Link to={`../gyms/${gymId}/stats`}>
           <Button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            className="text-white font-bold py-2 px-4 rounded"
+          >
+            Ver Estadísticas
+          </Button>
+        </Link> 
+        <Button
+            className="hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             onClick={handleDeleteGym}
           >
             Eliminar Gimnasio
