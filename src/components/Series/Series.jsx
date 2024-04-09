@@ -48,6 +48,7 @@ export const Series = (workoutID) => {
   const [showStartButton, setShowStartButton] = useState({});
   const [serieTimerOn, setSerieTimerOn] = useState({});
   const [editingSerieId, setEditingSerieId] = useState(null);
+  const [tipo, setTipo] = useState('peso');
 
   function formatDuration(duration) {
     const minutes = Math.floor(duration / 60);
@@ -91,9 +92,11 @@ export const Series = (workoutID) => {
           let data = await response.json();
           data.sort((a, b) => new Date(b.date) - new Date(a.date));
           const chartData = data.map(serie => ({
+            reps: serie.reps,
             weight: serie.weight,
             date: serie.date,
           }));
+          console.log(chartData);
           setChartData(chartData.reverse());
         } else {
           console.error('Error fetching API series:', response.status);
@@ -463,8 +466,8 @@ export const Series = (workoutID) => {
               labels: chartData.map((serie) => serie.date),
               datasets: [
                 {
-                  label: 'Mis Pesos',
-                  data: chartData.map((serie) => serie.weight),
+                  label: `Mis ${tipo == 'peso' ? 'pesos' : 'repeticiones'}`,
+                  data: chartData.map((serie) => tipo == 'peso' ? serie.weight : serie.reps),
                   fill: true,
                   borderColor: 'rgb(48, 164, 108)', 
                   backgroundColor: 'rgba(48, 164, 108, 0.4)',
@@ -485,6 +488,19 @@ export const Series = (workoutID) => {
           <IoMdAddCircleOutline />
         </Button>
       </div>
+      {showChart==true ?
+          <div className="mt-5 mr-4 flex justify-center" >
+            {tipo == 'peso' ?
+              <Button onClick={() => setTipo('reps')} className='w-1/2' size="4">
+                <Text>Mostrar Repeticiones</Text>
+              </Button>
+            :  
+              <Button onClick={() => setTipo('peso')} className='w-1/2' size="4">
+                <Text>Mostrar Pesos</Text>
+              </Button>
+            }
+          </div>
+        : undefined}
       {open && (
         <Card className='mt-5 mb-8 shadow-lg border-2 border-radixgreen'>
           <div className="flex flex-col items-center">
