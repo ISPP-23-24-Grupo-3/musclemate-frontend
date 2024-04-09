@@ -28,8 +28,6 @@ const EventList = () => {
     getOwnerSubscription();
   }, []);
 
-  console.log(ownerSubscription)
-
   async function getEvents() {
     try {
       const response = await getFromApi(`events/`);
@@ -228,7 +226,7 @@ const EventList = () => {
             
               
         </div>) : (
-          <div className="text-red-700 mt-4 text-center">Tu suscripción actual no incluye acceso a esta funcionalidad, ¡obten tu subscripción premium en la pestaña de subscripciones!.</div>
+          <div className="text-red-700 mt-4 text-center">Tu suscripción actual no incluye acceso a esta funcionalidad.</div>
         )}
     </>
   );
