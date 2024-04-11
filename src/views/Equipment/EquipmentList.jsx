@@ -38,7 +38,7 @@ export default function MachineList() {
       .then((response) => response.json())
       .then((data) => setGyms(data));
     }
-  }, [gyms]);
+  }, []);
 
   useEffect(() => {
     if (user?.rol === "gym") {
@@ -46,13 +46,13 @@ export default function MachineList() {
       .then((response) => response.json())
       .then((data) => setGym(data));
     }
-  }, [gym]);
+  }, []);
 
   useEffect(() => {
     getFromApi("equipments/")
       .then((response) => response.json())
       .then((data) => setMachines(data));
-  }, [machines]);
+  }, []);
 
   // Machine Ratings
   useEffect(() => {

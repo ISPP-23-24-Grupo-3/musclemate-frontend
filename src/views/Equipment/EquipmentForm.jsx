@@ -19,7 +19,7 @@ const GymMachineForm = () => {
       .then((response) => response.json())
       .then((data) => setGym(data));
     }
-  }, [gym]);
+  }, []);
 
   const {
     register,
