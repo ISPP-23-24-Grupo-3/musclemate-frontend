@@ -47,8 +47,14 @@ const Header = () => {
                     {user.username}
                   </Button>
                 </Link>
-              ) : (
+              ) : user.rol === "owner" ? (
                 <Link to="owner/profile">
+                  <Button size="3" variant="surface" color="green">
+                    {user.username}
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="gym/profile">
                   <Button size="3" variant="surface" color="green">
                     {user.username}
                   </Button>
@@ -197,6 +203,41 @@ const Header = () => {
                 </Link>
               </li>
             </>
+          ) : user?.rol === "gym" ? (
+            <>
+            <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+              <Link
+                to="/gym/equipments"
+                className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+              >
+                Mis máquinas
+              </Link>
+            </li>
+            <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+              <Link
+                to="/gym/users"
+                className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+              >
+                Usuarios
+              </Link>
+            </li>
+            <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+              <Link
+                to="/gym/tickets"
+                className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+              >
+                Tickets
+              </Link>
+            </li>
+            <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+              <Link
+                to="/gym/events"
+                className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+              >
+                Eventos
+              </Link>
+            </li>
+          </>
           ) : null}
         </ul>
       </div>

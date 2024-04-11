@@ -10,6 +10,16 @@ import { RHFSelect } from "../../components/RHFSelect";
 
 const GymMachineForm = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const [gym, setGym] = useState([]);
+
+  useEffect(() => {
+    if (user?.rol === "gym") {
+      getFromApi("gyms/detail/" + user?.username + "/")
+      .then((response) => response.json())
+      .then((data) => setGym(data));
+    }
+  }, []);
 
   const {
     register,
@@ -18,6 +28,7 @@ const GymMachineForm = () => {
   } = useForm();
 
   const onSubmit = async (machineInfo) => {
+    if (user?.rol === "gym") machineInfo.gym = gym.id;
     try {
       const response = await postToApi("equipments/create/", machineInfo);
 
@@ -26,7 +37,8 @@ const GymMachineForm = () => {
       }
 
       console.log("Máquina agregada exitosamente");
-      navigate("/owner/equipments");
+      if (user?.rol === "owner") navigate("/owner/equipments");
+      else if (user?.rol === "gym") navigate("/gym/equipments");
     } catch (error) {
       console.error("Hubo un error al agregar la máquina:", error);
     }
@@ -131,12 +143,14 @@ const GymMachineForm = () => {
               <p className="text-red-500">{errors.muscular_group.message}</p>
             )}
           </div>
-
-          <div className="flex flex-col ">
-            <label htmlFor="gym">Gimnasio</label>
-            <GymSelect {...register("gym", { required: messages.req })} />
-            {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
-          </div>
+          
+          { user?.rol === "owner" &&
+            <div className="flex flex-col ">
+              <label htmlFor="gym">Gimnasio</label>
+              <GymSelect {...register("gym", { required: messages.req })} />
+              {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+            </div>
+          }
 
           <Button
             type="submit"
