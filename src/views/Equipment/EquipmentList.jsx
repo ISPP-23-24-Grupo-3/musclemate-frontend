@@ -10,14 +10,16 @@ import * as Toggle from "@radix-ui/react-toggle";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { HiOutlineFilter } from "react-icons/hi";
 import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
 import { getFromApi } from "../../utils/functions/api";
+import AuthContext from "../../utils/context/AuthContext";
 
 // TODO: Add picture support
 const MUSCLES = ["arms", "legs", "core", "chest", "back", "shoulders", "other"];
 
 export default function MachineList() {
+  const { user } = useContext(AuthContext);
   const [filters, set_filters] = useState([]);
   const [sorting, set_sorting] = useState("name");
   const [sorting_reverse, set_sorting_reverse] = useState(false);
@@ -25,15 +27,26 @@ export default function MachineList() {
   const [machines, setMachines] = useState([]);
   const [selectedGym, setSelectedGym] = useState(null);
   const [gyms, setGyms] = useState([]);
+  const [gym, setGym] = useState([]);
   const [machineRatings, setMachineRatings] = useState([]);
   const [reviews, setReviews] = useState({});
   const [issues, setIssues] = useState({});
 
   useEffect(() => {
-    getFromApi("gyms/")
-    .then((response) => response.json())
-    .then((data) => setGyms(data));
+    if (user?.rol === "owner") {
+      getFromApi("gyms/")
+      .then((response) => response.json())
+      .then((data) => setGyms(data));
+    }
   }, [gyms]);
+
+  useEffect(() => {
+    if (user?.rol === "gym") {
+      getFromApi("gyms/detail/" + user?.username + "/")
+      .then((response) => response.json())
+      .then((data) => setGym(data));
+    }
+  }, [gym]);
 
   useEffect(() => {
     getFromApi("equipments/")
@@ -244,20 +257,25 @@ export default function MachineList() {
                   </Toggle.Root>
                 ))}
               </div>
-              <span className="text-lg font-bold">Filtrar por gimnasios</span>
-              <div className="flex gap-3">
-                {gyms.map((gym) => (
-                  <Toggle.Root
-                    key={gym.id}
-                    className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
-                      selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
-                      py-1 px-2 border border-radixgreen rounded-full`}
-                    onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
-                  >
-                    {gym.name}
-                  </Toggle.Root>
-                ))}
-              </div>
+
+              { user?.rol === "owner" &&
+                <>
+                  <span className="text-lg font-bold">Filtrar por gimnasios</span>
+                  <div className="flex gap-3">
+                    {gyms.map((gym) => (
+                      <Toggle.Root
+                        key={gym.id}
+                        className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
+                          selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
+                          py-1 px-2 border border-radixgreen rounded-full`}
+                        onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
+                      >
+                        {gym.name}
+                      </Toggle.Root>
+                    ))}
+                  </div>
+                </>
+              }
               
             </Popover.Content>
           </Popover.Root>

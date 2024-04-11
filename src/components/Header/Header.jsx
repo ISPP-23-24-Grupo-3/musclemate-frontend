@@ -47,8 +47,14 @@ const Header = () => {
                     {user.username}
                   </Button>
                 </Link>
-              ) : (
+              ) : user.rol === "owner" ? (
                 <Link to="owner/profile">
+                  <Button size="3" variant="surface" color="green">
+                    {user.username}
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="gym/profile">
                   <Button size="3" variant="surface" color="green">
                     {user.username}
                   </Button>

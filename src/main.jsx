@@ -18,16 +18,13 @@ import Users from "./views/UserListing/Users";
 import Profile from "./views/UserListing/Profile";
 import EquipmentList from "./views/Equipment/EquipmentList";
 import EquipmentListClient from "./views/Equipment/EquipmentListClient";
-import EquipmentListGym from "./views/Equipment/EquipmentListGym";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
-import EquipmentFormGym from "./views/Equipment/EquipmentFormGym";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
 import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
 import { Routines } from "./views/Routines/Routines";
 import { EditRoutine } from "./views/Routines/EditRoutine";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
-import RegisterUserGym from "./views/RegisterPage/RegisterUserGym"
 import ErrorPage from "./ErrorPage";
 import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
@@ -42,11 +39,11 @@ import TermsConditions from "./views/Terms&Conditions/Terms&Conditions";
 import MailVerification from "./views/VerificationPage/MailVerification";
 import ProfileClient from "./views/UserListing/ProfileClient";
 import AddEventsForm from "./views/EventsClasses/AddEvent";
-import AddEventsFormGym from "./views/EventsClasses/AddEventGym";
 import CreateGym from "./views/Gyms/CreateGym";
 import GymDetails from "./views/Gyms/GymDetails";
 import EventDetails from "./views/EventsClasses/EventDetails"
 import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
+import ProfileGym from "./views/ProfileOwner/ProfileGym";
 import ReservationClient from "./views/Reservation/ReservationClient";
 
 const ownerRoutes = [
@@ -73,15 +70,16 @@ const ownerRoutes = [
 const gymRoutes = [
   { path: "home", element: <GymHomePage />},
   { path: "users", element: <Users />},
-  { path: "users/register", element: <RegisterUserGym />},
+  { path: "users/register", element: <RegisterUser />},
   { path: "users/:userId/profile", element: <Profile />},
   { path: "events", element: <EventList />},
-  { path: "events/add", element: <AddEventsFormGym />},
+  { path: "events/add", element: <AddEventsForm />},
   { path: "events/:eventId", element: <EventDetails />},
-  { path: "equipments", element: <EquipmentListGym />},
-  { path: "equipments/add", element: <EquipmentFormGym /> },
+  { path: "equipments", element: <EquipmentList />},
+  { path: "equipments/add", element: <EquipmentForm /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetails />},
   { path: "tickets", element: <TicketManagement />},
+  { path: "profile", element: <ProfileGym />},
 ];
 
 const userRoutes = [
