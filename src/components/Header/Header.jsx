@@ -90,7 +90,7 @@ const Header = () => {
               </li>
             </>
           ) : (
-            <>
+            <li className="max-lg:py-2 px-3 flex gap-4 items-center">
               <Link to="/login">
                 <Button size="2" variant="solid" color="green">
                   Entrar
@@ -101,7 +101,7 @@ const Header = () => {
                   Registrarse
                 </Button>
               </Link>
-            </>
+            </li>
           )}
         </ul>
       </div>
