@@ -246,22 +246,16 @@ export default function MachineListGym() {
                   </Toggle.Root>
                 ))}
               </div>
-              <span className="text-lg font-bold">Filtrar por gimnasios</span>
-              <div className="flex gap-3">
-                <Toggle.Root
-                  key={gym.id}
-                  className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
-                    selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
-                    py-1 px-2 border border-radixgreen rounded-full`}
-                  onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
-                >
-                  {gym.name}
-                </Toggle.Root>
-              </div>
-              
             </Popover.Content>
           </Popover.Root>
         </div>
+
+        <Link to="add">
+          <Button size="3" className="w-full">
+            <IoMdAddCircleOutline className="size-6" />
+            Añadir máquina
+          </Button>
+        </Link>
 
         {filtered_machine_list.map((machine) => {
           const machineRatingData = machineRatings.find(

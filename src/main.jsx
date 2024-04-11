@@ -20,6 +20,7 @@ import EquipmentList from "./views/Equipment/EquipmentList";
 import EquipmentListClient from "./views/Equipment/EquipmentListClient";
 import EquipmentListGym from "./views/Equipment/EquipmentListGym";
 import EquipmentForm from "./views/Equipment/EquipmentForm";
+import EquipmentFormGym from "./views/Equipment/EquipmentFormGym";
 import EquipmentDetails from "./views/Equipment/EquipmentDetails";
 import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
 import { Routines } from "./views/Routines/Routines";
@@ -78,6 +79,7 @@ const gymRoutes = [
   { path: "events/add", element: <AddEventsFormGym />},
   { path: "events/:eventId", element: <EventDetails />},
   { path: "equipments", element: <EquipmentListGym />},
+  { path: "equipments/add", element: <EquipmentFormGym /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetails />},
   { path: "tickets", element: <TicketManagement />},
 ];
