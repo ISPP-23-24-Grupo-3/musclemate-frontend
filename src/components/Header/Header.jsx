@@ -64,6 +64,13 @@ const Header = () => {
               </HeaderLink>
               <HeaderLink to="/user/events">Eventos</HeaderLink>
             </>
+          ) : user?.rol === "gym" ? (
+            <>
+              <HeaderLink to="/gym/equipments">Mis máquinas</HeaderLink>
+              <HeaderLink to="/gym/users">Usuarios</HeaderLink>
+              <HeaderLink to="/gym/tickets">Incidencias</HeaderLink>
+              <HeaderLink to="/gym/events">Eventos</HeaderLink>
+            </>
           ) : null}
           {user ? (
             <>

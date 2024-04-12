@@ -11,18 +11,31 @@ import { RHFSelect } from "../../components/RHFSelect";
 const AddEventsForm = () => {
   const { user } = useContext(AuthContext);
   const [gyms, setGyms] = useState([]);
+  const [gym, setGym] = useState([]);
   const [selectedGym, setSelectedGym] = useState(null);
   const navigate = useNavigate();
 
-  async function getGyms() {
+  async function getGymsOwner() {
     const responseGym = await getFromApi("gyms/");
     return responseGym.json();
   }
 
+  async function getGym() {
+    const responseGym = await getFromApi("gyms/detail/" + user?.username + "/");
+    return responseGym.json();
+  }
+
   useEffect(() => {
-    getGyms()
+    if (user?.rol === "owner") {
+      getGymsOwner()
       .then((gyms) => setGyms(gyms))
       .catch((error) => console.log(error));
+    }
+    else if (user?.rol === "gym") {
+      getGym()
+      .then((gym) => setGym(gym))
+      .catch((error) => console.log(error));
+    }
   }, []);
 
   const {
@@ -38,7 +51,7 @@ const AddEventsForm = () => {
       const durationSeconds = 0;
       const formattedDuration = `${durationHours.toString().padStart(2, "0")}:${durationMinutes.toString().padStart(2, "0")}:${durationSeconds.toString().padStart(2, "0")}`;
 
-      const eventData = { ...eventInfo, duration: formattedDuration };
+      const eventData = (user?.rol === "owner") ? { ...eventInfo, duration: formattedDuration } : { ...eventInfo, duration: formattedDuration, gym: gym?.id };
 
       const currentDate = new Date().toISOString().split("T")[0];
       console.log(currentDate);
@@ -54,7 +67,8 @@ const AddEventsForm = () => {
         }
 
         console.log("Evento creado exitosamente");
-        navigate("/owner/events");
+        if (user?.rol === "owner") navigate("/owner/events");
+        else if (user?.rol === "gym") navigate("/gym/events");
       }
     } catch (error) {
       console.error("Hubo un error al crear el evento:", error);
@@ -184,12 +198,14 @@ const AddEventsForm = () => {
               <p className="text-red-500">{errors.intensity.message}</p>
             )}
           </div>
-
-          <div className="flex flex-col">
-            <label htmlFor="gym">Gimnasio</label>
-            <GymSelect {...register("gym", { required: messages.req })} />
-            {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
-          </div>
+          
+          { user?.rol === "owner" &&
+            <div className="flex flex-col">
+              <label htmlFor="gym">Gimnasio</label>
+              <GymSelect {...register("gym", { required: messages.req })} />
+              {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+            </div>
+          }
 
           <Button
             type="submit"

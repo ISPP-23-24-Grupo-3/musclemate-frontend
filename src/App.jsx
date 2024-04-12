@@ -14,6 +14,8 @@ function App() {
     return <Navigate to="/owner/home" />
   } else if(user?.rol === "client") {
     return <Navigate to="/user/home" />
+  } else if (user?.rol === "gym") {
+    return <Navigate to="/gym/home" />
   } else {
   return (
     <>
