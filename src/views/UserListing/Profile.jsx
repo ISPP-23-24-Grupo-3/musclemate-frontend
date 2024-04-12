@@ -225,7 +225,7 @@ const Profile = () => {
             </div>
             <div className="flex flex-col gap-3">
               {editMode ? (
-                <div className="flex justify-between">
+                <div className="flex justify-between flex-wrap gap-3">
                   <div className="flex gap-3">
                     <Button onClick={handleSaveChanges}>Guardar</Button>
                     <Button variant="surface" onClick={toggleEditMode}>
