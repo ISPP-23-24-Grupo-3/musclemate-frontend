@@ -17,7 +17,7 @@ const Header = () => {
   };
 
   return (
-    <header className="shadow-md px-5 py-2 sm:px-10 bg-white font-sans min-h-[70px]">
+    <header className="sticky top-0 shadow-md px-5 py-2 sm:px-10 bg-white font-sans min-h-[70px] z-10">
       <div className="flex justify-between max-lg:flex-wrap items-center gap-4 my-auto">
         <Link
           to={
