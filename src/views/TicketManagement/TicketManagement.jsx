@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
-import { Heading, TextField } from "@radix-ui/themes";
-import { IoMdSearch } from "react-icons/io";
+import { Card, Heading, Text, TextArea, TextField } from "@radix-ui/themes";
+import { IoMdSearch, IoIosFitness } from "react-icons/io";
 import { Checkbox } from "radix-ui";
+import { FormContainer } from "../../components/Form";
+import { FaLocationDot } from "react-icons/fa6";
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -74,6 +76,7 @@ const TicketManagement = () => {
   };
 
   const handleCheckboxChange = async (checked, ticketId) => {
+    console.log(checked);
     try {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
@@ -124,96 +127,71 @@ const TicketManagement = () => {
           </TextField.Slot>
           <TextField.Input
             type="text"
-            placeholder="Buscar por nombre de máquina o gimnasio..."
+            placeholder="Buscar por máquina o gimnasio"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           ></TextField.Input>
         </TextField.Root>
       </div>
-      <ul>
+      <div>
         {apiDataLoaded && currentTickets.length > 0 ? (
           currentTickets.map((ticket) => (
-            <li
-              key={ticket.id}
-              className="bg-white shadow-md p-4 rounded-md mb-4"
-            >
-              <div className="flex items-center mb-2">
-                <HiTicket
-                  className={`text-${ticket.status ? "green" : "red"}-500 w-6 h-6 mr-2 cursor-pointer`}
-                  onClick={() => toggleStatus(ticket.id)}
-                />
-                <div>
-                  <div className="flex">
-                    <div className="mr-4">
-                      <p className="text-radixgreen font-bold mb-1">
-                        Máquina:{" "}
-                        <span className="text-black">
-                          {ticket.equipment_name}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Gimnasio:{" "}
-                      <span className="text-black">{ticket.gym_name}</span>
-                    </p>
-                  </div>
-                  <div className="flex">
-                    <div className="mr-4">
-                      <p className="text-radixgreen font-bold mb-1">
-                        Asunto:{" "}
-                        <span className="text-black">{ticket.label}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-radixgreen font-bold mb-1">
-                        Cliente:{" "}
-                        <span className="text-black">{ticket.client.name}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-radixgreen font-bold mb-1">
-                    Descripción:{" "}
-                    <span className="text-black">{ticket.description}</span>
-                  </p>
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Correo:{" "}
-                      <span className="text-black">{ticket.client.email}</span>
-                    </p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-radixgreen font-bold mb-1 mr-4">
-                      Fecha:{" "}
-                      <span className="text-black">
-                        {formatDate(ticket.date)}
-                      </span>
-                    </p>
-                    <Checkbox
-                      checked={ticket.status}
-                      onChange={(c) => handleCheckboxChange(c, ticket.id)}
-                    />
-                    <p className="text-radixgreen font-bold mb-1">
-                      <span
-                        className={
-                          ticket.status
-                            ? "text-green-500 ml-2"
-                            : "text-red-500 ml-2"
+            <FormContainer key={ticket.id}>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col">
+                  <div className="flex gap-3 justify-between">
+                    <Heading as="h1">
+                      {/* {ticket.equipment_name} */}
+                      {ticket.label}
+                    </Heading>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        onCheckedChange={(c) =>
+                          handleCheckboxChange(c, ticket.id)
                         }
+                        className="flex items-center gap-1  border rounded-md  p-1
+                          text-red-600 border-red-500 hover:bg-red-500/10
+                          data-state-checked:text-radixgreen data-state-checked:border-radixgreen hover:data-state-checked:bg-radixgreen/10
+                        "
                       >
-                        {ticket.status ? "Resuelto" : "No Resuelto"}
-                      </span>
-                    </p>
+                        <HiTicket
+                          className="size-6"
+                          onClick={() => toggleStatus(ticket.id)}
+                        />
+                        <Text weight="bold" className="whitespace-pre">
+                          {ticket.status ? "Resuelto" : "No resuelto"}
+                        </Text>
+                      </Checkbox>
+                    </div>
                   </div>
+                  <Text size="2" color="gray">
+                    {formatDate(ticket.date)} por {ticket.client.name}
+                  </Text>
                 </div>
+                <div className="flex items-center flex-wrap gap-3">
+                  <span className="flex items-center gap-1">
+                    <IoIosFitness className="size-7" />
+                    {ticket.equipment_name}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FaLocationDot className="size-5" />
+                    {ticket.gym_name}
+                  </span>
+                </div>
+                <Card>
+                  <Text size="4">{ticket.description}</Text>
+                </Card>
+                {/* <Checkbox */}
+                {/*   checked={ticket.status} */}
+                {/*   onChange={(c) => handleCheckboxChange(c, ticket.id)} */}
+                {/* ></Checkbox> */}
               </div>
-            </li>
+            </FormContainer>
           ))
         ) : (
           <p className="text-red-500">No hay tickets disponibles.</p>
         )}
-      </ul>
+      </div>
       {/* Agregar controles de paginación */}
       <div className="flex justify-center mt-4">
         <ul className="flex">
