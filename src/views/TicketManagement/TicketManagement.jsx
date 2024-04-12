@@ -113,7 +113,7 @@ const TicketManagement = () => {
   };
 
   return (
-    <div className="max-w-lg md:mx-auto md:mt-8 m-5">
+    <div className="max-w-xl md:mx-auto">
       <Heading
         size="8"
         className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
