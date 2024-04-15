@@ -27,6 +27,7 @@ import {
   putToApi,
 } from "../../utils/functions/api";
 import { FormContainer } from "../../components/Form";
+import { EquipmentSelect } from "../../components/Equipments";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
@@ -517,7 +518,7 @@ const EditableWorkout = ({
             ></TextField.Input>
           </Flex>
           <div className="w-1/5 items-end flex flex-col gap-2">
-            <EquipmentSelect equipment={equipment} control={control}/>
+            <EquipmentSelect/>
           </div>
         </Flex>
         <div className="flex items-center gap-3 pt-2">
@@ -525,62 +526,6 @@ const EditableWorkout = ({
           <span className="text-red-500">{errors.name?.message}</span>
         </div>
       </form>
-    </>
-  );
-};
-
-const EquipmentSelect = ({ equipment, control}) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "equipment",
-  });
-
-  return (
-    <>
-      
-      {fields.map((f, index) => (
-        <div key={f.id} className="flex items-center gap-3">
-          <Controller
-            control={control}
-            name={`equipment.${index}.value`}
-            render={({ field }) => (
-              <Select.Root
-                onValueChange={field.onChange}
-                value={field.value}
-              >
-                <Select.Trigger placeholder="Selecciona una máquina" />
-                <Select.Content>
-                  {equipment.map((e) => (
-                      <Select.Item key={e.id} value={e.id.toString()}>
-                        {e.name}
-                      </Select.Item>
-                    ))}
-                </Select.Content>
-              </Select.Root>
-            )}
-          />
-          <IconButton
-            radius="full"
-            size="1"
-            color="red"
-            variant="ghost"
-            onClick={() => remove(index)}
-          >
-            <ImCross className="size-2.5" />
-          </IconButton>
-        </div>
-      ))}
-      <div className="flex items-center gap-2">
-        <IconButton
-          type="button"
-          radius="full"
-          size="1"
-          onClick={() => append({ value: undefined })}
-        >
-          <FaPlus className="size-3" />
-        </IconButton>
-        <Text weight="bold">Máquinas</Text>
-      </div>
     </>
   );
 };
