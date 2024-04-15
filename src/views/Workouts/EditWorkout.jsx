@@ -5,6 +5,8 @@ import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { FormContainer } from "../../components/Form";
 import { Series as SerieForm } from "../../components/Series/Series";
 import { useParams } from 'react-router-dom';
+import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { Link } from 'react-router-dom';
 
 const EditWorkout = () => {
   const [hideForms, setHideForms] = useState([]);
@@ -84,9 +86,16 @@ const EditWorkout = () => {
 
   return (
     <>
-      <div className="mx-auto mt-8 m-5">
-        <Heading size="6" className="text-radixgreen mt-8 mb-3 md:text-center">Entrenamientos para la Rutina {nombre}</Heading>
-        <br/>
+      <div className="mx-auto mt-8 m-5 mb-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <Link to={`/user/routines/${routineId}/`}>
+              <ArrowLeftIcon className="w-8 h-8 text-green-500 cursor-pointer hover:text-green-700" />
+            </Link>
+          </div>
+          <Heading size="6" className="text-radixgreen mt-8 mb-3 mx-auto">Entrenamientos para la Rutina {nombre}</Heading>
+          <div></div> {/* Sin este div el texto se mueve a la derecha */}
+        </div>
           {apiDataLoaded && workouts.length > 0 ? (
             workouts.map((workout) => (
               <div key={workout.id}>
@@ -101,7 +110,7 @@ const EditWorkout = () => {
                 </div>
                 <div className="flex items-center justify-end flex-grow">
                   <p className="font-bold mb-1 text-black mr-2">
-                    {equipoNames[workout.id] || 'Sin asignar'}
+                    {equipoNames[workout.id] || 'Sin máquinas asignadas'}
                   </p>
                   <ChevronDownIcon className="w-6 h-6" />
                 </div>
