@@ -1,87 +1,36 @@
 import * as Slider from "@radix-ui/react-slider";
+import {
+  TiStarHalfOutline,
+  TiStarFullOutline,
+  TiStarOutline,
+} from "react-icons/ti";
 
 import { useState } from "react";
 
-function FilledStar() {
-  return (
-    <svg
-      className="w-8"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="-0.4 -0.4 6.61 6.61"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m102.951 121.936.818 1.656 1.828.268-1.323 1.288.312 2.08-1.635-.876-1.635.876.312-2.077-1.323-1.291 1.829-.268z"
-        transform="translate(-100.04 -121.672)"
-      />
-    </svg>
-  );
-}
-
-function EmptyStar() {
-  return (
-    <svg
-      className="fill-none w-8"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="-0.4 -0.4 6.61 6.61"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m102.951 121.936.818 1.656 1.828.268-1.323 1.288.312 2.08-1.635-.876-1.635.876.312-2.077-1.323-1.291 1.829-.268z"
-        transform="translate(-100.04 -121.672)"
-      />
-    </svg>
-  );
-}
-
-function HalfStar() {
-  return (
-    <svg
-      className="w-8 fill-none"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="-0.4 -0.4 6.61 6.61"
-    >
-      <path
-        className="stroke-none fill-current"
-        d="M102.951 121.936v4.416l-1.635.876.312-2.077-1.323-1.291 1.829-.268z"
-        transform="translate(-100.04 -121.672)"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m102.951 121.936.818 1.656 1.828.268-1.323 1.288.312 2.08-1.635-.876-1.635.876.312-2.077-1.323-1.291 1.829-.268z"
-        transform="translate(-100.04 -121.672)"
-      />
-    </svg>
-  );
-}
-
-function Rating({ rating }) {
+function Rating({ rating, className }) {
   const filled_stars = Math.floor(rating) || 0;
   const empty_stars = Math.floor(5 - rating) || 0;
   return (
-    <div
-      className={`flex fill-current stroke-yellow-700 stroke-[0.3] text-yellow-400`}
-    >
+    <div className={`flex fill-current text-yellow-500`}>
       {[...Array(filled_stars)].map((_, index) => (
-        <FilledStar key={index} />
+        <TiStarFullOutline key={index} className={`${className} size-6`} />
       ))}
-      {rating % 1 != 0 && <HalfStar />}
+      {rating % 1 != 0 && (
+        <TiStarHalfOutline className={`${className} size-6`} />
+      )}
       {[...Array(empty_stars)].map((_, index) => (
-        <EmptyStar key={index} />
+        <TiStarOutline key={index} className={`${className} size-6`} />
       ))}
     </div>
   );
 }
 
-export const EditableRating = ({ onChange }) => {
+export const EditableRating = ({ onChange, className, defaultValue }) => {
   const [rating, setRating] = useState(0);
   return (
     <div className="relative size-fit">
       <Slider.Root
-        defaultValue={[0]}
+        defaultValue={[defaultValue || 0]}
         onValueChange={(v) => {
           setRating(v);
           onChange(v);
@@ -90,13 +39,20 @@ export const EditableRating = ({ onChange }) => {
         step={0.5}
         className="absolute flex h-full w-full"
       ></Slider.Root>
-      <Rating rating={rating} />
+      <Rating rating={rating} className={className} />
     </div>
   );
 };
 
 Rating.propTypes = {
   rating: Number,
+  // className: String,
+};
+
+EditableRating.propTypes = {
+  onChange: Function,
+  // className: String,
+  defaultValue: Number,
 };
 
 export default Rating;
