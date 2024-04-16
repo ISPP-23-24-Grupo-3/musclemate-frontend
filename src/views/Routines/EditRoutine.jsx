@@ -27,7 +27,7 @@ import {
   putToApi,
 } from "../../utils/functions/api";
 import { FormContainer } from "../../components/Form";
-import { EquipmentSelect } from "../../components/Equipments";
+import { EquipmentSelect as EquipmentSel } from "../../components/Equipments";
 
 export const EditRoutine = () => {
   const [routine, setRoutine] = useState({
@@ -357,13 +357,11 @@ const EditableWorkout = ({
         .filter((e) => e.value !== undefined) // Filtrar los equipos definidos
         .map((e) => Number(e.value))
     : [];
-    console.log(definedEquipment)
     const parsed_workout = {
       ...workout,
       client: clientId, // Asignamos el ID del usuario al workout
       equipment: definedEquipment.length > 0 ? definedEquipment : undefined,
     };
-    console.log(parsed_workout)
     const temp_workout = {
       ...parsed_workout,
       temp_id: Date.now(),
@@ -518,7 +516,7 @@ const EditableWorkout = ({
             ></TextField.Input>
           </Flex>
           <div className="w-1/5 items-end flex flex-col gap-2">
-            <EquipmentSelect/>
+            <EquipmentSelect equipment={equipment} control={control}/>
           </div>
         </Flex>
         <div className="flex items-center gap-3 pt-2">
@@ -526,6 +524,51 @@ const EditableWorkout = ({
           <span className="text-red-500">{errors.name?.message}</span>
         </div>
       </form>
+    </>
+  );
+};
+
+
+const EquipmentSelect = ({ equipment, control}) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "equipment",
+  });
+
+  return (
+    <>
+      
+      {fields.map((f, index) => (
+        <div key={f.id} className="flex items-center gap-3">
+          <Controller
+            control={control}
+            name={`equipment.${index}.value`}
+            render={({ field }) => (
+              <EquipmentSel onChange={field.onChange} id="equipmentId" defaultValue={field.value}/>
+            )}
+          />
+          <IconButton
+            radius="full"
+            size="1"
+            color="red"
+            variant="ghost"
+            onClick={() => remove(index)}
+          >
+            <ImCross className="size-2.5" />
+          </IconButton>
+        </div>
+      ))}
+      <div className="flex items-center gap-2">
+        <IconButton
+          type="button"
+          radius="full"
+          size="1"
+          onClick={() => append({ value: undefined })}
+        >
+          <FaPlus className="size-3" />
+        </IconButton>
+        <Text weight="bold">Máquinas</Text>
+      </div>
     </>
   );
 };
