@@ -196,9 +196,9 @@ const AddEventsForm = () => {
               placeholder="Selecciona una intensidad"
               {...register("intensity", { required: messages.req })}
             >
-              <Select.Item value="L">Low</Select.Item>
-              <Select.Item value="M">Medium</Select.Item>
-              <Select.Item value="H">High</Select.Item>
+              <Select.Item value="L">Baja</Select.Item>
+              <Select.Item value="M">Media</Select.Item>
+              <Select.Item value="H">Alta</Select.Item>
             </RHFSelect>
             {errors.intensity && (
               <p className="text-red-500">{errors.intensity.message}</p>
