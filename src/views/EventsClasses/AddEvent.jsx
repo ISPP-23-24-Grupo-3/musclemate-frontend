@@ -28,13 +28,12 @@ const AddEventsForm = () => {
   useEffect(() => {
     if (user?.rol === "owner") {
       getGymsOwner()
-      .then((gyms) => setGyms(gyms))
-      .catch((error) => console.log(error));
-    }
-    else if (user?.rol === "gym") {
+        .then((gyms) => setGyms(gyms))
+        .catch((error) => console.log(error));
+    } else if (user?.rol === "gym") {
       getGym()
-      .then((gym) => setGym(gym))
-      .catch((error) => console.log(error));
+        .then((gym) => setGym(gym))
+        .catch((error) => console.log(error));
     }
   }, []);
 
@@ -51,7 +50,10 @@ const AddEventsForm = () => {
       const durationSeconds = 0;
       const formattedDuration = `${durationHours.toString().padStart(2, "0")}:${durationMinutes.toString().padStart(2, "0")}:${durationSeconds.toString().padStart(2, "0")}`;
 
-      const eventData = (user?.rol === "owner") ? { ...eventInfo, duration: formattedDuration } : { ...eventInfo, duration: formattedDuration, gym: gym?.id };
+      const eventData =
+        user?.rol === "owner"
+          ? { ...eventInfo, duration: formattedDuration }
+          : { ...eventInfo, duration: formattedDuration, gym: gym?.id };
 
       const currentDate = new Date().toISOString().split("T")[0];
       console.log(currentDate);
@@ -161,6 +163,10 @@ const AddEventsForm = () => {
             <TextField.Input
               {...register("date", {
                 required: messages.req,
+                validate: {
+                  futureDate: (date) =>
+                    new Date(date) > new Date() || "Debe ser una fecha futura",
+                },
               })}
               name="date"
               type="date"
@@ -198,14 +204,16 @@ const AddEventsForm = () => {
               <p className="text-red-500">{errors.intensity.message}</p>
             )}
           </div>
-          
-          { user?.rol === "owner" &&
+
+          {user?.rol === "owner" && (
             <div className="flex flex-col">
               <label htmlFor="gym">Gimnasio</label>
               <GymSelect {...register("gym", { required: messages.req })} />
-              {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
             </div>
-          }
+          )}
 
           <Button
             type="submit"
