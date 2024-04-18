@@ -67,6 +67,7 @@ export const Series = (workoutID) => {
           let data = await response.json();
           data.sort((a, b) => new Date(b.date) - new Date(a.date));
           const chartData = data.map(serie => ({
+            reps:serie.reps,
             weight: serie.weight,
             date: serie.date,
           }));
@@ -91,6 +92,7 @@ export const Series = (workoutID) => {
           let data = await response.json();
           data.sort((a, b) => new Date(b.date) - new Date(a.date));
           const chartData = data.map(serie => ({
+            reps:serie.reps,
             weight: serie.weight,
             date: serie.date,
           }));
@@ -124,11 +126,24 @@ export const Series = (workoutID) => {
   const { register, handleSubmit, reset,watch,setValue, formState: { errors } } = useForm({});
 
   const onSubmit = (data) => {
-    if (data.reps>99999){
-      alert('Las repeticiones no pueden ser mayores de 99999');
+    if(data.reps==""){
+      data.reps=0
     }
-    else if (data.weight>99999){
-      alert('El peso no puede ser mayor de 99999');
+    if(data.peso==""){
+      data.peso=0
+    }
+    if(data.duration==""){
+      data.duration=0
+    }
+
+    if (data.reps>9999){
+      alert('Las repeticiones no pueden ser mayores de 9999');
+    }
+    else if (data.peso>9999){
+      alert('El peso no puede ser mayor de 9999');
+    }
+    else if (data.duration>9999){
+      alert('El peso no puede ser mayor de 9999');
     }
     else{
       postToApi("series/create/", {
@@ -136,7 +151,7 @@ export const Series = (workoutID) => {
         weight: data.peso,
         date: new Date().toISOString().split('T')[0],
         workout: workoutId,
-        duration: 0
+        duration: data.duration
       })
       .then((response) => {
         if (response.ok) {
@@ -163,13 +178,11 @@ export const Series = (workoutID) => {
     });
   
     // Iniciar el temporizador para la serie seleccionada
-    setTimerOn(true);
     setSerieTimerOn((prev) => ({ ...prev, [id]: true }));
     setShowStartButton((prev) => ({ ...prev, [id]: false }));
   };
 
   const stopSerieTimer = (id) => {
-    setTimerOn(false);
     setSerieTimerOn((prev) => ({ ...prev, [id]: false }));
     setShowStartButton((prev) => ({ ...prev, [id]: true }));
     // Enviar una solicitud a la API para actualizar la duración
@@ -205,6 +218,7 @@ export const Series = (workoutID) => {
       }, 1000);
     } else if (!timerOn) {
       clearInterval(interval);
+      setTimer(0)
     }
   
     return () => clearInterval(interval);
@@ -212,23 +226,36 @@ export const Series = (workoutID) => {
 
   useEffect(() => {
     let interval = null;
-
+    let timerOff=false;
+    let idSerie = null;
     series.forEach((serie) => {
       if (serieTimerOn[serie.id]) {
-        interval = setInterval(() => {
-          setSeries((prevSeries) =>
-            prevSeries.map((prevSerie) =>
-              prevSerie.id === serie.id
-                ? { ...prevSerie, duration: prevSerie.duration + 1 }
-                : prevSerie
-            )
-          );
-        }, 1000);
+        idSerie=serie.id
+        if (serie.duration>0){
+          interval = setInterval(() => {
+            setSeries((prevSeries) =>
+              prevSeries.map((prevSerie) =>
+                prevSerie.id === serie.id
+                  ? prevSerie.duration>0 ? {
+                      ...prevSerie,
+                      duration: prevSerie.duration - 1,} : timerOff=true
+                  : prevSerie
+              )
+            );
+          }, 1000);}
+        else { 
+          timerOff=true
+        }
       }
     });
 
+    if (timerOff){
+      stopSerieTimer(idSerie)
+    }
+
     return () => clearInterval(interval);
-  }, [serieTimerOn]);
+  }, [serieTimerOn, series]);
+
 
   const editSerie = (id, reps, weight) => {
     if (reps>99999){
@@ -308,6 +335,23 @@ export const Series = (workoutID) => {
     <>
     <div className="mx-auto mt-1 m-5">
       <ul className='mt-1'>
+
+      <li className="flex items-center justify-center mb-5">
+        <div className="flex items-center">
+          <div>
+            <p className="text-radixgreen font-bold mb-1"></p>
+            <p className="text-radixgreen font-bold mb-1 text-xl">
+              Cronómetro de descansos: <span className="text-black">{formatDuration(timer)}</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center ml-5"> {/* Añade un espacio entre los dos divs */}
+          <Button onClick={() => timerOn ? setTimerOn(false) : setTimerOn(true)} className='mt-5' size="3">
+            {timerOn ? "Detener" : "Empezar"}
+          </Button>
+        </div>
+      </li>
         <ScrollArea.Root className="w-full h-[420px] rounded overflow-hidden shadow-[0_2px_10px] shadow-blackA4 bg-white">
           <ScrollArea.Viewport className="w-full h-full rounded">
             {apiDataLoaded && series.length > 0 ? (
@@ -397,26 +441,26 @@ export const Series = (workoutID) => {
                           </div>
                         </form>
                       </div>
-                        <div className="flex items-center">
-                          <div>
-                            <p className="text-radixgreen font-bold mb-1">
-                            </p>
-                            <p className={`text-radixgreen font-bold mb-1 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
-                              Duración: <span className="text-black">{formatDuration(serie.duration)}</span>
-                            </p>
-                          </div>
+                      <div className="flex items-center">
+                        <div>
+                          <p className="text-radixgreen font-bold mb-1">
+                          </p>
+                          <p className={`text-radixgreen font-bold mb-1 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
+                            Duración: <span className="text-black">{formatDuration(serie.duration)}</span>
+                          </p>
                         </div>
+                      </div>
                         {open ? null : (
-                          <div className='flex flex-col space-y-2 justify-center'>
+                          <div className={`flex flex-col space-y-2 justify-center ${editor[serie.id] ? "hidden" : undefined}`}>
                           <Button onClick={() => serieTimerOn[serie.id] ? stopSerieTimer(serie.id) : startSerieTimer(serie.id)} className='mt-5' size="3">
                             {serieTimerOn[serie.id] ? "Parar" : "Empezar"}
                           </Button>
-                        </div>
+                          </div>
                         )}
-                      </div>
                     </div>
-                  </li>
-                ))
+                  </div>
+                </li>
+              ))
               ) : (
                 <p className="text-red-500">No hay series disponibles para este entrenamiento.</p>
               )}
@@ -449,7 +493,33 @@ export const Series = (workoutID) => {
           </ScrollArea.Root>
         </ul>
       {showChart==true ? 
-        <div className='mt-7'>
+        <div>
+          <div className='mt-7'>
+            <Line 
+              options={{
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }} 
+              data={{
+                labels: chartData.map((serie) => serie.date),
+                datasets: [
+                  {
+                    label: 'Mis Pesos',
+                    data: chartData.map((serie) => serie.weight),
+                    fill: true,
+                    borderColor: 'rgb(48, 164, 108)', 
+                    backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                  },
+                ],
+              }} 
+            />
+          </div>
+
+          <div className='mt-7'>
           <Line 
             options={{
               responsive: true,
@@ -463,8 +533,8 @@ export const Series = (workoutID) => {
               labels: chartData.map((serie) => serie.date),
               datasets: [
                 {
-                  label: 'Mis Pesos',
-                  data: chartData.map((serie) => serie.weight),
+                  label: 'Mis Repeticiones',
+                  data: chartData.map((serie) => serie.reps),
                   fill: true,
                   borderColor: 'rgb(48, 164, 108)', 
                   backgroundColor: 'rgba(48, 164, 108, 0.4)',
@@ -472,6 +542,7 @@ export const Series = (workoutID) => {
               ],
             }} 
           />
+          </div>
         </div>
       : undefined
       }
@@ -505,8 +576,16 @@ export const Series = (workoutID) => {
                   })} ></TextField.Input>
                 </div>
               </div>
+              <div className='text-xl mx-1'>
+                <div className="flex flex-col items-center">
+                  <Text>Duración: </Text>
+                  <TextField.Input {...register("duration", {
+                    validate: value => (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                  })} ></TextField.Input>
+                </div>
+              </div>
             </div>
-            <span className={`font-bold ${errors.peso || errors.reps? "text-red-500" : "hidden"} block mb-2`}>
+            <span className={`font-bold ${errors.peso || errors.duration || errors.reps? "text-red-500" : "hidden"} block mb-2`}>
               Todos los campos deben ser 0 o números enteros positivos
             </span>
           </div>

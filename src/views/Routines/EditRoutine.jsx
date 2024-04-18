@@ -29,6 +29,9 @@ import {
 import AuthContext from "../../utils/context/AuthContext";
 
 export const EditRoutine = () => {
+  const [editing_name, set_editing_name] = useState(false);
+  const [routines, setRoutines] = useState([]);
+  const { register, handleSubmit, setValue, formState: { errors }} = useForm()
   const [routine, setRoutine] = useState({
     name: "",
   });
@@ -49,20 +52,82 @@ export const EditRoutine = () => {
       setRoutineNames(data.filter((r) => r.id != routineId).map((r) => r.name));
     });
   }, [routineId]);
+  
+  const hasUniqueNameRoutine = (routineName, currentRoutine) => {
+    return (
+      routines.every((r) => {
+        // Excluye la comparación si estamos editando la rutina con el mismo nombre
+        return currentRoutine && r.name === currentRoutine.name ? true : routineName !== r.name;
+      }) || "Ya tienes una rutina con ese nombre"
+    );
+  };
+  const updateName = (name) => {
+    const prevRoutine = { ...routine };
+    const tempRoutine = { ...routine, name: name };
+    setRoutine({ tempRoutine });
+    putToApi("routines/update/" + routine.id + "/", tempRoutine)
+      .then((r) => r.json())
+      .then((updatedRoutine) => setRoutine(updatedRoutine))
+      .catch(setRoutine(prevRoutine));
+  };
+  
+  const navigate = useNavigate();
+  const startRoutine = () => navigate(`/user/routines/${routineId}/workouts`, { state: { routineId: routineId } });
 
   return (
     <>
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <Heading as="h1" className="text-radixgreen">
-            Editar Rutina
-          </Heading>
-          <Button>
-            <IoMdFitness className="size-5 -rotate-45" />
-            Entrenar
-          </Button>
+          <div className="flex items-center">
+            <div>
+              <Heading className={`${editing_name ? "hidden" : undefined} text-radixgreen`}>
+                Rutina: {routine.name}
+              </Heading>
+              <form
+                className={`${!editing_name ? "hidden" : undefined} flex gap-3 items-center`}
+                onSubmit={handleSubmit((r) => {
+                  updateName(r.name);
+                  set_editing_name(false);
+                })}
+              >
+                <div className="flex items-center gap-3">
+                  <TextField.Input
+                    name="name"
+                    {...register("name", {
+                      required: "Debes escribir un nombre",
+                      validate: {
+                        unique: hasUniqueNameRoutine,
+                        maxLength: value => value.length <= 100 || 'El valor no puede tener más de 100 caracteres'
+                      },
+                    })}
+                    color={errors.name ? "red" : undefined}
+                    className={`${errors.name ? "!border-red-500" : undefined}`}
+                  />
+                  {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+                </div>
+                <Button type="submit">Aceptar</Button>
+              </form>
+            </div>
+            <div className="flex items-center ml-4">
+              <IconButton
+                className={`ml-auto ${editing_name ? undefined : "hidden"}`}
+                radius="full"
+                onClick={() => {
+                  set_editing_name(true);
+                  setValue("name", routine.name);
+                }}
+              >
+                <LuPencil />
+              </IconButton>
+            </div>
+          </div>
+          <div>
+            <Button onClick={startRoutine}>
+              <IoMdFitness className="size-5 -rotate-45" />
+              Entrenar
+            </Button>
+          </div>
         </div>
-        <RoutineName routine={routine} setRoutine={setRoutine} />
         <WorkoutList routineId={routineId} />
       </div>
     </>
