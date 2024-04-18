@@ -74,7 +74,13 @@ const CreateGym = () => {
               Nombre:
             </label>
             <TextField.Input
-              {...register("name", { required: "Este campo es obligatorio" })}
+              {...register("name", {
+                required: "Este campo es obligatorio",
+                maxLength: {
+                  value: 50,
+                  message: "El campo no debe sobrepasar 50 caracteres",
+                },
+              })}
               type="text"
               id="name"
             />
@@ -89,6 +95,10 @@ const CreateGym = () => {
             <TextField.Input
               {...register("address", {
                 required: "Este campo es obligatorio",
+                maxLength: {
+                  value: 200,
+                  message: "El campo no debe sobrepasar 200 caracteres",
+                },
               })}
               type="text"
               id="address"
@@ -104,6 +114,10 @@ const CreateGym = () => {
             <TextField.Input
               {...register("zip_code", {
                 required: "Este campo es obligatorio",
+                pattern: {
+                  value: /^[0-9]+$/,
+                  message: "Debe ser un número",
+                },
               })}
               type="text"
               id="zip_code"
@@ -119,6 +133,10 @@ const CreateGym = () => {
             <TextField.Input
               {...register("descripcion", {
                 required: "Este campo es obligatorio",
+                maxLength: {
+                  value: 500,
+                  message: "El campo no debe sobrepasar 500 caracteres",
+                },
               })}
               type="text"
               id="descripcion"
@@ -134,8 +152,12 @@ const CreateGym = () => {
             <TextField.Input
               {...register("phone_number", {
                 required: "Este campo es obligatorio",
+                pattern: {
+                  value: /^[0-9]+$/,
+                  message: "Debe ser un número",
+                },
               })}
-              type="text"
+              type="tel"
               id="phone_number"
             />
             {errors.phone_number && (
@@ -147,7 +169,13 @@ const CreateGym = () => {
               Correo Electrónico:
             </label>
             <TextFieldInput
-              {...register("email", { required: "Este campo es obligatorio" })}
+              {...register("email", {
+                required: "Este campo es obligatorio",
+                pattern: {
+                  value: /\S+@\S+\.\S+/,
+                  message: "Introduce una dirección de correo válida",
+                },
+              })}
               type="email"
               id="email"
             />
