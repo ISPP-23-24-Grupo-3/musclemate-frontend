@@ -13,6 +13,12 @@ const CreateGym = () => {
     formState: { errors },
   } = useForm();
 
+  const patterns = {
+    mail: /\S+@\S+\.\S+/,
+    phoneNumber: /^\d{9}$/,
+    zipCode: /^\d{5}$/,
+  };
+
   const onSubmit = async (formData) => {
     try {
       const response = await postToApi("gyms/create/", {
@@ -115,8 +121,8 @@ const CreateGym = () => {
               {...register("zip_code", {
                 required: "Este campo es obligatorio",
                 pattern: {
-                  value: /^[0-9]+$/,
-                  message: "Debe ser un número",
+                  value: patterns.zipCode,
+                  message: "Debe ser un número de 5 dígitos",
                 },
               })}
               type="text"
@@ -153,8 +159,8 @@ const CreateGym = () => {
               {...register("phone_number", {
                 required: "Este campo es obligatorio",
                 pattern: {
-                  value: /^[0-9]+$/,
-                  message: "Debe ser un número",
+                  value: patterns.phoneNumber,
+                  message: "Debe ser un número de 9 dígitos",
                 },
               })}
               type="tel"
@@ -172,11 +178,10 @@ const CreateGym = () => {
               {...register("email", {
                 required: "Este campo es obligatorio",
                 pattern: {
-                  value: /\S+@\S+\.\S+/,
+                  value: patterns.mail,
                   message: "Introduce una dirección de correo válida",
                 },
               })}
-              type="email"
               id="email"
             />
             {errors.email && (
