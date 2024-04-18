@@ -79,8 +79,8 @@ const AddEventsForm = () => {
 
   const messages = {
     req: "Este campo es obligatorio",
-    name: "El nombre del evento debe tener más de 5 caracteres",
-    description: "La descripción debe tener más de 10 caracteres",
+    name: "El nombre del evento debe entre 5 y 100 caracteres",
+    description: "La descripción debe tener entre 10 y 255 caracteres",
     muscularGroup: "El grupo muscular debe ser especificado",
   };
 
@@ -97,6 +97,7 @@ const AddEventsForm = () => {
               {...register("name", {
                 required: messages.req,
                 minLength: { value: 5, message: messages.name },
+                maxLength: { value: 100, message: messages.name },
               })}
               name="name"
               type="text"
@@ -112,6 +113,7 @@ const AddEventsForm = () => {
               {...register("description", {
                 required: messages.req,
                 minLength: { value: 10, message: messages.description },
+                maxLength: { value: 255, message: messages.description },
               })}
               name="description"
               rows="4"
@@ -124,32 +126,50 @@ const AddEventsForm = () => {
           <div>
             <label htmlFor="capacity">Aforo</label>
             <TextField.Input
-              {...register("capacity", { required: messages.req })}
+              {...register("capacity", {
+                required: messages.req,
+                min: {
+                  value: 1,
+                  message: "Debe ser mayor o igual a 1",
+                },
+              })}
               name="capacity"
               type="number"
-              min="0" // Establecer el valor mínimo permitido
-              step="1"
+              min="1"
             />
+            {errors.capacity && (
+              <p className="text-red-500">{errors.capacity.message}</p>
+            )}
           </div>
-          {errors.capacity && (
-            <p className="text-red-500">{errors.capacity.message}</p>
-          )}
 
           <div>
             <label htmlFor="attendees">Asistentes</label>
             <TextField.Input
-              {...register("attendees")}
+              {...register("attendees", {
+                min: {
+                  value: 0,
+                  message: "Debe ser mayor o igual a 0",
+                },
+              })}
               name="attendees"
               type="number"
-              min="0" // Establecer el valor mínimo permitido
-              step="1"
+              min="1"
             />
+            {errors.attendees && (
+              <p className="text-red-500">{errors.attendees.message}</p>
+            )}
           </div>
 
           <div>
             <label htmlFor="instructor">Monitor</label>
             <TextField.Input
-              {...register("instructor", { required: messages.req })}
+              {...register("instructor", {
+                required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "Debe tener como máximo 100 caracteres",
+                },
+              })}
               name="instructor"
               type="text"
             />
@@ -181,9 +201,14 @@ const AddEventsForm = () => {
             <TextField.Input
               {...register("duration", {
                 required: "Este campo es obligatorio",
+                min: {
+                  value: 1,
+                  message: "Debe ser mayor o igual a 1",
+                },
               })}
               name="duration"
               type="number"
+              min="1"
             />
             {errors.duration && (
               <p className="text-red-500">{errors.duration.message}</p>
