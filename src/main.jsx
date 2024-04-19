@@ -43,6 +43,7 @@ import CreateGym from "./views/Gyms/CreateGym";
 import GymDetails from "./views/Gyms/GymDetails";
 import EventDetails from "./views/EventsClasses/EventDetails"
 import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
+import GymStats from "./views/Gyms/GymStats";
 import ProfileGym from "./views/ProfileOwner/ProfileGym";
 import ReservationClient from "./views/Reservation/ReservationClient";
 
@@ -64,6 +65,7 @@ const ownerRoutes = [
   { path: "success", element: <SuccessPage />},
   { path: "gyms/add", element: <CreateGym />},
   { path: "gyms/:gymId", element: <GymDetails />},
+  { path: "gyms/:gymId/stats", element: <GymStats />},
   { path: "profile", element: <ProfileOwner />},
 ];
 
