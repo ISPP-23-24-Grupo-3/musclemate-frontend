@@ -3,13 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import { Button, Heading } from "@radix-ui/themes";
 import { getFromApi } from '../../utils/functions/api';
 
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
     BarElement,
     LinearScale,
     PointElement,
+    LineElement,
     Title,
     Tooltip,
     Filler,
@@ -21,6 +22,7 @@ ChartJS.register(
     LinearScale,
     BarElement,
     PointElement,
+    LineElement,
     Title,
     Tooltip,
     Filler,
@@ -35,6 +37,9 @@ export default function GymStats() {
     const [orderedGymMonthStats, setOrderedGymMonthStats] = useState([]);
     const [gymYearStats, setGymYearStats] = useState([]);
     const [actualMachines, setActualMachines] = useState([]);
+    const [daily, setDaily] = useState(false);
+    const [dailyStats, setDailyStats] = useState([]);
+    const [dailyMachines, setDailyMachines] = useState([]);
 
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const [month, setMonth] = useState("ANUAL");
@@ -61,7 +66,6 @@ export default function GymStats() {
                 }
             })
             .then((data) => {
-                console.log(data);
                 let groupedYearData = {};
 
                 for (let i = 0; i < data.length; i++) {
@@ -153,6 +157,53 @@ export default function GymStats() {
         setActualMachines(gymMonthStats.map(machine => machine.equipment_name));
     }, [gymMonthStats, machines]);
 
+    useEffect(() => {
+        if (daily) {
+            getFromApi(`gyms/usage/${gymId}/year/${year}/month/${month}/daily/`)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error("Estadísticas no disponibles");
+                    }
+                })
+                .then((data) => {
+                    let groupedDailyData = {};
+                    let machs= [];
+                    for (let i = 0; i < data.length; i++) {
+                        if(data[i].daily_usage.length > 0) {
+                            for (let j = 0; j < data[i].daily_usage.length; j++) {
+                                if(!machs.includes(data[i].daily_usage[j][0])) {
+                                    machs.push(data[i].daily_usage[j][0]);
+                                }
+                            }
+                        }
+                    }
+                    setDailyMachines(machs);
+                    for (let i = 0; i < machs.length; i++) {
+                        groupedDailyData[machs[i]] = new Array(31).fill(0);
+                    }
+                    for (let i = 0; i < data.length; i++) {
+                        for (let j = 0; j < data[i].daily_usage.length; j++) {
+                            if (groupedDailyData.hasOwnProperty(data[i].daily_usage[j][0])) {
+                                groupedDailyData[data[i].daily_usage[j][0]][i] = data[i].daily_usage[j][1];
+                            }
+                        }
+                    }
+                    setDailyStats(groupedDailyData);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+    }, [daily, month, year]);
+
+    useEffect(() => {
+        for (let i = 0; i < dailyMachines.length; i++) {
+            console.log(`${dailyMachines[i]}: `+dailyStats[dailyMachines[i]]);
+        }
+    }, [dailyStats]);
+
     return(
         <div className="mt-8 max-w-xl mx-auto">
             <div style={{display: 'flex', justifyContent: 'flex-end'}}> 
@@ -172,6 +223,12 @@ export default function GymStats() {
                 </Heading>
             )}
             <div style={{display: "flex", justifyContent: "right", marginTop: 5, marginBottom: 8}}>
+                {month != 'ANUAL' ? (
+                    <div className='text-right mr-5' style={{ display:'flex', alignItems: "flex-start"}}>
+                        <h1 className="text-radixgreen font-bold mb-1 mr-3 text-right">Mostrar Uso Diario</h1>
+                        <input style={{ transform: 'scale(1.3)' }} className="mt-1" type="checkbox" checked={daily} onChange={() => setDaily(!daily)} />
+                    </div>
+                ) : null }
                 <div className='text-right mr-5'>
                     <h1 className="text-radixgreen font-bold mb-1 text-right">Seleccione un Mes</h1>
                     <select defaultValue={month} onChange={(e) => setMonth(e.target.value === 'ANUAL' ? e.target.value : Number(e.target.value) + 1)} >
@@ -199,16 +256,10 @@ export default function GymStats() {
                 <div className='mt-5'>
                     <Bar
                         options={{
-                            indexAxis: 'x',
                             responsive: true,
                             scales: {
                                 y: {
                                     beginAtZero: true,
-                                },
-                            },
-                            plugins: {
-                                legend: {
-                                    position: 'top',
                                 },
                             },
                         }} 
@@ -225,25 +276,47 @@ export default function GymStats() {
                 </div>
             ) : (
                 <div className='mt-5'>
-                    <Bar
-                        options={{
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
+                    {daily ? (
+                        <Line
+                            options={{
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                    },
                                 },
-                            },
-                        }} 
-                        data={{
-                            labels: actualMachines,
-                            datasets: orderedGymMonthStats.map((machine) => ({
-                                label: machine.equipment_name,
-                                data: machine.total,
-                                fill: true,
-                                backgroundColor: getColor(),
-                            })),
-                        }}
-                    />
+                            }} 
+                            data={{
+                                labels: Array.from({length: 31}, (_, i) => i + 1),
+                                datasets: Object.keys(dailyStats).map((key) => ({
+                                    label: key,
+                                    data: dailyStats[key],
+                                    fill: false,
+                                    backgroundColor: getColor(),
+                                }))
+                            }}
+                        />
+                    ) : (
+                        <Bar
+                            options={{
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            }} 
+                            data={{
+                                labels: actualMachines,
+                                datasets: orderedGymMonthStats.map((machine) => ({
+                                    label: machine.equipment_name,
+                                    data: machine.total,
+                                    fill: true,
+                                    backgroundColor: getColor(),
+                                })),
+                            }}
+                        />
+                    )}
                 </div>
             )}
         </div>
