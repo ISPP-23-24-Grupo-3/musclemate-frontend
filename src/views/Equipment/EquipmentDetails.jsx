@@ -15,6 +15,7 @@ import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 import { Checkbox } from "@radix-ui/themes";
 import { RHFSelect } from "../../components/RHFSelect.jsx";
+import { Ticket } from "../../components/Ticket/Ticket.jsx";
 
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
@@ -146,8 +147,7 @@ export default function EquipmentDetails() {
     setActualRating(value);
   }
 
-  const handleCheckboxChange = async (event, ticketId) => {
-    const { checked } = event.target;
+  const handleCheckboxChange = async (checked, ticketId) => {
     try {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
@@ -251,6 +251,13 @@ export default function EquipmentDetails() {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleInputChange = (e, field) => {
+    setUpdatedDetails({
+      ...updatedDetails,
+      [field]: e.target.value,
+    });
+  };
+
+  const handleInputChangeMuscular = (e, field) => {
     setUpdatedDetails({
       ...updatedDetails,
       [field]: e,
@@ -396,7 +403,7 @@ export default function EquipmentDetails() {
                 name="muscular_group"
                 defaultValue={updatedDetails.muscular_group}
                 onChange={(e) =>
-                  handleInputChange(e.target.value, "muscular_group")
+                  handleInputChangeMuscular(e.target.value, "muscular_group")
                 }
               >
                 {muscularGroupOptions.map((option) => (
@@ -468,64 +475,11 @@ export default function EquipmentDetails() {
         <ul>
           {apiDataLoaded && currentTickets.length > 0 ? (
             currentTickets.map((ticket) => (
-              <li
+              <Ticket
                 key={ticket.id}
-                className={`bg-white shadow-md p-4 rounded-md mb-4 ${
-                  ticket.status ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                <div className="flex items-center mb-2">
-                  <HiTicket className="w-6 h-6 mr-2" />
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Usuario:{" "}
-                      <span className="text-black">
-                        {ticket.client.name} {ticket.client.lastName}
-                      </span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Asunto: <span className="text-black">{ticket.label}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Descripción:{" "}
-                      <span className="text-black">{ticket.description}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Gimnasio:{" "}
-                      <span className="text-black">{ticket.gym_name}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Email:{" "}
-                      <span className="text-black">{ticket.client.email}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Fecha:{" "}
-                      <span className="text-black">
-                        {formatDate(ticket.date)}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="ml-auto">
-                    <Checkbox
-                      type="checkbox"
-                      checked={ticket.status}
-                      onChange={(ch) => handleCheckboxChange(ch, ticket.id)}
-                      className="mr-2"
-                    />
-                    <p className="text-radixgreen font-bold mb-1">
-                      <span
-                        className={
-                          ticket.status
-                            ? "text-green-500 ml-2"
-                            : "text-red-500 ml-2"
-                        }
-                      >
-                        {ticket.status ? "Resuelto" : "No Resuelto"}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </li>
+                ticket={ticket}
+                onStatusChange={handleCheckboxChange}
+              />
             ))
           ) : (
             <p className="text-red-500 mb-6">No hay tickets disponibles.</p>

@@ -15,7 +15,7 @@ const Routine = ({ routine }) => {
           </Text>
         </span>
         <span className="flex gap-2">
-          <Link href={`./routines/${routine.id}/train`}>
+          <Link href={`./routines/${routine.id}/workouts`}>
             <IconButton size="2" radius="full">
               <CgGym className="size-5 rotate-30" />
             </IconButton>

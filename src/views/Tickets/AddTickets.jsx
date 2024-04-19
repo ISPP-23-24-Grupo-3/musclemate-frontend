@@ -12,6 +12,7 @@ const AddTickets = () => {
   const [equipmentId, setEquipmentId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [gymPlan, setGymPlan] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,12 +44,33 @@ const AddTickets = () => {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      getFromApi("clients/detail/" + user.username + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          let gym = data.gym;
+          getFromApi("gyms/detail/" + gym + "/")
+            .then((response) => response.json())
+            .then((data) => {
+              setGymPlan(data.subscription_plan);
+            });
+        });
+    }
+  }, [user]);
+
   return (
-    <div className="mt-8 flex justify-center mb-8">
-      <FormContainer className="w-1/2">
-        <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
-          Crear Ticket
-        </h2>
+    <FormContainer className="sm:max-w-md m-auto">
+      <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
+        Crear Ticket
+      </h2>
+      {gymPlan === "free" ? (
+        <div className="text-red-700">
+          La subscripción "{gymPlan}" de tu gimnasio no incluye esta
+          funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades
+          como esta!
+        </div>
+      ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="label">Asunto:</label>
@@ -84,8 +106,8 @@ const AddTickets = () => {
             Agregar Ticket
           </Button>
         </form>
-      </FormContainer>
-    </div>
+      )}
+    </FormContainer>
   );
 };
 

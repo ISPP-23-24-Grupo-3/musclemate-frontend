@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { getFromApi } from '../../utils/functions/api';
-import { useLocation } from 'react-router';
+import {Heading,Flex} from "@radix-ui/themes";
+import { ChevronDownIcon } from '@radix-ui/react-icons';
+import { FormContainer } from "../../components/Form";
+import { Series as SerieForm } from "../../components/Series/Series";
+import { useParams } from 'react-router-dom';
+import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { Link } from 'react-router-dom';
 
 const EditWorkout = () => {
-  const location = useLocation();
-  const routineId = location.state.routineId;
+  const [hideForms, setHideForms] = useState([]);
+  const params = useParams();
+  const routineId = params.routineId;
   const [nombre, setNombre] = useState('');
   const [workouts, setWorkouts] = useState([]);
   const [equipoNames, setEquipoNames] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
-  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchWorkouts = async () => {
@@ -48,10 +53,6 @@ const EditWorkout = () => {
     fetchRoutine();
   }, [routineId]);
 
-  const handleViewSeries = (workoutId) => {
-    navigate(`/user/workout/${workoutId}/series`); 
-  };
-
   const equipoN = async (equipo) => {
     let equipoName = [];
     if (equipo) {
@@ -76,40 +77,60 @@ const EditWorkout = () => {
     fetchEquipoNames();
   }, [workouts]);
 
-  
+  const toggleFormVisibility = (workoutId) => {
+    setHideForms((prevHideForms) => ({
+      ...prevHideForms,
+      [workoutId]: !prevHideForms[workoutId] // Cambiar el estado de visibilidad del formulario
+    }));
+  };
 
   return (
-    <div className="max-w-lg mx-auto mt-8 m-5">
-      <h2 className="text-radixgreen mt-8 mb-3 md:text-center">Entrenamientos para la Rutina {nombre}</h2>
-      <ul>
-        {apiDataLoaded && workouts.length > 0 ? (
-          workouts.map((workout) => (
-            <li key={workout.id} className="bg-white shadow-md p-4 rounded-md mb-4">
-              <div className="flex items-center justify-between mb-2">
+    <>
+      <div className="mx-auto mt-8 m-5 mb-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <Link to={`/user/routines/${routineId}/`}>
+              <ArrowLeftIcon className="w-8 h-8 text-green-500 cursor-pointer hover:text-green-700" />
+            </Link>
+          </div>
+          <Heading size="6" className="text-radixgreen mt-8 mb-3 mx-auto">Entrenamientos para la Rutina {nombre}</Heading>
+          <div></div> {/* Sin este div el texto se mueve a la derecha */}
+        </div>
+          {apiDataLoaded && workouts.length > 0 ? (
+            workouts.map((workout) => (
+              <div key={workout.id}>
+              <button
+                className="w-full my-4 p-4 rounded-lg flex items-center gap-3 bg-green-100 cursor-pointer focus:outline-none"
+                onClick={() => toggleFormVisibility(workout.id)}
+              >
                 <div>
-                  <div className="mr-4">
-                    <p className="text-radixgreen font-bold mb-1">
-                      Nombre del Entrenamiento: <span className="text-black">{workout.name}</span>
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Máquina: <span className="text-black">{ equipoNames[workout.id] || 'Sin asignar'}</span>
-                    </p>
-                  </div>
+                  <p className="font-bold mb-1">
+                    <span className="text-black">{workout.name}</span>
+                  </p>
                 </div>
-                <div>
-                  <button onClick={() => handleViewSeries(workout.id)} className="text-blue-600 font-bold">Ver detalles</button>
+                <div className="flex items-center justify-end flex-grow">
+                  <p className="font-bold mb-1 text-black mr-2">
+                    {equipoNames[workout.id] || 'Sin máquinas asignadas'}
+                  </p>
+                  <ChevronDownIcon className="w-6 h-6" />
                 </div>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p className="text-red-500">No hay entrenamientos disponibles.</p>
-        )}
-      </ul>
-    </div>
+              </button>
+              <Flex direction="column" gap="3" className="mt-4">
+                {hideForms[workout.id] && (
+                  <div className="w-full">
+                    <FormContainer>
+                      <SerieForm workoutID={workout.id}/>
+                    </FormContainer>
+                  </div>
+                )}
+              </Flex>
+            </div>
+        ))) : (<p className="text-red-500">No hay entrenamientos disponibles.</p>) }
+      </div>
+    </>
   );
 };
+
+
 
 export default EditWorkout;

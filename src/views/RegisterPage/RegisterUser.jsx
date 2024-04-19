@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { HiUser, HiLockClosed, HiOutlineMail, HiPhone } from "react-icons/hi";
 import {
   HiBuildingOffice2,
@@ -13,23 +13,48 @@ import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
 import { GymSelect } from "../../components/Gyms";
 import { RHFSelect } from "../../components/RHFSelect";
+import AuthContext from "../../utils/context/AuthContext";
 
 const UserRegister = () => {
+  const { user } = useContext(AuthContext);
   const [gyms, setGyms] = useState(null);
+  const [gym, setGym] = useState(null);
   const navigate = useNavigate();
   const [errorMessageUser, setErrorMessageUser] = useState("");
   const [errorMessageMail, setErrorMessageMail] = useState("");
+  const [errorMessageDate, setErrorMessageDate] = useState("");
 
-  async function getGyms() {
+  const handleEmailChange = () => {
+    setErrorMessageMail(null); // Limpiar el mensaje de error del email
+  };
+
+  // Función para manejar cambios en el campo de nombre de usuario
+  const handleUsernameChange = () => {
+    setErrorMessageUser(null); // Limpiar el mensaje de error del nombre de usuario
+  };
+
+  async function getGymsOwner() {
     const responseGym = await getFromApi("gyms/");
     const gymsData = await responseGym.json();
     return gymsData;
   }
 
+  async function getGym() {
+    const responseGym = await getFromApi("gyms/detail/" + user?.username + "/");
+    const gymsData = await responseGym.json();
+    return gymsData;
+  }
+
   useEffect(() => {
-    getGyms()
-      .then((gyms) => setGyms(gyms))
-      .catch((error) => console.log(error));
+    if (user?.rol === "owner") {
+      getGymsOwner()
+        .then((gyms) => setGyms(gyms))
+        .catch((error) => console.log(error));
+    } else if (user?.rol === "gym") {
+      getGym()
+        .then((gym) => setGym(gym))
+        .catch((error) => console.log(error));
+    }
   }, []);
 
   const {
@@ -52,8 +77,17 @@ const UserRegister = () => {
         zipCode,
         username,
         password,
-        gym,
       } = formData;
+
+      const birthDate = new Date(birth);
+      const currentDate = new Date();
+      if (birthDate > currentDate) {
+        setErrorMessageDate("La fecha de nacimiento no puede ser futura");
+        return;
+      } else {
+        // Si la fecha de nacimiento es válida, limpiar el mensaje de error
+        setErrorMessageDate(null);
+      }
 
       const requestBody = {
         name,
@@ -69,7 +103,7 @@ const UserRegister = () => {
           username,
           password,
         },
-        gym,
+        gym: user?.rol === "owner" ? formData.gym : gym.id,
       };
 
       const response = await postToApi("clients/create/", requestBody);
@@ -77,13 +111,15 @@ const UserRegister = () => {
       if (!response.ok) {
         const responseData = await response.json();
         setErrorMessageUser(
-          responseData.username ? responseData.username[0] : "",
+          "Este nombre de usuario ya existe, prueba con otro",
         );
-        setErrorMessageMail(responseData.email ? responseData.email[0] : "");
+        setErrorMessageMail("Ya existe un usuario con este email en uso");
         return;
       }
-
-      navigate("/owner/users");
+      setErrorMessageUser(null);
+      setErrorMessageMail(null);
+      if (user?.rol === "owner") navigate("/owner/users");
+      else if (user?.rol === "gym") navigate("/gym/users");
     } catch (error) {
       console.error("Hubo un error al crear el usuario:", error);
     }
@@ -99,7 +135,7 @@ const UserRegister = () => {
   };
 
   const patterns = {
-    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+    mail: /\S+@\S+\.\S+/,
     phoneNumber: /^\d{9}$/,
     zipCode: /^\d{5}$/,
   };
@@ -167,7 +203,7 @@ const UserRegister = () => {
                   pattern: { value: patterns.mail, message: messages.mail },
                 })}
                 name="email"
-                type="email"
+                onChange={handleEmailChange} // Agregar evento onChange
               />
             </TextField.Root>
             {errors.email && (
@@ -194,6 +230,9 @@ const UserRegister = () => {
             </TextField.Root>
             {errors.birth && (
               <p className="text-red-500">{errors.birth.message}</p>
+            )}
+            {errorMessageDate && (
+              <p className="text-red-500">{errorMessageDate}</p>
             )}
           </div>
 
@@ -321,6 +360,7 @@ const UserRegister = () => {
                 })}
                 name="username"
                 type="text"
+                onChange={handleUsernameChange} // Agregar evento onChang
               />
             </TextField.Root>
             {errors.username && (
@@ -361,13 +401,17 @@ const UserRegister = () => {
             )}
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="gym" className="mr-3">
-              Gimnasio
-            </label>
-            <GymSelect {...register("gym", { required: messages.req })} />
-            {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
-          </div>
+          {user?.rol === "owner" && (
+            <div className="flex flex-col">
+              <label htmlFor="gym" className="mr-3">
+                Gimnasio
+              </label>
+              <GymSelect {...register("gym", { required: messages.req })} />
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
+            </div>
+          )}
 
           <Button
             type="submit"

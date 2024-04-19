@@ -11,7 +11,9 @@ import "./index.css";
 import "@radix-ui/themes/styles.css";
 import UserRoute from "./components/UserRoute";
 import OwnerRoute from "./components/OwnerRoute";
+import GymRoute from "./components/GymRoute";
 import OwnerHomePage from "./views/OwnerHomePage/OwnerHomePage";
+import GymHomePage from "./views/GymHomePage/GymHomePage";
 import Users from "./views/UserListing/Users";
 import Profile from "./views/UserListing/Profile";
 import EquipmentList from "./views/Equipment/EquipmentList";
@@ -28,8 +30,8 @@ import ClientHomePage from "./views/ClientHomePage/ClientHomePage";
 import AddTickets from "./views/Tickets/AddTickets";
 import MyGymsOwner from "./views/Gyms/MyGymsOwner";
 import EventList from "./views/EventsClasses/EventList";
+import EventListClient from "./views/EventsClasses/EventListClient";
 import EditWorkout from "./views/Workouts/EditWorkout";
-import Series from "./views/Series/Series";
 import PricingPage from "./views/PricingPage/PricingPage";
 import SubscriptionsPage from "./views/SubscriptionsPage/SubscriptionsPage";
 import SuccessPage from "./views/SuccessPage";
@@ -39,76 +41,47 @@ import ProfileClient from "./views/UserListing/ProfileClient";
 import AddEventsForm from "./views/EventsClasses/AddEvent";
 import CreateGym from "./views/Gyms/CreateGym";
 import GymDetails from "./views/Gyms/GymDetails";
+import EventDetails from "./views/EventsClasses/EventDetails"
+import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
+import GymStats from "./views/Gyms/GymStats";
+import ProfileGym from "./views/ProfileOwner/ProfileGym";
+import ReservationClient from "./views/Reservation/ReservationClient";
 
 const ownerRoutes = [
-  {
-    path: "home",
-    element: <OwnerHomePage />,
-  },
-  {
-    path: "users",
-    element: <Users />,
-  },
-  {
-    path: "users/register",
-    element: <RegisterUser />,
-  },
-  {
-    path: "users/:userId/profile",
-    element: <Profile />,
-  },
-  {
-    path: "events",
-    element: <EventList />,
-  },
-  {
-    path: "events/add",
-    element: <AddEventsForm />,
-  },
-  {
-    path: "equipments",
-    element: <EquipmentList />,
-  },
-  {
-    path: "equipmentsClient",
-    element: <EquipmentListClient />,
-  },
-  {
-    path: "equipments/add",
-    element: <EquipmentForm />,
-  },
-  {
-    path: "equipments/:equipmentId",
-    element: <EquipmentDetails />,
-  },
-  {
-    path: "tickets",
-    element: <TicketManagement />,
-  },
-  {
-    path: "my-gyms",
-    element: <MyGymsOwner />,
-  },
-  {
-    path: "pricing",
-    element: <PricingPage />,
-  },
-  {
-    path: "subscriptions",
-    element: <SubscriptionsPage />,
-  },
-  {
-    path: "success",
-    element: <SuccessPage />,
-  },
-  {
-    path: "gyms/add",
-    element: <CreateGym />,
-  },
-  {
-    path: "gyms/:gymId",
-    element: <GymDetails />,
-  },
+  { path: "home", element: <OwnerHomePage />},
+  { path: "users", element: <Users />},
+  { path: "users/register", element: <RegisterUser />},
+  { path: "users/:userId/profile", element: <Profile />},
+  { path: "events", element: <EventList />},
+  { path: "events/add", element: <AddEventsForm />},
+  { path: "events/:eventId", element: <EventDetails />},
+  { path: "equipments", element: <EquipmentList />},
+  { path: "equipments/add", element: <EquipmentForm />},
+  { path: "equipments/:equipmentId", element: <EquipmentDetails />},
+  { path: "tickets", element: <TicketManagement />},
+  { path: "my-gyms", element: <MyGymsOwner />},
+  { path: "pricing", element: <PricingPage />},
+  { path: "subscriptions", element: <SubscriptionsPage />},
+  { path: "success", element: <SuccessPage />},
+  { path: "gyms/add", element: <CreateGym />},
+  { path: "gyms/:gymId", element: <GymDetails />},
+  { path: "gyms/:gymId/stats", element: <GymStats />},
+  { path: "profile", element: <ProfileOwner />},
+];
+
+const gymRoutes = [
+  { path: "home", element: <GymHomePage />},
+  { path: "users", element: <Users />},
+  { path: "users/register", element: <RegisterUser />},
+  { path: "users/:userId/profile", element: <Profile />},
+  { path: "events", element: <EventList />},
+  { path: "events/add", element: <AddEventsForm />},
+  { path: "events/:eventId", element: <EventDetails />},
+  { path: "equipments", element: <EquipmentList />},
+  { path: "equipments/add", element: <EquipmentForm /> },
+  { path: "equipments/:equipmentId", element: <EquipmentDetails />},
+  { path: "tickets", element: <TicketManagement />},
+  { path: "profile", element: <ProfileGym />},
 ];
 
 const userRoutes = [
@@ -118,9 +91,9 @@ const userRoutes = [
   { path: "routines/:id", element: <EditRoutine /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> },
-  { path: "events", element: <EventList /> },
+  { path: "events", element: <EventListClient /> },
+  { path: "reservations/:eventId", element: <ReservationClient />},
   { path: "routines/:routineId/workouts", element: <EditWorkout /> },
-  { path: "workout/:workoutId/series", element: <Series /> },
   { path: "profile", element: <ProfileClient /> },
   { path: "equipments", element: <EquipmentList /> },
   { path: "equipmentsClient", element: <EquipmentListClient /> },
@@ -147,6 +120,11 @@ const router = createBrowserRouter([
         path: "/owner",
         element: <OwnerRoute />,
         children: ownerRoutes,
+      },
+      {
+        path: "/gym",
+        element: <GymRoute />,
+        children: gymRoutes,
       },
       {
         path: "/user",

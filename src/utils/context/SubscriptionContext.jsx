@@ -26,11 +26,36 @@ export function SubscriptionProvider( {children} ) {
 
     const getOwnerSubscription = useCallback(async () => {
         if (user.rol === 'owner') {
-            const gyms = await getFromApi(`gyms/`)
-            const gyms_list = await gyms.json()
-            const gymSubscription = gyms_list.filter(gym => gym.subscription_plan !== 'free')
-            await setOwnerSubscription({
-                owner_plan: gymSubscription[0].subscription_plan})            
+            const gyms = await getFromApi(`gyms/`);
+            const gyms_list = await gyms.json();
+            const gymSubscriptionStandard = gyms_list.some(gym => gym.subscription_plan === 'standard');
+            const gymSubscriptionPremium = gyms_list.some(gym => gym.subscription_plan === 'premium');
+            if (gymSubscriptionPremium) {
+                await setOwnerSubscription({
+                    owner_plan: "premium"});
+            } else if (gymSubscriptionStandard) {
+                await setOwnerSubscription({
+                    owner_plan: "standard"});
+            } else {
+                await setOwnerSubscription({
+                    owner_plan: "free"});
+            }        
+        }
+        else if (user.rol === "gym") {
+            const gymjson = await getFromApi("gyms/detail/" + user?.username + "/");
+            const gym = await gymjson.json();
+            if (gym.subscription_plan === "premium") {
+                await setOwnerSubscription({
+                    owner_plan: "premium"});
+            }
+            else if (gym.subscription_plan === "standard") {
+                await setOwnerSubscription({
+                    owner_plan: "standard"});
+            }
+            else {
+                await setOwnerSubscription({
+                    owner_plan: "free"});
+            }
         }
         localStorage.setItem('ownerSubscription', JSON.stringify(ownerSubscription));
     }, [ownerSubscription, user])
