@@ -256,11 +256,11 @@ const EquipmentDetailsClient = () => {
         </div>
       </FormContainer>
       <div className="mt-8 text-center">
-        <h2 className="text-2xl font-semibold mb-2">Tickets</h2>
+        <h2 className="text-2xl font-semibold mb-2">Incidencias</h2>
         <Link to="../add-tickets">
           <Button>
             <IoMdAddCircleOutline className="size-6" />
-            Añadir ticket
+            Añadir incidencia
           </Button>
         </Link>
         <ul className="mt-4">
@@ -317,7 +317,7 @@ const EquipmentDetailsClient = () => {
               </li>
             ))
           ) : (
-            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
+            <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
           )}
         </ul>
       </div>

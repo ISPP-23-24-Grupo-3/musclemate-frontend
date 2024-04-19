@@ -3,7 +3,8 @@ import { HiTicket } from "react-icons/hi";
 import { getFromApi, putToApi } from "../../utils/functions/api";
 import { Heading, TextField } from "@radix-ui/themes";
 import { IoMdSearch } from "react-icons/io";
-import { Checkbox } from "radix-ui";
+import { Checkbox } from "@radix-ui/themes";
+import { RingLoader } from "react-spinners";
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -12,9 +13,11 @@ const TicketManagement = () => {
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage] = useState(4);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchTickets = async () => {
+      setLoading(true);
       try {
         const response = await getFromApi("tickets/");
         if (response.ok) {
@@ -30,21 +33,29 @@ const TicketManagement = () => {
       } catch (error) {
         console.error("Error fetching API tickets:", error);
       }
+      setLoading(false);
     };
 
     fetchTickets();
   }, []);
 
   useEffect(() => {
+    const normalizeText = (text) => {
+      return text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    };
+  
     const filtered = allTickets.filter(
       (ticket) =>
-        ticket.gym_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.equipment_name.toLowerCase().includes(searchTerm.toLowerCase()),
+        normalizeText(ticket.gym_name).includes(normalizeText(searchTerm)) ||
+        normalizeText(ticket.equipment_name).includes(normalizeText(searchTerm)),
     );
     setFilteredTickets(
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date)),
     ); // Ordenar por fecha
-  }, [searchTerm, allTickets]);
+  }, [searchTerm, allTickets, currentPage]);
 
   const indexOfLastTicket = currentPage * ticketsPerPage;
   const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
@@ -66,10 +77,10 @@ const TicketManagement = () => {
           ),
         );
       } else {
-        console.error("Error updating ticket status:", response.status);
+        console.error("Error updating incidencia status:", response.status);
       }
     } catch (error) {
-      console.error("Error updating ticket status:", error);
+      console.error("Error updating incidencia status:", error);
     }
   };
 
@@ -94,13 +105,13 @@ const TicketManagement = () => {
             ),
           );
         } else {
-          console.error("Error updating ticket status:", updateResponse.status);
+          console.error("Error updating incidencia status:", updateResponse.status);
         }
       } else {
-        console.error("Error fetching ticket details:", response.status);
+        console.error("Error fetching incidencis details:", response.status);
       }
     } catch (error) {
-      console.error("Error updating ticket status:", error);
+      console.error("Error updating incidencias status:", error);
     }
   };
 
@@ -113,7 +124,7 @@ const TicketManagement = () => {
     <div className="max-w-lg md:mx-auto md:mt-8 m-5">
       <Heading
         size="8"
-        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-center"
       >
         Lista de Incidencias
       </Heading>
@@ -130,90 +141,100 @@ const TicketManagement = () => {
           ></TextField.Input>
         </TextField.Root>
       </div>
-      <ul>
-        {apiDataLoaded && currentTickets.length > 0 ? (
-          currentTickets.map((ticket) => (
-            <li
-              key={ticket.id}
-              className="bg-white shadow-md p-4 rounded-md mb-4"
-            >
-              <div className="flex items-center mb-2">
-                <HiTicket
-                  className={`text-${ticket.status ? "green" : "red"}-500 w-6 h-6 mr-2 cursor-pointer`}
-                  onClick={() => toggleStatus(ticket.id)}
-                />
-                <div>
-                  <div className="flex">
-                    <div className="mr-4">
+      {loading ? (
+        <RingLoader color="#30A46C" loading={loading} size={60} />
+      ) : (
+        <ul>
+          {currentTickets.length > 0 ? (
+            currentTickets.map((ticket) => (
+              <li
+                key={ticket.id}
+                className="bg-white shadow-md p-4 rounded-md mb-4"
+              >
+                <div className="flex items-center mb-2">
+                  <HiTicket
+                    className={`text-${ticket.status ? "green" : "red"}-500 w-6 h-6 mr-2 cursor-pointer`}
+                    onClick={() => toggleStatus(ticket.id)}
+                  />
+                  <div>
+                    <div className="flex">
+                      <div className="mr-4">
+                        <p className="text-radixgreen font-bold mb-1">
+                          Máquina:{" "}
+                          <span className="text-black">
+                            {ticket.equipment_name}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div>
                       <p className="text-radixgreen font-bold mb-1">
-                        Máquina:{" "}
+                        Gimnasio:{" "}
+                        <span className="text-black">{ticket.gym_name}</span>
+                      </p>
+                    </div>
+                    <div className="flex">
+                      <div className="mr-4">
+                        <p className="text-radixgreen font-bold mb-1">
+                          Asunto:{" "}
+                          <span className="text-black">{ticket.label}</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-radixgreen font-bold mb-1">
+                          Cliente:{" "}
+                          <span className="text-black">
+                            {ticket.client.name}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-radixgreen font-bold mb-1">
+                      Descripción:{" "}
+                      <span className="text-black">{ticket.description}</span>
+                    </p>
+                    <div>
+                      <p className="text-radixgreen font-bold mb-1">
+                        Correo:{" "}
                         <span className="text-black">
-                          {ticket.equipment_name}
+                          {ticket.client.email}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="flex items-center">
+                      <p className="text-radixgreen font-bold mb-1 mr-4">
+                        Fecha:{" "}
+                        <span className="text-black">
+                          {formatDate(ticket.date)}
+                        </span>
+                      </p>
+                      <Checkbox
+                        checked={ticket.status}
+                        onCheckedChange={(c) =>
+                          handleCheckboxChange(c, ticket.id)
+                        }
+                      />
+                      <p className="text-radixgreen font-bold mb-1">
+                        <span
+                          className={
+                            ticket.status
+                              ? "text-green-500 ml-2"
+                              : "text-red-500 ml-2"
+                          }
+                        >
+                          {ticket.status ? "Resuelto" : "No Resuelto"}
                         </span>
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Gimnasio:{" "}
-                      <span className="text-black">{ticket.gym_name}</span>
-                    </p>
-                  </div>
-                  <div className="flex">
-                    <div className="mr-4">
-                      <p className="text-radixgreen font-bold mb-1">
-                        Asunto:{" "}
-                        <span className="text-black">{ticket.label}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-radixgreen font-bold mb-1">
-                        Cliente:{" "}
-                        <span className="text-black">{ticket.client.name}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-radixgreen font-bold mb-1">
-                    Descripción:{" "}
-                    <span className="text-black">{ticket.description}</span>
-                  </p>
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Correo:{" "}
-                      <span className="text-black">{ticket.client.email}</span>
-                    </p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-radixgreen font-bold mb-1 mr-4">
-                      Fecha:{" "}
-                      <span className="text-black">
-                        {formatDate(ticket.date)}
-                      </span>
-                    </p>
-                    <Checkbox
-                      checked={ticket.status}
-                      onChange={(c) => handleCheckboxChange(c, ticket.id)}
-                    />
-                    <p className="text-radixgreen font-bold mb-1">
-                      <span
-                        className={
-                          ticket.status
-                            ? "text-green-500 ml-2"
-                            : "text-red-500 ml-2"
-                        }
-                      >
-                        {ticket.status ? "Resuelto" : "No Resuelto"}
-                      </span>
-                    </p>
-                  </div>
                 </div>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p className="text-red-500">No hay tickets disponibles.</p>
-        )}
-      </ul>
+              </li>
+            ))
+          ) : (
+            <p className="text-red-500">No hay incidencias disponibles.</p>
+          )}
+        </ul>
+      )}
       {/* Agregar controles de paginación */}
       <div className="flex justify-center mt-4">
         <ul className="flex">

@@ -134,7 +134,7 @@ const Header = () => {
                   to="/owner/tickets"
                   className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
                 >
-                  Tickets
+                  Incidencias
                 </Link>
               </li>
               <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
@@ -177,7 +177,7 @@ const Header = () => {
                   to="/user/add-tickets"
                   className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
                 >
-                  Crear ticket
+                  Crear Incidencia
                 </Link>
               </li>
               <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
@@ -194,6 +194,14 @@ const Header = () => {
                   className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
                 >
                   Eventos
+                </Link>
+              </li>
+              <li className="max-lg:border-b max-lg:py-2 px-3 max-lg:rounded">
+                <Link
+                  to="user/tickets"
+                  className="lg:hover:text-radixgreen text-black block font-semibold text-lg"
+                >
+                  Mis Incidencias
                 </Link>
               </li>
             </>

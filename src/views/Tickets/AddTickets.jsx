@@ -16,6 +16,19 @@ const AddTickets = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!label) {
+      setErrorMessage("El asunto es obligatorio.");
+      setSuccessMessage("");
+      return;
+    } else if (!description) {
+      setErrorMessage("La descripción es obligatoria.");
+      setSuccessMessage("");
+      return;
+    } else if (!equipmentId) {
+      setErrorMessage("La máquina es obligatoria.");
+      setSuccessMessage("");
+      return;
+    }
     try {
       const response = await postToApi("tickets/create/", {
         label,
@@ -46,16 +59,16 @@ const AddTickets = () => {
 
   useEffect(() => {
     if (user) {
-        getFromApi("clients/detail/" + user.username + "/") 
+      getFromApi("clients/detail/" + user.username + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          let gym = data.gym;
+          getFromApi("gyms/detail/" + gym + "/")
             .then((response) => response.json())
             .then((data) => {
-              let gym = data.gym;
-              getFromApi("gyms/detail/" + gym + "/") 
-              .then((response) => response.json())
-              .then((data) => {
-                setGymPlan(data.subscription_plan);
-              });
+              setGymPlan(data.subscription_plan);
             });
+        });
     }
   }, [user]);
 
@@ -63,7 +76,7 @@ const AddTickets = () => {
     <div className="mt-8 flex justify-center mb-8">
       <FormContainer className="w-1/2">
         <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
-          Crear Ticket
+          Crear Incidencia
         </h2>
         {gymPlan === "free" ? (
           <div className="text-red-700">
@@ -77,6 +90,7 @@ const AddTickets = () => {
                 type="text"
                 id="label"
                 value={label}
+                maxLength={50}
                 onChange={(e) => setLabel(e.target.value)}
               />
             </div>
@@ -85,8 +99,9 @@ const AddTickets = () => {
               <TextArea
                 id="description"
                 value={description}
+                maxLength={250}
                 onChange={(e) => setDescription(e.target.value)}
-              ></TextArea>
+              />
             </div>
             <div className="flex flex-col">
               <label htmlFor="equipmentId" className="text-gray-800">
@@ -95,6 +110,8 @@ const AddTickets = () => {
               <EquipmentSelect
                 id="equipmentId"
                 onChange={(eq) => setEquipmentId(eq.target.value)}
+                searchable // Habilitar búsqueda
+                searchPlaceholder="Buscar máquina..." // Placeholder del campo de búsqueda
               />
             </div>
             {successMessage && (
@@ -102,7 +119,7 @@ const AddTickets = () => {
             )}
             {errorMessage && <div className="text-red-700">{errorMessage}</div>}
             <Button className="w-full" type="submit">
-              Agregar Ticket
+              Agregar Incidencia
             </Button>
           </form>
         )}

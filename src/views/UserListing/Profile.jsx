@@ -20,6 +20,7 @@ const Profile = () => {
   const [editedUser, setEditedUser] = useState(null);
 
   useEffect(() => {
+    console.log(userId);
     getFromApi("clients/detail/" + userId + "/")
       .then((response) => response.json())
       .then((data) => setUser(data));

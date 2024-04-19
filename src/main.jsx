@@ -42,6 +42,8 @@ import CreateGym from "./views/Gyms/CreateGym";
 import GymDetails from "./views/Gyms/GymDetails";
 import EventDetails from "./views/EventsClasses/EventDetails"
 import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
+import TicketManagementUser from "./views/TicketManagement/TicektManagementUser";
+import AddTicketFromDetails from "./views/Tickets/AddTicketFromDetails";
 
 const ownerRoutes = [
   {
@@ -135,6 +137,8 @@ const userRoutes = [
   { path: "profile", element: <ProfileClient /> },
   { path: "equipments", element: <EquipmentList /> },
   { path: "equipmentsClient", element: <EquipmentListClient /> },
+  { path: "tickets", element: <TicketManagementUser /> },
+  { path: "equipments/:equipmentId/add-tickets", element: <AddTicketFromDetails /> },
 ];
 
 const router = createBrowserRouter([

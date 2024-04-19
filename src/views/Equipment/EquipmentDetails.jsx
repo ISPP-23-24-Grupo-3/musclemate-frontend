@@ -146,8 +146,7 @@ export default function EquipmentDetails() {
     setActualRating(value);
   }
 
-  const handleCheckboxChange = async (event, ticketId) => {
-    const { checked } = event.target;
+  const handleCheckboxChange = async (checked, ticketId) => {
     try {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
@@ -179,6 +178,7 @@ export default function EquipmentDetails() {
       console.error("Error updating ticket status:", error);
     }
   };
+  
 
   // Función para formatear la fecha
   const formatDate = (dateString) => {
@@ -470,7 +470,7 @@ export default function EquipmentDetails() {
       </FormContainer>
       <div className="mt-8 text-center md:m-0 m-5">
         <Heading size="7" className="text-radixgreen !mt-8 !mb-3 text-center">
-          Tickets
+          Incidencias
         </Heading>
         <ul>
           {apiDataLoaded && currentTickets.length > 0 ? (
@@ -516,7 +516,7 @@ export default function EquipmentDetails() {
                     <Checkbox
                       type="checkbox"
                       checked={ticket.status}
-                      onChange={(ch) => handleCheckboxChange(ch, ticket.id)}
+                      onCheckedChange={(ch) => handleCheckboxChange(ch, ticket.id)}
                       className="mr-2"
                     />
                     <p className="text-radixgreen font-bold mb-1">
@@ -535,7 +535,7 @@ export default function EquipmentDetails() {
               </li>
             ))
           ) : (
-            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
+            <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
           )}
         </ul>
         {/* Agregar controles de paginación */}
