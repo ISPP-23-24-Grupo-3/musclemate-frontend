@@ -1,14 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { getFromApi } from '../../utils/functions/api';
-import {Heading,Flex} from "@radix-ui/themes";
+import {Heading,Flex, Button,Text} from "@radix-ui/themes";
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { FormContainer } from "../../components/Form";
 import { Series as SerieForm } from "../../components/Series/Series";
 import { useParams } from 'react-router-dom';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { Link } from 'react-router-dom';
+import { EquipmentSelect } from "../../components/Equipments";
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
 
 const EditWorkout = () => {
+  const [equipment, setEquipment] = useState({});
+  const [chartData, setChartData] = useState([]);
+  const [showChart, setShowChart] = useState(false);
   const [hideForms, setHideForms] = useState([]);
   const params = useParams();
   const routineId = params.routineId;
@@ -35,6 +62,42 @@ const EditWorkout = () => {
 
     fetchWorkouts();
   }, [routineId]);
+
+  useEffect(() => {
+    const fetchSeries = async () => {
+      if (showChart) {
+        let chartData = [];
+        for (let workout of workouts){
+          if (workout.equipment.includes(Number(equipment))) {
+            try {
+              let workoutId=workout.id
+              const response = await getFromApi(`series/workout/${workoutId}/`);
+              if (response.ok) {
+                let data = await response.json();
+                data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                const workoutChartData = data.map(serie => ({
+                  reps:serie.reps,
+                  weight: serie.weight,
+                  date: serie.date,
+                }));
+                chartData.push(...workoutChartData);
+              }
+            }catch (error) {
+              console.error('Error fetching API workout:', error);
+            }
+          }
+        }
+        chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
+        setChartData(chartData);
+      }
+      else{
+        setEquipment(0)
+      }
+    };
+
+    fetchSeries();
+  }, [showChart,workouts,equipment]);
+
 
   useEffect(() => {
     const fetchRoutine = async () => {
@@ -96,6 +159,68 @@ const EditWorkout = () => {
           <Heading size="6" className="text-radixgreen mt-8 mb-3 mx-auto">Entrenamientos para la Rutina {nombre}</Heading>
           <div></div> {/* Sin este div el texto se mueve a la derecha */}
         </div>
+        <div className="flex justify-center space-x-4 mt-5 mr-4">
+          <Button onClick={() => setShowChart(!showChart)} className='w-1/2' size="4">
+            <Text>Mostrar gráfica de la evolución</Text>
+          </Button>
+        </div>
+        {showChart==true ? 
+        <div>
+          <EquipmentSelect
+            onChange={(e) =>{ setEquipment(e.target.value)}}
+          />
+          <div className='mt-7'>
+            <Line 
+              options={{
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }} 
+              data={{
+                labels: chartData.map((serie) => serie.date),
+                datasets: [
+                  {
+                    label: 'Mis Pesos',
+                    data: chartData.map((serie) => serie.weight),
+                    fill: true,
+                    borderColor: 'rgb(48, 164, 108)', 
+                    backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                  },
+                ],
+              }} 
+            />
+          </div>
+
+          <div className='mt-7'>
+          <Line 
+            options={{
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            }} 
+            data={{
+              labels: chartData.map((serie) => serie.date),
+              datasets: [
+                {
+                  label: 'Mis Repeticiones',
+                  data: chartData.map((serie) => serie.reps),
+                  fill: true,
+                  borderColor: 'rgb(48, 164, 108)', 
+                  backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                },
+              ],
+            }} 
+          />
+          </div>
+        </div>
+      : undefined
+      }
           {apiDataLoaded && workouts.length > 0 ? (
             workouts.map((workout) => (
               <div key={workout.id}>

@@ -7,32 +7,7 @@ import { useForm } from 'react-hook-form';
 import { LuPencil } from "react-icons/lu";
 import { CgTrash } from "react-icons/cg";
 
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend,
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
-
 export const Series = (workoutID) => {
-  const [chartData, setChartData] = useState([]);
   const [duration, setDuration] = useState(0);
   const workoutId = workoutID.workoutID
   const [series, setSeries] = useState([]);
@@ -71,7 +46,6 @@ export const Series = (workoutID) => {
             weight: serie.weight,
             date: serie.date,
           }));
-          setChartData(chartData.reverse());
           setSeries(data);
           setEditor(data.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {}));
           setApiDataLoaded(true);
@@ -84,29 +58,6 @@ export const Series = (workoutID) => {
     fetchSeries();
   }, [workoutId]);
 
-  useEffect(() => {
-    const fetchGraph = async () => {
-      try {
-        const response = await getFromApi(`series/workout/${workoutId}/`);
-        if (response.ok) {
-          let data = await response.json();
-          data.sort((a, b) => new Date(b.date) - new Date(a.date));
-          const chartData = data.map(serie => ({
-            reps:serie.reps,
-            weight: serie.weight,
-            date: serie.date,
-          }));
-          setChartData(chartData.reverse());
-        } else {
-          console.error('Error fetching API series:', response.status);
-        }
-      } catch (error) {
-        console.error('Error fetching API series:', error);
-      }
-    };
-
-    fetchGraph();
-  }, [series]);
 
   useEffect(() => {
     const fetchWorkout = async () => {
@@ -191,7 +142,7 @@ export const Series = (workoutID) => {
       putToApi(`series/update/${id}/`, {
         reps: serie.reps,
         weight: serie.weight,
-        date: serie.date,
+        date: new Date().toISOString().split('T')[0],
         workout: workoutId,
         duration: serie.duration
       })
@@ -270,7 +221,7 @@ export const Series = (workoutID) => {
       putToApi(`series/update/${id}/`, {
         reps: reps === "" ? serie.reps : reps,
         weight: weight === "" ? serie.weight : weight,
-        date: serie.date,
+        date: new Date().toISOString().split('T')[0],
         workout: workoutId,
         duration: durationn === 0 ? serie.duration : durationn
       })
@@ -492,65 +443,8 @@ export const Series = (workoutID) => {
             <ScrollArea.Corner className="bg-blackA5" />
           </ScrollArea.Root>
         </ul>
-      {showChart==true ? 
-        <div>
-          <div className='mt-7'>
-            <Line 
-              options={{
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                  },
-                },
-              }} 
-              data={{
-                labels: chartData.map((serie) => serie.date),
-                datasets: [
-                  {
-                    label: 'Mis Pesos',
-                    data: chartData.map((serie) => serie.weight),
-                    fill: true,
-                    borderColor: 'rgb(48, 164, 108)', 
-                    backgroundColor: 'rgba(48, 164, 108, 0.4)',
-                  },
-                ],
-              }} 
-            />
-          </div>
-
-          <div className='mt-7'>
-          <Line 
-            options={{
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                },
-              },
-            }} 
-            data={{
-              labels: chartData.map((serie) => serie.date),
-              datasets: [
-                {
-                  label: 'Mis Repeticiones',
-                  data: chartData.map((serie) => serie.reps),
-                  fill: true,
-                  borderColor: 'rgb(48, 164, 108)', 
-                  backgroundColor: 'rgba(48, 164, 108, 0.4)',
-                },
-              ],
-            }} 
-          />
-          </div>
-        </div>
-      : undefined
-      }
       
-      <div className="flex space-x-4 mt-5 mr-4">
-        <Button onClick={() => setShowChart(!showChart)} className='w-1/2' size="4">
-          <Text>Mostrar gráfica de la evolución</Text>
-        </Button>
+      <div className="flex justify-center space-x-4 mt-5 mr-4">
         <Button onClick={() => setOpen(!open)} className='w-1/2' size="4">
           <Text>Crear Serie</Text>
           <IoMdAddCircleOutline />
