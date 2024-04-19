@@ -27,7 +27,7 @@ const UserRegister = () => {
   const handleEmailChange = () => {
     setErrorMessageMail(null); // Limpiar el mensaje de error del email
   };
-  
+
   // Función para manejar cambios en el campo de nombre de usuario
   const handleUsernameChange = () => {
     setErrorMessageUser(null); // Limpiar el mensaje de error del nombre de usuario
@@ -48,13 +48,12 @@ const UserRegister = () => {
   useEffect(() => {
     if (user?.rol === "owner") {
       getGymsOwner()
-      .then((gyms) => setGyms(gyms))
-      .catch((error) => console.log(error));
-    }
-    else if (user?.rol === "gym") {
+        .then((gyms) => setGyms(gyms))
+        .catch((error) => console.log(error));
+    } else if (user?.rol === "gym") {
       getGym()
-      .then((gym) => setGym(gym))
-      .catch((error) => console.log(error));
+        .then((gym) => setGym(gym))
+        .catch((error) => console.log(error));
     }
   }, []);
 
@@ -111,7 +110,9 @@ const UserRegister = () => {
 
       if (!response.ok) {
         const responseData = await response.json();
-        setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
+        setErrorMessageUser(
+          "Este nombre de usuario ya existe, prueba con otro",
+        );
         setErrorMessageMail("Ya existe un usuario con este email en uso");
         return;
       }
@@ -134,7 +135,7 @@ const UserRegister = () => {
   };
 
   const patterns = {
-    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+    mail: /\S+@\S+\.\S+/,
     phoneNumber: /^\d{9}$/,
     zipCode: /^\d{5}$/,
   };
@@ -202,7 +203,6 @@ const UserRegister = () => {
                   pattern: { value: patterns.mail, message: messages.mail },
                 })}
                 name="email"
-                type="email"
                 onChange={handleEmailChange} // Agregar evento onChange
               />
             </TextField.Root>
@@ -400,16 +400,18 @@ const UserRegister = () => {
               <p className="text-red-500">{errors.password.message}</p>
             )}
           </div>
-          
-          { user?.rol === "owner" &&
+
+          {user?.rol === "owner" && (
             <div className="flex flex-col">
               <label htmlFor="gym" className="mr-3">
                 Gimnasio
               </label>
               <GymSelect {...register("gym", { required: messages.req })} />
-              {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
             </div>
-          }
+          )}
 
           <Button
             type="submit"

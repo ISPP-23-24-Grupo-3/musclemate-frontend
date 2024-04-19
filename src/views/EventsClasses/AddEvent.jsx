@@ -28,13 +28,12 @@ const AddEventsForm = () => {
   useEffect(() => {
     if (user?.rol === "owner") {
       getGymsOwner()
-      .then((gyms) => setGyms(gyms))
-      .catch((error) => console.log(error));
-    }
-    else if (user?.rol === "gym") {
+        .then((gyms) => setGyms(gyms))
+        .catch((error) => console.log(error));
+    } else if (user?.rol === "gym") {
       getGym()
-      .then((gym) => setGym(gym))
-      .catch((error) => console.log(error));
+        .then((gym) => setGym(gym))
+        .catch((error) => console.log(error));
     }
   }, []);
 
@@ -51,7 +50,10 @@ const AddEventsForm = () => {
       const durationSeconds = 0;
       const formattedDuration = `${durationHours.toString().padStart(2, "0")}:${durationMinutes.toString().padStart(2, "0")}:${durationSeconds.toString().padStart(2, "0")}`;
 
-      const eventData = (user?.rol === "owner") ? { ...eventInfo, duration: formattedDuration } : { ...eventInfo, duration: formattedDuration, gym: gym?.id };
+      const eventData =
+        user?.rol === "owner"
+          ? { ...eventInfo, duration: formattedDuration }
+          : { ...eventInfo, duration: formattedDuration, gym: gym?.id };
 
       const currentDate = new Date().toISOString().split("T")[0];
       console.log(currentDate);
@@ -77,8 +79,8 @@ const AddEventsForm = () => {
 
   const messages = {
     req: "Este campo es obligatorio",
-    name: "El nombre del evento debe tener más de 5 caracteres",
-    description: "La descripción debe tener más de 10 caracteres",
+    name: "El nombre del evento debe entre 5 y 100 caracteres",
+    description: "La descripción debe tener entre 10 y 255 caracteres",
     muscularGroup: "El grupo muscular debe ser especificado",
   };
 
@@ -95,6 +97,7 @@ const AddEventsForm = () => {
               {...register("name", {
                 required: messages.req,
                 minLength: { value: 5, message: messages.name },
+                maxLength: { value: 100, message: messages.name },
               })}
               name="name"
               type="text"
@@ -110,6 +113,7 @@ const AddEventsForm = () => {
               {...register("description", {
                 required: messages.req,
                 minLength: { value: 10, message: messages.description },
+                maxLength: { value: 255, message: messages.description },
               })}
               name="description"
               rows="4"
@@ -122,32 +126,50 @@ const AddEventsForm = () => {
           <div>
             <label htmlFor="capacity">Aforo</label>
             <TextField.Input
-              {...register("capacity", { required: messages.req })}
+              {...register("capacity", {
+                required: messages.req,
+                min: {
+                  value: 1,
+                  message: "Debe ser mayor o igual a 1",
+                },
+              })}
               name="capacity"
               type="number"
-              min="0" // Establecer el valor mínimo permitido
-              step="1"
+              min="1"
             />
+            {errors.capacity && (
+              <p className="text-red-500">{errors.capacity.message}</p>
+            )}
           </div>
-          {errors.capacity && (
-            <p className="text-red-500">{errors.capacity.message}</p>
-          )}
 
           <div>
             <label htmlFor="attendees">Asistentes</label>
             <TextField.Input
-              {...register("attendees")}
+              {...register("attendees", {
+                min: {
+                  value: 0,
+                  message: "Debe ser mayor o igual a 0",
+                },
+              })}
               name="attendees"
               type="number"
-              min="0" // Establecer el valor mínimo permitido
-              step="1"
+              min="1"
             />
+            {errors.attendees && (
+              <p className="text-red-500">{errors.attendees.message}</p>
+            )}
           </div>
 
           <div>
             <label htmlFor="instructor">Monitor</label>
             <TextField.Input
-              {...register("instructor", { required: messages.req })}
+              {...register("instructor", {
+                required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "Debe tener como máximo 100 caracteres",
+                },
+              })}
               name="instructor"
               type="text"
             />
@@ -161,6 +183,10 @@ const AddEventsForm = () => {
             <TextField.Input
               {...register("date", {
                 required: messages.req,
+                validate: {
+                  futureDate: (date) =>
+                    new Date(date) > new Date() || "Debe ser una fecha futura",
+                },
               })}
               name="date"
               type="date"
@@ -175,9 +201,14 @@ const AddEventsForm = () => {
             <TextField.Input
               {...register("duration", {
                 required: "Este campo es obligatorio",
+                min: {
+                  value: 1,
+                  message: "Debe ser mayor o igual a 1",
+                },
               })}
               name="duration"
               type="number"
+              min="1"
             />
             {errors.duration && (
               <p className="text-red-500">{errors.duration.message}</p>
@@ -190,22 +221,24 @@ const AddEventsForm = () => {
               placeholder="Selecciona una intensidad"
               {...register("intensity", { required: messages.req })}
             >
-              <Select.Item value="L">Low</Select.Item>
-              <Select.Item value="M">Medium</Select.Item>
-              <Select.Item value="H">High</Select.Item>
+              <Select.Item value="L">Baja</Select.Item>
+              <Select.Item value="M">Media</Select.Item>
+              <Select.Item value="H">Alta</Select.Item>
             </RHFSelect>
             {errors.intensity && (
               <p className="text-red-500">{errors.intensity.message}</p>
             )}
           </div>
-          
-          { user?.rol === "owner" &&
+
+          {user?.rol === "owner" && (
             <div className="flex flex-col">
               <label htmlFor="gym">Gimnasio</label>
               <GymSelect {...register("gym", { required: messages.req })} />
-              {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
             </div>
-          }
+          )}
 
           <Button
             type="submit"
