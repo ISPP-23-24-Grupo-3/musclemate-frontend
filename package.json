@@ -26,6 +26,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/themes": "^2.0.3",
     "axios": "^1.6.7",
+    "chart.js": "^4.4.2",
     "dotenv": "^16.4.5",
     "heroicons": "^2.1.1",
     "jwt-decode": "^4.0.0",

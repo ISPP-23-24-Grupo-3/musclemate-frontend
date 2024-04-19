@@ -23,6 +23,7 @@ export const Series = (workoutID) => {
   const [showStartButton, setShowStartButton] = useState({});
   const [serieTimerOn, setSerieTimerOn] = useState({});
   const [editingSerieId, setEditingSerieId] = useState(null);
+  const [tipo, setTipo] = useState('peso');
 
   function formatDuration(duration) {
     const minutes = Math.floor(duration / 60);
@@ -58,6 +59,7 @@ export const Series = (workoutID) => {
     fetchSeries();
   }, [workoutId]);
 
+ 
 
   useEffect(() => {
     const fetchWorkout = async () => {
@@ -443,6 +445,61 @@ export const Series = (workoutID) => {
             <ScrollArea.Corner className="bg-blackA5" />
           </ScrollArea.Root>
         </ul>
+
+      {showChart==true ? 
+        <div>
+          <div className='mt-7'>
+            <Line 
+              options={{
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }} 
+              data={{
+                labels: chartData.map((serie) => serie.date),
+                datasets: [
+                  {
+                    label: 'Mis Pesos',
+                    data: chartData.map((serie) => serie.weight),
+                    fill: true,
+                    borderColor: 'rgb(48, 164, 108)', 
+                    backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                  },
+                ],
+              }} 
+            />
+          </div>
+
+          <div className='mt-7'>
+          <Line 
+            options={{
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            }} 
+            data={{
+              labels: chartData.map((serie) => serie.date),
+              datasets: [
+                {
+                  label: `Mis ${tipo == 'peso' ? 'pesos' : 'repeticiones'}`,
+                  data: chartData.map((serie) => tipo == 'peso' ? serie.weight : serie.reps),
+                  fill: true,
+                  borderColor: 'rgb(48, 164, 108)', 
+                  backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                },
+              ],
+            }} 
+          />
+          </div>
+        </div>
+      : undefined
+      }
       
       <div className="flex justify-center space-x-4 mt-5 mr-4">
         <Button onClick={() => setOpen(!open)} className='w-1/2' size="4">
@@ -450,6 +507,19 @@ export const Series = (workoutID) => {
           <IoMdAddCircleOutline />
         </Button>
       </div>
+      {showChart==true ?
+          <div className="mt-5 mr-4 flex justify-center" >
+            {tipo == 'peso' ?
+              <Button onClick={() => setTipo('reps')} className='w-1/2' size="4">
+                <Text>Mostrar Repeticiones</Text>
+              </Button>
+            :  
+              <Button onClick={() => setTipo('peso')} className='w-1/2' size="4">
+                <Text>Mostrar Pesos</Text>
+              </Button>
+            }
+          </div>
+        : undefined}
       {open && (
         <Card className='mt-5 mb-8 shadow-lg border-2 border-radixgreen'>
           <div className="flex flex-col items-center">

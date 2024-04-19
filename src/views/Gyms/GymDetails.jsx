@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getFromApi, deleteFromApi } from "../../utils/functions/api";
 import { Button, Heading } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form";
@@ -93,6 +93,7 @@ export default function GymDetails() {
         <Heading size="7" className="text-radixgreen !mb-3 text-center">
           Detalles del Gimnasio
         </Heading>
+
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
             <strong className="text-radixgreen">Nombre</strong>
@@ -110,13 +111,22 @@ export default function GymDetails() {
             <strong className="text-radixgreen">Descripción</strong>{" "}
             {gymDetails.descripcion}
           </div>
-          <Button
-            color="red"
-            className="w-1/2 self-center"
-            onClick={handleDeleteGym}
-          >
-            Eliminar Gimnasio
-          </Button>
+          <div className="mt-4 text-center space-x-10">
+            <Link to={`../gyms/${gymId}/stats`}>
+              <Button
+                className="text-white font-bold py-2 px-4 rounded"
+              >
+                Ver Estadísticas
+              </Button>
+            </Link> 
+            <Button
+              color="red"
+              className="w-1/2 self-center"
+              onClick={handleDeleteGym}
+            >
+              Eliminar Gimnasio
+            </Button>
+          </div>
         </div>
       </FormContainer>
     </div>
