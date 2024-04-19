@@ -11,6 +11,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
 import { Ticket } from "../../components/Ticket/Ticket";
+import { RingLoader } from "react-spinners";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
@@ -260,20 +261,22 @@ const EquipmentDetailsClient = () => {
       </FormContainer>
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-semibold mb-2">Incidencias</h2>
-        <Link to="../add-tickets">
+        <Link to={`${window.location.pathname}/add-tickets`}>
           <Button>
             <IoMdAddCircleOutline className="size-6" />
             Añadir incidencia
           </Button>
         </Link>
         <ul className="mt-4">
-          {apiDataLoaded && apiTickets.length > 0 ? (
-            apiTickets.map((ticket) => (
-              <Ticket ticket={ticket} key={ticket.id} disabled />
-            ))
-          ) : (
-            <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
-          )}
+        {apiDataLoaded && apiTickets.length > 0 ? (
+          apiTickets.map((ticket) => (
+            <Ticket ticket={ticket} key={ticket.id} disabled />
+          ))
+        ) : (
+          <div className="flex justify-center mt-4">
+            <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+          </div>
+        )}
         </ul>
       </div>
     </div>

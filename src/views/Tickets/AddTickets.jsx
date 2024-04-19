@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { postToApi, getFromApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
@@ -38,14 +39,14 @@ const AddTickets = () => {
         status: false,
       });
       if (response.ok) {
-        setSuccessMessage("Ticket creado exitosamente");
+        setSuccessMessage("Incidencia creada exitosamente");
         setErrorMessage("");
         setLabel("");
         setDescription("");
         setEquipmentId("");
       } else {
         setErrorMessage(
-          "Error al crear el ticket. Por favor, inténtelo de nuevo más tarde.",
+          "Error al crear la incidencia. Por favor, inténtelo de nuevo más tarde.",
         );
         setSuccessMessage("");
       }

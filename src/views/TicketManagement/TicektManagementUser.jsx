@@ -4,6 +4,7 @@ import { Heading, TextField } from "@radix-ui/themes";
 import { IoMdSearch } from "react-icons/io";
 import AuthContext from "../../utils/context/AuthContext";
 import { RingLoader } from "react-spinners";
+import { Ticket } from "../../components/Ticket/Ticket";
 
 const TicketManagementUser = () => {
   const { user } = useContext(AuthContext);
@@ -99,60 +100,7 @@ const TicketManagementUser = () => {
           {apiDataLoaded ? (
             currentTickets.length > 0 ? (
               currentTickets.map((ticket) => (
-                <li
-                  key={ticket.id}
-                  className="bg-white shadow-md p-4 rounded-md mb-4"
-                >
-                  <div className="flex items-center mb-2">
-                    <div>
-                      <div className="flex">
-                        <div className="mr-4">
-                          <p className="text-radixgreen font-bold mb-1">
-                            Máquina:{" "}
-                            <span className="text-black">
-                              {ticket.equipment_name}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-radixgreen font-bold mb-1">
-                          Gimnasio:{" "}
-                          <span className="text-black">{ticket.gym_name}</span>
-                        </p>
-                      </div>
-                      <div className="flex">
-                        <div className="mr-4">
-                          <p className="text-radixgreen font-bold mb-1">
-                            Asunto:{" "}
-                            <span className="text-black">{ticket.label}</span>
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-radixgreen font-bold mb-1">
-                        Descripción:{" "}
-                        <span className="text-black">{ticket.description}</span>
-                      </p>
-                      <div>
-                        <p className="text-radixgreen font-bold mb-1">
-                          Fecha:{" "}
-                          <span className="text-black">
-                            {formatDate(ticket.date)}
-                          </span>
-                        </p>
-                      </div>
-                      <p className="text-radixgreen font-bold mb-1">
-                        <span
-                          className={
-                            ticket.status ? "text-green-500" : "text-red-500"
-                          }
-                        >
-                          {ticket.status ? "Resuelto" : "No Resuelto"}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </li>
+                <Ticket ticket={ticket} key={ticket.id} disabled />
               ))
             ) : (
               <p className="text-red-500">No hay incidencias disponibles.</p>

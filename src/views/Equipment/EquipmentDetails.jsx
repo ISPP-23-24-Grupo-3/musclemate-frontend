@@ -16,6 +16,7 @@ import { HiTicket } from "react-icons/hi";
 import { Checkbox } from "@radix-ui/themes";
 import { RHFSelect } from "../../components/RHFSelect.jsx";
 import { Ticket } from "../../components/Ticket/Ticket.jsx";
+import { RingLoader } from "react-spinners";
 
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
@@ -474,7 +475,8 @@ export default function EquipmentDetails() {
           Incidencias
         </Heading>
         <ul>
-          {apiDataLoaded && currentTickets.length > 0 ? (
+        {apiDataLoaded ? (
+          currentTickets.length > 0 ? (
             currentTickets.map((ticket) => (
               <Ticket
                 key={ticket.id}
@@ -484,7 +486,12 @@ export default function EquipmentDetails() {
             ))
           ) : (
             <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
-          )}
+          )
+        ) : (
+          <div className="flex justify-center mt-4">
+            <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+          </div>
+        )}
         </ul>
         {/* Agregar controles de paginación */}
         <div className="flex justify-center mt-4">

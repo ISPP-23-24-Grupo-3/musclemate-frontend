@@ -141,16 +141,22 @@ const TicketManagement = () => {
         </TextField.Root>
       </div>
       <div className="flex flex-col gap-4">
-        {apiDataLoaded && currentTickets.length > 0 ? (
-          currentTickets.map((ticket) => (
-            <Ticket
-              ticket={ticket}
-              key={ticket.id}
-              onStatusChange={handleCheckboxChange}
-            />
-          ))
+        {loading ? (
+          <RingLoader color={"#123abc"} loading={loading} />
         ) : (
-          <p className="text-red-500">No hay tickets disponibles.</p>
+          <>
+            {apiDataLoaded && currentTickets.length > 0 ? (
+              currentTickets.map((ticket) => (
+                <Ticket
+                  ticket={ticket}
+                  key={ticket.id}
+                  onStatusChange={handleCheckboxChange}
+                />
+              ))
+            ) : (
+              <p className="text-red-500">No hay incidencias disponibles.</p>
+            )}
+          </>
         )}
       </div>
       {/* Agregar controles de paginación */}

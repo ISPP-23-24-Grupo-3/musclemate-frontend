@@ -29,13 +29,13 @@ const AddTicketFromDetails = () => {
         status: false,
       });
       if (response.ok) {
-        setSuccessMessage("Ticket creado exitosamente");
+        setSuccessMessage("Incidencia creada exitosamente");
         setErrorMessage("");
         setLabel("");
         setDescription("");
       } else {
         setErrorMessage(
-          "Error al crear el ticket. Por favor, inténtelo de nuevo más tarde."
+          "Error al crear la incidencia. Por favor, inténtelo de nuevo más tarde."
         );
         setSuccessMessage("");
       }
