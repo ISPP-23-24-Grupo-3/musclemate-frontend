@@ -10,6 +10,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
+import { Ticket } from "../../components/Ticket/Ticket";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
@@ -77,16 +78,16 @@ const EquipmentDetailsClient = () => {
   // Datos de subscripción
   useEffect(() => {
     if (user) {
-        getFromApi("clients/detail/" + user.username + "/") 
+      getFromApi("clients/detail/" + user.username + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          let gym = data.gym;
+          getFromApi("gyms/detail/" + gym + "/")
             .then((response) => response.json())
             .then((data) => {
-              let gym = data.gym;
-              getFromApi("gyms/detail/" + gym + "/") 
-              .then((response) => response.json())
-              .then((data) => {
-                setGymPlan(data.subscription_plan);
-              });
+              setGymPlan(data.subscription_plan);
             });
+        });
     }
   }, [user]);
 
@@ -195,7 +196,7 @@ const EquipmentDetailsClient = () => {
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
           {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-  
+
         <div className="mb-1">
           <strong className="text-radixgreen">Tu Valoración:</strong>
           <div
@@ -206,7 +207,9 @@ const EquipmentDetailsClient = () => {
             }}
           >
             {gymPlan === "free" ? (
-              <div className="text-red-700">La subscripción de tu gimnasio no incluye esta funcionalidad.</div>
+              <div className="text-red-700">
+                La subscripción de tu gimnasio no incluye esta funcionalidad.
+              </div>
             ) : (
               <>
                 <EditableRating
@@ -214,7 +217,7 @@ const EquipmentDetailsClient = () => {
                     setActualRating(e);
                   }}
                 />
-  
+
                 {isClient && (
                   <div style={{ display: "flex" }}>
                     <Button
@@ -248,7 +251,7 @@ const EquipmentDetailsClient = () => {
             )}
           </div>
         </div>
-  
+
         <div className="mt-4 flex justify-center items-center">
           <strong className="text-radixgreen">
             {message && <div>{message}</div>}
@@ -266,55 +269,7 @@ const EquipmentDetailsClient = () => {
         <ul className="mt-4">
           {apiDataLoaded && apiTickets.length > 0 ? (
             apiTickets.map((ticket) => (
-              <li
-                key={ticket.id}
-                className={`bg-white shadow-md p-4 rounded-md mb-4 ${
-                  ticket.status ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                <div className="flex items-center mb-2">
-                  <HiTicket className="w-6 h-6 mr-2" />
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Usuario:{" "}
-                      <span className="text-black">
-                        {ticket.client.name} {ticket.client.lastName}
-                      </span>
-                      <span className="ml-7">
-                        Asunto:{" "}
-                        <span className="text-black">{ticket.label}</span>
-                      </span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Descripción:{" "}
-                      <span className="text-black">{ticket.description}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Gimnasio:{" "}
-                      <span className="text-black">{ticket.gym_name}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Email:{" "}
-                      <span className="text-black">{ticket.client.email}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Fecha:{" "}
-                      <span className="text-black">
-                        {formatDate(ticket.date)}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="ml-auto">
-                    {ticket.status ? (
-                      <span className="text-green-500 font-bold">Resuelto</span>
-                    ) : (
-                      <span className="text-red-500 font-bold">
-                        No resuelto
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </li>
+              <Ticket ticket={ticket} key={ticket.id} disabled />
             ))
           ) : (
             <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>

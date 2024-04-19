@@ -28,9 +28,16 @@ export const Routines = () => {
   const { user } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [routines, setRoutines] = useState([]);
+  const [workouts, set_workouts] = useState([]);
   const [gymPlan, setGymPlan] = useState("");
 
   useEffect(() => {
+    const fetchWorkouts = async () => {
+      const response = await getFromApi("workouts/");
+      const fetchedWorkouts = await response.json();
+      return fetchedWorkouts;
+    };
+
     const fetchRoutines = async () => {
       const response = await getFromApi("routines/");
       const fetchedRoutines = await response.json();
@@ -44,51 +51,58 @@ export const Routines = () => {
           "There was a problem while searching your routines. Please stand by.",
         );
       });
+    fetchWorkouts().then((w) => set_workouts(w));
   }, []);
 
   useEffect(() => {
     if (user) {
-        getFromApi("clients/detail/" + user.username + "/") 
+      getFromApi("clients/detail/" + user.username + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          let gym = data.gym;
+          getFromApi("gyms/detail/" + gym + "/")
             .then((response) => response.json())
             .then((data) => {
-              let gym = data.gym;
-              getFromApi("gyms/detail/" + gym + "/") 
-              .then((response) => response.json())
-              .then((data) => {
-                setGymPlan(data.subscription_plan);
-              });
+              setGymPlan(data.subscription_plan);
             });
+        });
     }
   }, [user]);
 
   return (
-    <Section className="md:m-0 m-5">
+    <>
       <div className="flex mb-3 justify-between">
         <Heading size="8" className="text-radixgreen text-center md:text-left">
           Mis Rutinas
         </Heading>
       </div>
-  
+
       {gymPlan === "free" ? (
         <div className="text-red-700 text-center mb-4">
-          La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
+          La subscripción "{gymPlan}" de tu gimnasio no incluye esta
+          funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades
+          como esta!
         </div>
       ) : (
         <>
           <RoutineForm set_routines={setRoutines} routines={routines} />
-  
+
           {error ? (
             <Error message={error} size="3" />
           ) : (
-            <ListRoutines routines={routines} set_routines={setRoutines} />
+            <ListRoutines
+              routines={routines}
+              set_routines={setRoutines}
+              workouts={workouts}
+            />
           )}
         </>
       )}
-    </Section>
+    </>
   );
 };
 
-const ListRoutines = ({ routines, set_routines }) => {
+const ListRoutines = ({ routines, set_routines, workouts }) => {
   const navigate = useNavigate();
   const editRoutine = (routine) => navigate("/user/routines/" + routine.id);
   const startRoutine = (routine) =>
@@ -111,9 +125,20 @@ const ListRoutines = ({ routines, set_routines }) => {
 
   if (routines.length === 0) {
     return (
-      <Info size="3" message="You don't have routines currently registered." />
+      <Info size="3" message="Aún no tienes rutinas creadas para mostrar" />
     );
   }
+
+  const getWorkoutsLength = (routineId) => {
+    let workoutLenght = 0;
+    for (const workout of workouts) {
+      if (workout.routine == routineId) {
+        workoutLenght += 1;
+      }
+    }
+    return workoutLenght;
+  };
+
   return (
     <Flex gap="4" direction="column">
       {routines.map((routine) => (
@@ -122,13 +147,20 @@ const ListRoutines = ({ routines, set_routines }) => {
           size="4"
           className="flex bg-radixgreen/10 items-center p-4 justify-between rounded-lg"
         >
-          <span className="flex gap-3 items-center">
-            <Text style={{ textOverflow: "ellipsis" }} size="5" weight="bold">
+          <Flex direction="column">
+            <Text
+              wrap="nowrap"
+              style={{ textOverflow: "ellipsis", fontWeight: "bold" }}
+              size="5"
+            >
               {routine.name}
             </Text>
             {routine.temp_id && <CgSpinner className="size-6 animate-spin" />}
-          </span>
-          <span className="flex gap-3">
+            <Text color="gray" size="2">
+              {getWorkoutsLength(routine.id)} ejercicios
+            </Text>
+          </Flex>
+          <span className="flex gap-2 md:gap-5">
             <IconButton
               size="3"
               radius="full"
@@ -215,7 +247,7 @@ const RoutineForm = ({ set_routines, routines }) => {
           <FormContainer className="mb-6">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className={`flex justify-between`}
+              className={`flex justify-between flex-wrap gap-3 flex-col sm:flex-row`}
             >
               <div className="flex flex-col gap-1">
                 <span>Nombre de la rutina</span>
@@ -241,7 +273,7 @@ ListRoutines.propTypes = {
   routines: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
     }),
   ).isRequired,
 };

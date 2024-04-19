@@ -69,6 +69,16 @@ const AddTickets = () => {
               setGymPlan(data.subscription_plan);
             });
         });
+      getFromApi("clients/detail/" + user.username + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          let gym = data.gym;
+          getFromApi("gyms/detail/" + gym + "/")
+            .then((response) => response.json())
+            .then((data) => {
+              setGymPlan(data.subscription_plan);
+            });
+        });
     }
   }, [user]);
 

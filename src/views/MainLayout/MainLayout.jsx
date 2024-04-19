@@ -12,8 +12,7 @@ const MainLayout = ({ children }) => {
         <Theme>
           <div className="flex flex-col min-h-screen">
             <Header />
-            <Container size="4" my="7">
-              {children}
+            <Container size="4" my="7" mx={{ md: "9", xs: "6", initial: "4" }}>
               <Outlet />
             </Container>
             <Footer />

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getFromApi, deleteFromApi } from "../../utils/functions/api";
 import { Button, Heading } from "@radix-ui/themes";
+import { FormContainer } from "../../components/Form";
 
 export default function GymDetails() {
   const { gymId } = useParams();
@@ -63,42 +64,71 @@ export default function GymDetails() {
   return (
     <div className="mt-8 max-w-xl mx-auto">
       {deleteSuccess && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <div
+          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
           <strong className="font-bold">¡Éxito!</strong>
-          <span className="block sm:inline"> El gimnasio se ha eliminado correctamente.</span>
-          <span className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={() => setDeleteSuccess(false)}>
-            <svg className="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Cerrar</title><path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z"/></svg>
+          <span className="block sm:inline">
+            {" "}
+            El gimnasio se ha eliminado correctamente.
+          </span>
+          <span
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+            onClick={() => setDeleteSuccess(false)}
+          >
+            <svg
+              className="fill-current h-6 w-6 text-green-500"
+              role="button"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <title>Cerrar</title>
+              <path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z" />
+            </svg>
           </span>
         </div>
       )}
-      <div className="p-10 border border-radixgreen rounded md:m-0 m-5">
+      <FormContainer className="">
         <Heading size="7" className="text-radixgreen !mb-3 text-center">
           Detalles del Gimnasio
         </Heading>
-        <div className="mb-4">
-          <strong className="text-radixgreen">Nombre:</strong> {gymDetails.name}
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <strong className="text-radixgreen">Nombre</strong>
+            {gymDetails.name}
+          </div>
+          <div className="flex flex-col">
+            <strong className="text-radixgreen">Dirección</strong>{" "}
+            {gymDetails.address}
+          </div>
+          <div className="flex flex-col">
+            <strong className="text-radixgreen">Número de Teléfono</strong>{" "}
+            {gymDetails.phone_number}
+          </div>
+          <div className="flex flex-col">
+            <strong className="text-radixgreen">Descripción</strong>{" "}
+            {gymDetails.descripcion}
+          </div>
+          <div className="mt-4 text-center space-x-10">
+            <Link to={`../gyms/${gymId}/stats`}>
+              <Button
+                className="text-white font-bold py-2 px-4 rounded"
+              >
+                Ver Estadísticas
+              </Button>
+            </Link> 
+            <Button
+              color="red"
+              className="w-1/2 self-center"
+              onClick={handleDeleteGym}
+            >
+              Eliminar Gimnasio
+            </Button>
+          </div>
         </div>
-        <div className="mb-4">
-          <strong className="text-radixgreen">Dirección:</strong>{" "}
-          {gymDetails.address}
-        </div>
-        <div className="mb-4">
-          <strong className="text-radixgreen">Número de Teléfono:</strong>{" "}
-          {gymDetails.phone_number}
-        </div>
-        <div className="mb-4">
-          <strong className="text-radixgreen">Descripción:</strong>{" "}
-          {gymDetails.descripcion}
-        </div>
-        <div className="mt-4 text-center">
-          <Button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleDeleteGym}
-          >
-            Eliminar Gimnasio
-          </Button>
-        </div>
-      </div>
+      </FormContainer>
     </div>
   );
 }
