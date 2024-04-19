@@ -1,6 +1,6 @@
-/* eslint-disable react/prop-types */
 import { Select } from "@radix-ui/themes";
 import React from "react";
+import PropTypes from "prop-types";
 
 export const RHFSelect = ({
   children,
@@ -9,6 +9,9 @@ export const RHFSelect = ({
   placeholder,
   name,
   onChange,
+  radius,
+  variant,
+  size,
 }) => {
   return (
     <Select.Root
@@ -16,9 +19,26 @@ export const RHFSelect = ({
       className={className}
       name={name}
       onValueChange={(v) => onChange({ target: { name, value: v } })}
+      size={size}
     >
-      <Select.Trigger placeholder={placeholder} />
+      <Select.Trigger
+        placeholder={placeholder}
+        variant={variant}
+        radius={radius}
+      />
       <Select.Content position="popper">{children}</Select.Content>
     </Select.Root>
   );
+};
+
+RHFSelect.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  placeholder: PropTypes.string,
+  name: PropTypes.string,
+  onChange: PropTypes.func,
+  radius: PropTypes.string,
+  defaultValue: PropTypes.string,
+  variant: PropTypes.string,
+  size: PropTypes.string,
 };

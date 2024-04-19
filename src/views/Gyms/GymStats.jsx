@@ -61,6 +61,7 @@ export default function GymStats() {
                 }
             })
             .then((data) => {
+                console.log(data);
                 let groupedYearData = {};
 
                 for (let i = 0; i < data.length; i++) {

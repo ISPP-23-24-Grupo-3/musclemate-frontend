@@ -8,15 +8,15 @@ import {
   Section,
   Select,
 } from "@radix-ui/themes";
+import { IoMdFitness } from "react-icons/io";
 import { ImCross } from "react-icons/im";
-import { useContext, useEffect, useState } from "react";
-import { CgGym, CgTrash } from "react-icons/cg";
-import { FaPlus } from "react-icons/fa";
-import { LuPencil } from "react-icons/lu";
+import { useContext, useEffect, useRef, useState } from "react";
+import { FaCheck, FaPlus } from "react-icons/fa";
+import { LuPencil, LuPlusCircle } from "react-icons/lu";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Info } from "../../components/Callouts/Callouts";
-import AuthContext from "../../utils/context/AuthContext";
+import { EquipmentSelect } from "../../components/Equipments";
 import { useNavigate } from "react-router-dom";
 
 import PropTypes from "prop-types";
@@ -26,21 +26,41 @@ import {
   postToApi,
   putToApi,
 } from "../../utils/functions/api";
-import { FormContainer } from "../../components/Form";
+import AuthContext from "../../utils/context/AuthContext";
 
 export const EditRoutine = () => {
+  const [editing_name, set_editing_name] = useState(false);
+  const [routines, setRoutines] = useState([]);
+  const { register, handleSubmit, setValue, formState: { errors }} = useForm()
   const [routine, setRoutine] = useState({
     name: "",
   });
-
-  const [other_workouts, set_other_workouts] = useState([]);
-  const [workouts, set_workouts] = useState([]);
-  const [hide_form, set_hide_form] = useState(true);
-  const [editing_name, set_editing_name] = useState(false);
-  const [equipment, set_equipment] = useState([]);
-  const [routines, setRoutines] = useState([]);
+  const [routineNames, setRoutineNames] = useState([]);
 
   const routineId = useParams().id;
+
+  useEffect(() => {
+    const fetchRoutines = async () => {
+      const response = await getFromApi("routines/");
+      const fetchedRoutines = await response.json();
+      return fetchedRoutines;
+    };
+
+    fetchRoutines().then((data) => {
+      const current = data.find((r) => r.id == routineId);
+      setRoutine(current);
+      setRoutineNames(data.filter((r) => r.id != routineId).map((r) => r.name));
+    });
+  }, [routineId]);
+  
+  const hasUniqueNameRoutine = (routineName, currentRoutine) => {
+    return (
+      routines.every((r) => {
+        // Excluye la comparación si estamos editando la rutina con el mismo nombre
+        return currentRoutine && r.name === currentRoutine.name ? true : routineName !== r.name;
+      }) || "Ya tienes una rutina con ese nombre"
+    );
+  };
   const updateName = (name) => {
     const prevRoutine = { ...routine };
     const tempRoutine = { ...routine, name: name };
@@ -50,296 +70,126 @@ export const EditRoutine = () => {
       .then((updatedRoutine) => setRoutine(updatedRoutine))
       .catch(setRoutine(prevRoutine));
   };
-
-  useEffect(() => {
-
-    const fetchRoutines = async () => {
-      const response = await getFromApi("routines/");
-      const fetchedRoutines = await response.json();
-      return fetchedRoutines;
-    };
-
-    fetchRoutines()
-      .then((r) => setRoutines(r));
-
-    const fetchWorkouts = async (routineId) => {
-      const response = await getFromApi("workouts/byRoutine/"+routineId+"/");
-      const fetchedWorkouts = await response.json();
-      set_other_workouts(
-        fetchedWorkouts.filter((w) => w.routine.some((r) => r != routineId)),
-      );
-      return fetchedWorkouts.filter((w) =>
-        // Array.includes does not cover the case of having string inputs and numbers inside the array
-        w.routine.some((r) => r == routineId),
-      );
-    };
-    const fetchRoutine = async (id) => {
-      try {
-        const response = await getFromApi(`routines/detail/`+id+`/`);
-        if (!response.ok) {
-          throw new Error("No tienes permisos para acceder a esta rutina.");
-        }
-        const fetchedRoutine = await response.json();
-        return fetchedRoutine;
-      } catch (error) {
-        window.alert(error.message);
-      }
-    };
-    const fetchEquipment = async () => {
-      const response = await getFromApi(`equipments/`);
-      const fetchedEquipment = await response.json();
-      return fetchedEquipment;
-    };
-
-    fetchWorkouts(routineId).then((w) => set_workouts(w));
-    fetchRoutine(routineId)
-      .then((r) => setRoutine(r))
-      .catch((error) => {
-      });
-    fetchEquipment().then((e) => set_equipment(e));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routineId]);
-
-  const { register, handleSubmit, setValue, formState: { errors }} = useForm()
+  
   const navigate = useNavigate();
   const startRoutine = () => navigate(`/user/routines/${routineId}/workouts`, { state: { routineId: routineId } });
-  const hasUniqueNameRoutine = (routineName, currentRoutine) => {
-    return (
-      routines.every((r) => {
-        // Excluye la comparación si estamos editando la rutina con el mismo nombre
-        return currentRoutine && r.name === currentRoutine.name ? true : routineName !== r.name;
-      }) || "Ya tienes una rutina con ese nombre"
-    );
-  };
 
   return (
     <>
-      <Section className="!pt-1">
-        <div className="flex justify-around items-center pt-8">
-          <div className="flex items-center gap-3 pt-2 mb-3">
-            <Heading className={`${editing_name ? "hidden" : undefined} text-radixgreen`}>
-              {routine.name}
-            </Heading>
-            <form
-              className={`${!editing_name ? "hidden" : undefined} flex gap-3`}
-              onSubmit={handleSubmit((r) => {
-                updateName(r.name);
-                set_editing_name(false);
-              })}
-              >
-              <TextField.Input
-                name="name"
-                {...register("name", {
-                  required: "Debes escribir un nombre",
-                  validate: {
-                    unique: hasUniqueNameRoutine,
-                    maxLength: value => value.length <= 100 || 'El valor no puede tener más de 100 caracteres'
-                  },
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div>
+              <Heading className={`${editing_name ? "hidden" : undefined} text-radixgreen`}>
+                Rutina: {routine.name}
+              </Heading>
+              <form
+                className={`${!editing_name ? "hidden" : undefined} flex gap-3 items-center`}
+                onSubmit={handleSubmit((r) => {
+                  updateName(r.name);
+                  set_editing_name(false);
                 })}
-                color={errors.name ? "red" : undefined}
-                className={`${errors.name ? "!border-red-500" : undefined}`}
-                >
-              </TextField.Input>
-              {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-              <Button>Aceptar</Button>
-            </form>
-            <IconButton
-              className={editing_name ? "!hidden" : undefined}
-              radius="full"
-              onClick={() => {
-                set_editing_name(true);
-                setValue("name", routine.name);
-              }}
-            >
-              <LuPencil />
-            </IconButton>
+              >
+                <div className="flex items-center gap-3">
+                  <TextField.Input
+                    name="name"
+                    {...register("name", {
+                      required: "Debes escribir un nombre",
+                      validate: {
+                        unique: hasUniqueNameRoutine,
+                        maxLength: value => value.length <= 100 || 'El valor no puede tener más de 100 caracteres'
+                      },
+                    })}
+                    color={errors.name ? "red" : undefined}
+                    className={`${errors.name ? "!border-red-500" : undefined}`}
+                  />
+                  {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+                </div>
+                <Button type="submit">Aceptar</Button>
+              </form>
+            </div>
+            <div className="flex items-center ml-4">
+              <IconButton
+                className={`ml-auto ${editing_name ? undefined : "hidden"}`}
+                radius="full"
+                onClick={() => {
+                  set_editing_name(true);
+                  setValue("name", routine.name);
+                }}
+              >
+                <LuPencil />
+              </IconButton>
+            </div>
           </div>
-          <button
-            className="my-4 p-4 rounded-lg flex items-center gap-3 bg-green-100 cursor-pointer focus:outline-none"
-            onClick={() => set_hide_form(false)}
-            >
-             <FaPlus className="text-gray-700 size-5" />
-            <Heading as="h2" className="text-black font-bold flex-grow">Añadir Ejercicios</Heading>
-          </button>
-
-          <Button size="3" onClick={startRoutine}>
-            <CgGym className="size-7"/>
-            Entrenar
-          </Button>
+          <div>
+            <Button onClick={startRoutine}>
+              <IoMdFitness className="size-5 -rotate-45" />
+              Entrenar
+            </Button>
+          </div>
         </div>
-        <Heading as="h2" className="text-radixgreen font-bold">Ejercicios</Heading>
-        
-        <Flex direction="column" gap="3" className="mt-4">
-            <EditableWorkout
-              workouts={workouts}
-              set_workout={set_workouts}
-              hideForm={hide_form}
-              setHideForm={set_hide_form}
-              routine={routine}
-              equipment={equipment}
-              other_workouts={other_workouts}
-            />
-          <WorkoutList
-            workouts={workouts}
-            equipments={equipment}
-            set_workouts={set_workouts}
-            routine={routine}
-            other_workouts={other_workouts}
-          />
-        </Flex>
-      </Section>
-    </>
-  );
-};
-
-const WorkoutList = ({
-  workouts,
-  equipments,
-  set_workouts,
-  routine,
-  other_workouts,
-}) => {
-  return (
-    <>
-      {workouts.length == 0 && (
-        <Info size="3" message="Aún no tienes ningún ejercicio registrado" />
-      )}
-      {workouts.map((workout) => (
-        <Workout
-          workouts={workouts}
-          workout={workout}
-          key={workout.id}
-          set_workouts={set_workouts}
-          equipments={equipments}
-          routine={routine}
-          other_workouts={other_workouts}
-        />
-      ))}
-    </>
-  );
-};
-
-const Workout = ({
-  workouts,
-  workout,
-  set_workouts,
-  equipments,
-  routine,
-  other_workouts,
-  }) => {
-  const [editing, setEditing] = useState(false);
-
-  const deleteWorkout = (workout) => {
-      if (
-        window.confirm(
-          `¿Estás seguro de que deseas borrar el ejercicio "${workout.name}"?`,
-        )
-      ){
-    deleteFromApi("workouts/delete/" + workout.id + "/").then((r) => {
-      if (r.ok) {
-        set_workouts((c_workouts) =>
-          c_workouts.filter((w) => w.id != workout.id),
-        );
-      }
-    });
-  };}
-
-  return (
-    
-      <div className="flex gap-5 bg-radixgreen/10 items-center p-4 justify-between rounded-lg">
-        <div className="flex justify-between grow">
-          {!editing ? (
-            <WorkoutInfo workout={workout} equipments={equipments} />
-          ) : (
-            <EditableWorkout
-              workouts={workouts}
-              defaultWorkout={workout}
-              set_workout={set_workouts}
-              routine={routine}
-              equipment={equipments}
-              setHideForm={setEditing}
-              hideForm={false}
-              other_workouts={other_workouts}
-            />
-          )}
-        </div>
-        <IconButton
-          variant="surface"
-          radius="full"
-          onClick={() => setEditing(!editing)}
-        >
-          <LuPencil className="size-4" />
-        </IconButton>
-        <IconButton
-          size="3"
-          radius="full"
-          color="red"
-          variant="outline"
-          onClick={() => deleteWorkout(workout)}
-        >
-          <CgTrash className="size-6" />
-        </IconButton>
+        <WorkoutList routineId={routineId} />
       </div>
-    
+    </>
   );
 };
 
-WorkoutList.propTypes = {
-  workouts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      sets: PropTypes.number,
-      reps: PropTypes.number,
-      weigth: PropTypes.number,
-    }),
-  ),
-};
+const RoutineName = ({ routine, setRoutine, names }) => {
+  const [edit, setEdit] = useState(false);
+  const { register, handleSubmit } = useForm();
+  const inputRef = useRef(null);
 
-const WorkoutInfo = ({ workout, equipments }) => {
-  const getEquipmentName = (equipment_id) => {
-    if (!equipments || equipments.length === 0) return '';
-    const equipment = equipments.find((e) => e.id === equipment_id);
-    return equipment ? equipment.name : '';
+  const updateName = (formData) => {
+    const prevRoutine = { ...routine };
+    const tempRoutine = { ...routine, name: formData.name };
+    setRoutine({ tempRoutine });
+    putToApi("routines/update/" + routine.id + "/", tempRoutine)
+      .then((r) => r.json())
+      .then((updatedRoutine) => setRoutine(updatedRoutine))
+      .catch(setRoutine(prevRoutine));
+    setEdit(false);
   };
 
   return (
-    <>
-      <Flex direction="column" className="w-1/5">
-        <Text style={{ fontStyle: "italic" }}>Nombre</Text>
-        <Text weight="bold" style={{ fontSize: 22 }}>
-          {workout.name}
-        </Text>
-      </Flex>
-      <Flex direction="column" className="w-1/5 items-end">
-        <Text weight="bold">Máquinas</Text>
-        {workout.equipment &&
-          workout.equipment.map((e) => (
-            <span key={e}>{getEquipmentName(e)}</span>
-          ))}
-      </Flex>
-    </>
+    <div className="flex gap-3 items-center">
+      {edit ? (
+        <form onSubmit={handleSubmit(updateName)}>
+          <TextField.Input
+            {...register("name")}
+            autoFocus
+            defaultValue={routine.name}
+            onFocus={(e) => e.currentTarget.select()}
+          />
+        </form>
+      ) : (
+        <Heading as="h2" size="5" onDoubleClick={() => setEdit(true)}>
+          {routine.name}
+        </Heading>
+      )}
+
+      <IconButton radius="full" onClick={() => setEdit(!edit)}>
+        <LuPencil />
+      </IconButton>
+    </div>
   );
 };
 
-const EditableWorkout = ({
-  workouts,
-  set_workout,
-  hideForm,
-  setHideForm,
-  equipment,
-  routine,
-  defaultWorkout,
-  other_workouts,
-  }) => {
-  const { user } = useContext(AuthContext); // Obtenemos la información del usuario del contexto de autorización
+RoutineName.propTypes = {
+  routine: PropTypes.object,
+  setRoutine: PropTypes.func,
+  names: PropTypes.array,
+};
 
+const WorkoutList = ({ routineId }) => {
+  const [workouts, setWorkouts] = useState([]);
+  const [equipment, setEquipment] = useState([]);
+
+  const { user } = useContext(AuthContext);
   const [clientId, setClientId] = useState(null);
-  const clientUsername = user?.username;
 
   useEffect(() => {
-    if (clientUsername) {
-      getFromApi("clients/detail/" + clientUsername + "/")
+    if (user) {
+      getFromApi("clients/detail/" + user.username + "/")
         .then((response) => {
           return response.json();
         })
@@ -347,29 +197,134 @@ const EditableWorkout = ({
           setClientId(data.id);
         });
     }
-  }, [clientUsername]);
+  }, [user]);
 
-  const addWorkout = (workout) => {
+  useEffect(() => {
+    const fetchWorkouts = async (id) => {
+      const response = await getFromApi("workouts/byRoutine/" + id + "/");
+      return await response.json();
+    };
 
-    const definedEquipment = workout.equipment
-    ? workout.equipment
-        .filter((e) => e.value !== undefined) // Filtrar los equipos definidos
-        .map((e) => Number(e.value))
-    : [];
-    console.log(definedEquipment)
+    fetchWorkouts(routineId).then((data) => setWorkouts(data));
+  }, [routineId]);
+
+  useEffect(() => {
+    const fetchEquipment = async () => {
+      const response = await getFromApi("equipments/");
+      return await response.json();
+    };
+
+    fetchEquipment().then((data) => setEquipment(data));
+  }, []);
+
+  const hasUniqueName = (workout) => {
+    return !workouts.some((w) => w.name == workout.name && w.id != workout.id);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Button
+        onClick={() => {
+          setWorkouts([
+            {
+              name: "Nuevo ejercicio",
+              temp_id: Date.now(),
+              equipment: [undefined],
+            },
+            ...workouts,
+          ]);
+        }}
+      >
+        <FaPlus />
+        Añadir ejercicio
+      </Button>
+      {workouts.map((w, index) => (
+        <EditableWorkout
+          key={index}
+          workout={w}
+          setWorkouts={setWorkouts}
+          equipment={equipment}
+          routineId={routineId}
+          clientId={clientId}
+          uniqueNameChecker={hasUniqueName}
+        />
+      ))}
+    </div>
+  );
+};
+
+const EditableWorkout = ({
+  workout,
+  setWorkouts,
+  equipment,
+  routineId,
+  clientId,
+  uniqueNameChecker,
+}) => {
+  const [edit, setEdit] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
+    values: {
+      routine: [routineId],
+      name: workout?.name,
+      client: clientId,
+      equipment: workout?.equipment
+        ? workout.equipment.map((e) => ({ value: e }))
+        : [],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: control,
+    name: "equipment",
+  });
+
+  const getEquipmentName = (equipment_id) => {
+    if (!equipment || equipment.length == 0) return "";
+    const eq = equipment.find((e) => e.id == equipment_id);
+    return eq ? eq.name : "";
+  };
+
+  const deleteWorkout = (workout) => {
+    if (!workout.id) {
+      setWorkouts((c_workouts) => c_workouts.filter((w) => w !== workout));
+      return;
+    }
+    if (
+      window.confirm(
+        `¿Estás seguro de que deseas borrar el ejercicio "${workout.name}"?`,
+      )
+    ) {
+      deleteFromApi("workouts/delete/" + workout.id + "/").then((r) => {
+        if (r.ok) {
+          setWorkouts((c_workouts) =>
+            c_workouts.filter((w) => w.id != workout.id),
+          );
+        }
+      });
+    }
+  };
+
+  const addWorkout = (newWorkout) => {
+    const definedEquipment = newWorkout.equipment
+      ? [
+          ...new Set(
+            newWorkout.equipment
+              .filter((e) => e.value != undefined) // Filtrar los equipos definidos
+              .map((e) => e.value),
+          ),
+        ]
+      : [];
     const parsed_workout = {
-      ...workout,
-      client: clientId, // Asignamos el ID del usuario al workout
+      ...newWorkout,
       equipment: definedEquipment.length > 0 ? definedEquipment : undefined,
     };
-    console.log(parsed_workout)
-    const temp_workout = {
-      ...parsed_workout,
-      temp_id: Date.now(),
-      id: Date.now(),
-    };
-    
-    set_workout([temp_workout, ...workouts]);
 
     postToApi("workouts/create/", parsed_workout)
       .then(async (r) => {
@@ -379,15 +334,15 @@ const EditableWorkout = ({
         throw r;
       })
       .then((postedWorkout) =>
-        set_workout((c_workouts) =>
+        setWorkouts((c_workouts) =>
           c_workouts.map((w) =>
-            w.temp_id == temp_workout.temp_id ? postedWorkout : w,
+            w.temp_id == workout.temp_id ? postedWorkout : w,
           ),
         ),
       )
       .catch((e) => {
-        set_workout((c_workouts) =>
-          c_workouts.filter((w) => w.temp_id != temp_workout.temp_id),
+        setWorkouts((c_workouts) =>
+          c_workouts.map((w) => (w.temp_id == workout.temp_id ? workout : w)),
         );
       });
   };
@@ -405,11 +360,10 @@ const EditableWorkout = ({
                 .filter((e) => !isNaN(e) && e !== null)
             : []
           : [],
-      client: clientId,
     };
     const temp_workout = { ...parsed_workout, temp_id: Date.now() };
 
-    set_workout((c_workouts) =>
+    setWorkouts((c_workouts) =>
       // The list component uses the ID as key, so it needs to be given
       c_workouts.map((w) => (w.id == id ? { ...temp_workout, id: id } : w)),
     );
@@ -422,14 +376,14 @@ const EditableWorkout = ({
         throw r;
       })
       .then((updatedWorkout) => {
-        set_workout((c_workouts) =>
+        setWorkouts((c_workouts) =>
           c_workouts.map((w) =>
             w.temp_id == temp_workout.temp_id ? updatedWorkout : w,
           ),
         );
       })
       .catch((e) => {
-        set_workout((c_workouts) =>
+        setWorkouts((c_workouts) =>
           c_workouts.map((w) =>
             w.temp_id == temp_workout.temp_id
               ? { ...parsed_workout, id: id }
@@ -440,147 +394,130 @@ const EditableWorkout = ({
       });
   };
 
-  const hasUniqueName = (name) => {
-    const allWorkouts = [...workouts, ...other_workouts];
-    return (
-      !allWorkouts.some((w) => w.name == name && defaultWorkout != w) ||
-      "Ya tienes un ejercicio con ese nombre"
-    );
-  };
-
   const onSubmit = (data) => {
-    const uniqueEquipmentSet = new Set();
-    // Agregar equipos definidos al conjunto
-    data.equipment.forEach(e => {
-      if (e.value !== undefined) {
-        uniqueEquipmentSet.add(e.value);
-      }
-    });
-
-    // Convertir el conjunto nuevamente a una lista
-    const uniqueEquipment = Array.from(uniqueEquipmentSet);
-
-    // Conservar solo un equipo indefinido si hay varios
-    if (uniqueEquipmentSet.size==0) {
-      uniqueEquipment.push(undefined);
+    if (!workout.id) {
+      addWorkout(data);
+    } else {
+      editWorkout(data, workout.id);
     }
-
-    // Actualizar los datos con los equipos únicos
-    data.equipment = uniqueEquipment.map(value => ({ value }));
-
-    // Enviar los datos para agregar o editar el ejercicio
-    defaultWorkout ? editWorkout(data, defaultWorkout.id) : addWorkout(data);
-
-    // Ocultar el formulario y restablecer los valores
-    setHideForm(c => !c);
+    setEdit(false);
     reset();
   };
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors },
-  } = useForm({
-    values: {
-      routine: [routine.id],
-      name: defaultWorkout?.name,
-      equipment: defaultWorkout?.equipment 
-      ? defaultWorkout.equipment.map((e) => ({ value: e + "" }))
-      : [{ value: undefined }],
-    },
-  });
   return (
-    <>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className={`w-full ${hideForm ? "hidden" : ""} 
-          rounded-lg mb-4 p-5 px-3 justify-between border border-radixgreen/30`}
-      >
-        <Flex justify="between">
-          <Flex direction="column" className="w-1/5">
-            <span>Nombre del ejercicio</span>
-            <TextField.Input
-              name="name"
-              {...register("name", {
-                required: "Debes escribir un nombre",
-                validate: {
-                  unique: hasUniqueName,
-                  maxLength: (value) =>
-                    value.length <= 100 ||
-                    "El valor no puede tener más de 100 caracteres",
-                },
-              })}
-              color={errors.name && "red"}
-              className={`${errors.name ? "!border-red-500" : undefined}`}
-            ></TextField.Input>
-          </Flex>
-          <div className="w-1/5 items-end flex flex-col gap-2">
-            <EquipmentSelect equipment={equipment} control={control}/>
-          </div>
-        </Flex>
-        <div className="flex items-center gap-3 pt-2">
-          <Button type="submit">Aceptar</Button>
-          <span className="text-red-500">{errors.name?.message}</span>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full bg-radixgreen/10 rounded-lg p-3 flex flex-col gap-1"
+    >
+      <div className="flex justify-between items-center">
+        {!edit && workout.id ? (
+          <Text weight="bold" size="3">
+            {workout.name}
+          </Text>
+        ) : (
+          <TextField.Input
+            {...register("name", {
+              required: "Debes escribir un nombre",
+              validate: {
+                unique: (name) =>
+                  uniqueNameChecker({ id: workout.id, name }) ||
+                  "Ya tienes un ejercicio con ese nombre",
+              },
+            })}
+            defaultValue={workout.name}
+          />
+        )}
+        <div className="flex gap-2 items-center">
+          {(edit || !workout.id) && (
+            <IconButton radius="full" size="2" type="submit">
+              <FaCheck />
+            </IconButton>
+          )}
+          {workout.id && (
+            <IconButton
+              radius="full"
+              size="2"
+              type="button"
+              onClick={() => setEdit(!edit)}
+            >
+              <LuPencil />
+            </IconButton>
+          )}
+          <IconButton
+            radius="full"
+            size="2"
+            color="red"
+            type="button"
+            onClick={() => deleteWorkout(workout)}
+          >
+            <ImCross className="size-3" />
+          </IconButton>
         </div>
-      </form>
-    </>
+      </div>
+      <Text color="red">{errors.name?.message}</Text>
+      {((workout.equipment && workout.equipment.length > 0) || edit) && (
+        <div className="flex items-stretch rounded-lg border-2 border-radixgreen/40 overflow-hidden">
+          {!edit && workout.id ? (
+            <div className="bg-radixgreen/20 p-2 flex items-center">
+              <IoMdFitness className="size-5 -rotate-45" />
+            </div>
+          ) : (
+            <div className="flex">
+              <IconButton
+                radius="none"
+                type="button"
+                className="!h-full"
+                onClick={() => append({})}
+              >
+                <FaPlus />
+              </IconButton>
+            </div>
+          )}
+          <div className="flex flex-col flex-grow divide-y divide-radixgreen/30">
+            {!edit && workout.id
+              ? workout.equipment.map((e) => (
+                  <Text key={e} className="p-1 px-2">
+                    {getEquipmentName(e)}
+                  </Text>
+                ))
+              : fields.map((f, index) => (
+                  <div
+                    key={f.id}
+                    className="flex items-center gap-2 px-2 p-1 overflow-hidden justify-between"
+                  >
+                    <EquipmentSelect
+                      {...register(`equipment.${index}.value`)}
+                      variant="ghost"
+                      radius="none"
+                      size="3"
+                      className="!flex-grow"
+                      equipment={equipment}
+                      defaultValue={
+                        workout.id
+                          ? workout.equipment[index]?.toString()
+                          : undefined
+                      }
+                    />
+                    <IconButton
+                      variant="ghost"
+                      color="red"
+                      radius="full"
+                      size="2"
+                      type="button"
+                      onClick={() => remove(index)}
+                    >
+                      <ImCross />
+                    </IconButton>
+                  </div>
+                ))}
+          </div>
+        </div>
+      )}
+    </form>
   );
 };
 
-const EquipmentSelect = ({ equipment, control}) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "equipment",
-  });
-
-  return (
-    <>
-      
-      {fields.map((f, index) => (
-        <div key={f.id} className="flex items-center gap-3">
-          <Controller
-            control={control}
-            name={`equipment.${index}.value`}
-            render={({ field }) => (
-              <Select.Root
-                onValueChange={field.onChange}
-                value={field.value}
-              >
-                <Select.Trigger placeholder="Selecciona una máquina" />
-                <Select.Content>
-                  {equipment.map((e) => (
-                      <Select.Item key={e.id} value={e.id.toString()}>
-                        {e.name}
-                      </Select.Item>
-                    ))}
-                </Select.Content>
-              </Select.Root>
-            )}
-          />
-          <IconButton
-            radius="full"
-            size="1"
-            color="red"
-            variant="ghost"
-            onClick={() => remove(index)}
-          >
-            <ImCross className="size-2.5" />
-          </IconButton>
-        </div>
-      ))}
-      <div className="flex items-center gap-2">
-        <IconButton
-          type="button"
-          radius="full"
-          size="1"
-          onClick={() => append({ value: undefined })}
-        >
-          <FaPlus className="size-3" />
-        </IconButton>
-        <Text weight="bold">Máquinas</Text>
-      </div>
-    </>
-  );
+EditableWorkout.propTypes = {
+  workout: PropTypes.object,
+  editWorkout: PropTypes.func,
 };
