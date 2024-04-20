@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import { getFromApi } from "../utils/functions/api";
 import * as PropTypes from "prop-types";
 import { Select } from "@radix-ui/themes";
 import { RHFSelect } from "./RHFSelect";
 
-export const EquipmentSelect = (props) => {
+export const EquipmentSelect = forwardRef((props, ref) => {
   const [equipment, set_equipment] = useState([]);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const EquipmentSelect = (props) => {
         ))}
     </RHFSelect>
   );
-};
+});
 
 EquipmentSelect.propTypes = {
   className: PropTypes.string,

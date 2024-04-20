@@ -7,32 +7,7 @@ import { useForm } from 'react-hook-form';
 import { LuPencil } from "react-icons/lu";
 import { CgTrash } from "react-icons/cg";
 
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend,
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
-
 export const Series = (workoutID) => {
-  const [chartData, setChartData] = useState([]);
   const [duration, setDuration] = useState(0);
   const workoutId = workoutID.workoutID
   const [series, setSeries] = useState([]);
@@ -44,11 +19,9 @@ export const Series = (workoutID) => {
   const [editor, setEditor] = useState(
     series.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {})
   );
-  const [showChart, setShowChart] = useState(false);
   const [showStartButton, setShowStartButton] = useState({});
   const [serieTimerOn, setSerieTimerOn] = useState({});
   const [editingSerieId, setEditingSerieId] = useState(null);
-  const [tipo, setTipo] = useState('peso');
 
   function formatDuration(duration) {
     const minutes = Math.floor(duration / 60);
@@ -67,14 +40,10 @@ export const Series = (workoutID) => {
         if (response.ok) {
           let data = await response.json();
           data.sort((a, b) => new Date(b.date) - new Date(a.date));
-          const chartData = data.map(serie => ({
-            reps:serie.reps,
-            weight: serie.weight,
-            date: serie.date,
-          }));
-          setChartData(chartData.reverse());
-          setSeries(data);
-          setEditor(data.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {}));
+          const currentDate = new Date().toISOString().split('T')[0];
+          const filteredData = data.filter(serie => serie.date == currentDate);
+          setSeries(filteredData);
+          setEditor(filteredData.reduce((acc, serie) => ({ ...acc, [serie.id]: false }), {}));
           setApiDataLoaded(true);
         }
       }catch (error) {
@@ -85,30 +54,7 @@ export const Series = (workoutID) => {
     fetchSeries();
   }, [workoutId]);
 
-  useEffect(() => {
-    const fetchGraph = async () => {
-      try {
-        const response = await getFromApi(`series/workout/${workoutId}/`);
-        if (response.ok) {
-          let data = await response.json();
-          data.sort((a, b) => new Date(b.date) - new Date(a.date));
-          const chartData = data.map(serie => ({
-            reps: serie.reps,
-            weight: serie.weight,
-            date: serie.date,
-          }));
-          console.log(chartData);
-          setChartData(chartData.reverse());
-        } else {
-          console.error('Error fetching API series:', response.status);
-        }
-      } catch (error) {
-        console.error('Error fetching API series:', error);
-      }
-    };
-
-    fetchGraph();
-  }, [series]);
+ 
 
   useEffect(() => {
     const fetchWorkout = async () => {
@@ -193,7 +139,7 @@ export const Series = (workoutID) => {
       putToApi(`series/update/${id}/`, {
         reps: serie.reps,
         weight: serie.weight,
-        date: serie.date,
+        date: new Date().toISOString().split('T')[0],
         workout: workoutId,
         duration: serie.duration
       })
@@ -260,6 +206,18 @@ export const Series = (workoutID) => {
 
 
   const editSerie = (id, reps, weight) => {
+    let serie = series.find((serie) => serie.id === id);
+    let durationn = watch(`durationn${serie.id}`);
+    if(reps==""){
+      reps=0
+    }
+    if(weight==""){
+      peso=0
+    }
+    if(durationn==""){
+      durationn=0
+    }
+
     if (reps>99999){
       alert('Las repeticiones no pueden ser mayores de 99999');
     }
@@ -267,12 +225,10 @@ export const Series = (workoutID) => {
       alert('El peso no puede ser mayor de 99999');
     }
     else{
-      let serie = series.find((serie) => serie.id === id);
-      const durationn = watch(`durationn${serie.id}`);
       putToApi(`series/update/${id}/`, {
         reps: reps === "" ? serie.reps : reps,
         weight: weight === "" ? serie.weight : weight,
-        date: serie.date,
+        date: new Date().toISOString().split('T')[0],
         workout: workoutId,
         duration: durationn === 0 ? serie.duration : durationn
       })
@@ -348,7 +304,7 @@ export const Series = (workoutID) => {
           </div>
         </div>
 
-        <div className="flex items-center ml-5"> {/* Añade un espacio entre los dos divs */}
+        <div className="flex items-center ml-5">
           <Button onClick={() => timerOn ? setTimerOn(false) : setTimerOn(true)} className='mt-5' size="3">
             {timerOn ? "Detener" : "Empezar"}
           </Button>
@@ -376,11 +332,7 @@ export const Series = (workoutID) => {
                         </div>
                       </div>
                       <div className="mr-4 flex items-center">
-                        <div>
-                          <p className={`text-radixgreen font-bold mb-1 mr-8 text-xl ${editor[serie.id] ? "hidden" : undefined}`}>
-                            Fecha de creación: <span className="text-black">{serie.date}</span>
-                          </p>
-                        </div>
+                        
                         <div className={`${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 mr-4 text-xl`}>
                           <p>Repeticiones: <span className="text-black">{serie.reps}</span></p>
                         </div>
@@ -494,83 +446,13 @@ export const Series = (workoutID) => {
             <ScrollArea.Corner className="bg-blackA5" />
           </ScrollArea.Root>
         </ul>
-      {showChart==true ? 
-        <div>
-          <div className='mt-7'>
-            <Line 
-              options={{
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                  },
-                },
-              }} 
-              data={{
-                labels: chartData.map((serie) => serie.date),
-                datasets: [
-                  {
-                    label: 'Mis Pesos',
-                    data: chartData.map((serie) => serie.weight),
-                    fill: true,
-                    borderColor: 'rgb(48, 164, 108)', 
-                    backgroundColor: 'rgba(48, 164, 108, 0.4)',
-                  },
-                ],
-              }} 
-            />
-          </div>
-
-          <div className='mt-7'>
-          <Line 
-            options={{
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                },
-              },
-            }} 
-            data={{
-              labels: chartData.map((serie) => serie.date),
-              datasets: [
-                {
-                  label: `Mis ${tipo == 'peso' ? 'pesos' : 'repeticiones'}`,
-                  data: chartData.map((serie) => tipo == 'peso' ? serie.weight : serie.reps),
-                  fill: true,
-                  borderColor: 'rgb(48, 164, 108)', 
-                  backgroundColor: 'rgba(48, 164, 108, 0.4)',
-                },
-              ],
-            }} 
-          />
-          </div>
-        </div>
-      : undefined
-      }
       
-      <div className="flex space-x-4 mt-5 mr-4">
-        <Button onClick={() => setShowChart(!showChart)} className='w-1/2' size="4">
-          <Text>Mostrar gráfica de la evolución</Text>
-        </Button>
+      <div className="flex justify-center space-x-4 mt-5 mr-4">
         <Button onClick={() => setOpen(!open)} className='w-1/2' size="4">
           <Text>Crear Serie</Text>
           <IoMdAddCircleOutline />
         </Button>
       </div>
-      {showChart==true ?
-          <div className="mt-5 mr-4 flex justify-center" >
-            {tipo == 'peso' ?
-              <Button onClick={() => setTipo('reps')} className='w-1/2' size="4">
-                <Text>Mostrar Repeticiones</Text>
-              </Button>
-            :  
-              <Button onClick={() => setTipo('peso')} className='w-1/2' size="4">
-                <Text>Mostrar Pesos</Text>
-              </Button>
-            }
-          </div>
-        : undefined}
       {open && (
         <Card className='mt-5 mb-8 shadow-lg border-2 border-radixgreen'>
           <div className="flex flex-col items-center">

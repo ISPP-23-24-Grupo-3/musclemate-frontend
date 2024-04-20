@@ -38,7 +38,7 @@ export default function OwnerHomePage() {
         </Link>
         <Link to="../tickets">
           <Button size="4" variant="classic" className="mt-4">
-            Ver Tickets
+            Ver Incidencias
           </Button>
         </Link>
         <Link to="../my-gyms">

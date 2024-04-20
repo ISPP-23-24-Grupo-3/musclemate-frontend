@@ -45,7 +45,7 @@ export default function ClientHomePage() {
         </div>
         <div>
           <Heading as="h1">
-            <Link href="./routines">Tu Evolución</Link>
+            <Link href="./statistics">Tu Evolución</Link>
           </Heading>
           {/*TODO: Add routine stats here*/}
         </div>
