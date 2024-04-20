@@ -63,6 +63,7 @@ const Header = () => {
                 Máquinas del gimnasio
               </HeaderLink>
               <HeaderLink to="/user/events">Eventos</HeaderLink>
+              <HeaderLink to="user/tickets">Mis Incidencias</HeaderLink>
             </>
           ) : user?.rol === "gym" ? (
             <>
