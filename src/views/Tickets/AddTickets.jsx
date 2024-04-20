@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate desde react-router-dom
 import { postToApi, getFromApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
@@ -8,6 +8,7 @@ import { EquipmentSelect } from "../../components/Equipments";
 
 const AddTickets = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate(); // Usa useNavigate para obtener la función de navegación
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
   const [equipmentId, setEquipmentId] = useState("");
@@ -44,6 +45,7 @@ const AddTickets = () => {
         setLabel("");
         setDescription("");
         setEquipmentId("");
+        navigate("/user/tickets"); // Realiza la redirección a la página de incidencias después de crear una incidencia exitosamente
       } else {
         setErrorMessage(
           "Error al crear la incidencia. Por favor, inténtelo de nuevo más tarde.",

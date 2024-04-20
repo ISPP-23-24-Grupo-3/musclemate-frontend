@@ -26,8 +26,10 @@ const TicketManagementUser = () => {
           const ticketsResponse = await getFromApi(`tickets/byClient/${profileData.id}/`);
           if (ticketsResponse.ok) {
             const ticketsData = await ticketsResponse.json();
-            setUserTickets(ticketsData);
-            setFilteredTickets(ticketsData);
+            // Ordenar las incidencias por fecha de forma descendente
+            const sortedTickets = ticketsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setUserTickets(sortedTickets);
+            setFilteredTickets(sortedTickets);
             setApiDataLoaded(true);
           } else {
             console.error("Error fetching user tickets:", ticketsResponse.status);
@@ -40,9 +42,10 @@ const TicketManagementUser = () => {
       }
       setLoading(false);
     };
-
+  
     fetchUserTickets();
   }, []);
+  
 
   useEffect(() => {
     const normalizeText = (text) => {

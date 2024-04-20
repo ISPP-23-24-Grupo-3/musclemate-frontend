@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Importa useNavigate desde react-router-dom
 import { postToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { Button, TextArea, TextField } from "@radix-ui/themes";
@@ -8,6 +8,7 @@ import { FormContainer } from "../../components/Form";
 const AddTicketFromDetails = () => {
   const { user } = useContext(AuthContext);
   const { equipmentId } = useParams(); // Obtener el equipmentId de los parámetros de la URL
+  const navigate = useNavigate(); // Usa useNavigate para obtener la función de navegación
 
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
@@ -33,6 +34,7 @@ const AddTicketFromDetails = () => {
         setErrorMessage("");
         setLabel("");
         setDescription("");
+        navigate("/user/tickets"); // Realiza la redirección a la página de incidencias después de crear una incidencia exitosamente
       } else {
         setErrorMessage(
           "Error al crear la incidencia. Por favor, inténtelo de nuevo más tarde."
