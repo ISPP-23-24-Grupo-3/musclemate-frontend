@@ -20,6 +20,7 @@ const UserRegister = () => {
   const [gyms, setGyms] = useState(null);
   const [gym, setGym] = useState(null);
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [errorMessageUser, setErrorMessageUser] = useState("");
   const [errorMessageMail, setErrorMessageMail] = useState("");
   const [errorMessageDate, setErrorMessageDate] = useState("");
@@ -91,11 +92,11 @@ const UserRegister = () => {
 
       const requestBody = {
         name,
-        lastName,
+        last_name:lastName,
         email,
         birth,
         gender,
-        phoneNumber,
+        phone_number:phoneNumber,
         address,
         city,
         zipCode,
@@ -107,15 +108,18 @@ const UserRegister = () => {
       };
 
       const response = await postToApi("clients/create/", requestBody);
-
       if (!response.ok) {
-        const responseData = await response.json();
-        setErrorMessageUser(
-          "Este nombre de usuario ya existe, prueba con otro",
-        );
-        setErrorMessageMail("Ya existe un usuario con este email en uso");
+        const data = await response.json();
+        if (data.username) {
+          setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
+        } else if (data.email) {
+          setErrorMessageMail("Ya existe un usuario con este email");
+        } else {
+          setError("Hubo un error al crear el propietario");
+        }
         return;
       }
+      setError(null);
       setErrorMessageUser(null);
       setErrorMessageMail(null);
       if (user?.rol === "owner") navigate("/owner/users");
@@ -413,6 +417,7 @@ const UserRegister = () => {
             </div>
           )}
 
+          {error && <div className="text-red-500">{error}</div>}
           <Button
             type="submit"
             size="3"

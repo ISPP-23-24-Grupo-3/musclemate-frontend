@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { Select } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef} from "react";
 import { getFromApi } from "../utils/functions/api";
 import { RHFSelect } from "./RHFSelect";
 
-export const GymSelect = (props) => {
+export const GymSelect = forwardRef((props, ref) => {
   const [gyms, setGyms] = useState([]);
 
   useEffect(() => {
@@ -28,4 +28,4 @@ export const GymSelect = (props) => {
         ))}
     </RHFSelect>
   );
-};
+});

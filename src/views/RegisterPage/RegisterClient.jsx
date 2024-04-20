@@ -35,9 +35,9 @@ const ClientRegister = () => {
 
       const requestBody = {
         name,
-        lastName,
+        last_name:lastName,
         email,
-        phoneNumber,
+        phone_number:phoneNumber,
         address,
         userCustom: {
           username,
@@ -47,7 +47,7 @@ const ClientRegister = () => {
 
       const response = await postToApiRegister("owners/create/", requestBody);
       const data = await response.json();
-
+      console.log(data)
       if (response.ok) {
         setError(null);
         console.log("Propietario creado exitosamente");
@@ -146,6 +146,9 @@ const ClientRegister = () => {
                   type="text"
                 />
               </TextField.Root>
+              {errors.lastName && (
+                <p className="text-red-500">{errors.lastName.message}</p>
+              )}
             </div>
 
             <div className="flex flex-col">
@@ -157,7 +160,9 @@ const ClientRegister = () => {
                 <TextField.Input
                   {...register("email", {
                     required: messages.req,
-                    pattern: { value: patterns.email, message: messages.email },
+                    pattern: { 
+                      value: /\S+@\S+\.\S+/, // Validar que contenga un "@" en el medio
+                      message: "Debes introducir una dirección de correo electrónico válida", },
                   })}
                   name="email"
                   type="email"
@@ -180,8 +185,8 @@ const ClientRegister = () => {
                   {...register("phoneNumber", {
                     required: messages.req,
                     pattern: {
-                      value: patterns.phoneNumber,
-                      message: messages.phoneNumber,
+                      value: /^\d{9}$/,
+                      message: "El número de teléfono debe tener 9 dígitos",
                     },
                   })}
                   name="phoneNumber"
