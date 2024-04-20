@@ -494,19 +494,19 @@ export default function EquipmentDetails() {
         )}
         </ul>
         {/* Agregar controles de paginación */}
-        <div className="flex justify-center mt-4">
-          <ul className="flex">
-            <li className="mr-2">
-              <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
-              >
-                Anterior
-              </button>
-            </li>
-            {apiTickets.length > 0 &&
-              Array.from(
+        {apiTickets.length > 3 && (
+          <div className="flex justify-center mt-4">
+            <ul className="flex">
+              <li className="mr-2">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+                >
+                  Anterior
+                </button>
+              </li>
+              {Array.from(
                 { length: Math.ceil(apiTickets.length / ticketsPerPage) },
                 (_, i) => (
                   <li key={i} className="mr-2">
@@ -523,19 +523,20 @@ export default function EquipmentDetails() {
                   </li>
                 ),
               )}
-            <li>
-              <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={
-                  currentPage === Math.ceil(apiTickets.length / ticketsPerPage)
-                }
-                className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
-              >
-                Siguiente
-              </button>
-            </li>
-          </ul>
-        </div>
+              <li>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={
+                    currentPage === Math.ceil(apiTickets.length / ticketsPerPage)
+                  }
+                  className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+                >
+                  Siguiente
+                </button>
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

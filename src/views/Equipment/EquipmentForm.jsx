@@ -99,7 +99,13 @@ const GymMachineForm = () => {
               Número de referencia
             </label>
             <TextField.Input
-              {...register("serial_number", { required: messages.req })}
+              {...register("serial_number", {
+                required: messages.req,
+                pattern: {
+                  value: /^[0-9]+$/,
+                  message: "El número de referencia debe ser numérico",
+                },
+              })}
               name="serial_number"
               type="text"
             />
