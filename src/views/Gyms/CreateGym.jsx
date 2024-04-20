@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { postToApi } from "../../utils/functions/api";
 import { FormContainer } from "../../components/Form";
 import { Button, TextField, TextFieldInput } from "@radix-ui/themes";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 
 const CreateGym = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -12,6 +13,7 @@ const CreateGym = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate(); // Obtener la función navigate
 
   const patterns = {
     mail: /\S+@\S+\.\S+/,
@@ -39,13 +41,14 @@ const CreateGym = () => {
       if (response.ok) {
         setSuccessMessage("¡Gimnasio creado exitosamente!");
         setErrorMessage("");
+        navigate("/owner/my-gyms"); // Redireccionar a la página deseada
       } else {
         let errorMessage =
           "Error al crear el gimnasio. Por favor, inténtelo de nuevo más tarde.";
         if (data.email) {
-          errorMessage = data.email[0]; // Mensaje de error específico del campo de correo electrónico
-        } else if (data.userCustom && data.userCustom.username) {
-          errorMessage = data.userCustom.username[0]; // Mensaje de error específico del campo de nombre de usuario
+          errorMessage = "Ya existe un usuario con este email" // Mensaje de error específico del campo de correo electrónico
+        } else if (data.username) {
+          errorMessage = "Este nombre de usuario ya existe, prueba con otro"; // Mensaje de error específico del campo de nombre de usuario
         } else if (data.name) {
           errorMessage = data.name[0]; // Mensaje de error específico del campo de nombre
         } else if (data.address) {
@@ -74,7 +77,9 @@ const CreateGym = () => {
         <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
           Crear Gimnasio
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <ul className="list-none m-0 p-0 mb-6">
+          <li className="text-center text-gray-500 mb-1">• Recuerda que el nombre de usuario y la contraseña que elijas serán necesarios para iniciar sesión como gimnasio en MuscleMate.</li>
+        </ul>        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div>
             <label htmlFor="name" className="text-gray-800">
               Nombre:
