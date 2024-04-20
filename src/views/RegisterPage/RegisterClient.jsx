@@ -77,10 +77,6 @@ const ClientRegister = () => {
     password: "La contraseña tiene que ser mayor a 10 caracteres",
   };
 
-  const patterns = {
-    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-  };
-
   useEffect(() => {
     let redirectTimer;
     if (success) {
@@ -159,7 +155,7 @@ const ClientRegister = () => {
                   {...register("email", {
                     required: messages.req,
                     pattern: { 
-                      value: /\S+@\S+\.\S+/, // Validar que contenga un "@" en el medio
+                      value: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
                       message: "Debes introducir una dirección de correo electrónico válida", },
                   })}
                   name="email"
