@@ -23,6 +23,7 @@ import EquipmentDetails from "./views/Equipment/EquipmentDetails";
 import EquipmentDetailsClient from "./views/Equipment/EquipmentDetailsClient";
 import { Routines } from "./views/Routines/Routines";
 import { EditRoutine } from "./views/Routines/EditRoutine";
+import Statistics from "./views/Statistics/StatisticsClient";
 import TicketManagement from "./views/TicketManagement/TicketManagement";
 import RegisterUser from "./views/RegisterPage/RegisterUser";
 import ErrorPage from "./ErrorPage";
@@ -91,6 +92,7 @@ const userRoutes = [
   { path: "routines", element: <Routines /> },
   { path: "routines/add", element: <EditRoutine /> },
   { path: "routines/:id", element: <EditRoutine /> },
+  { path: "statistics", element: <Statistics /> },
   { path: "equipments/:equipmentId", element: <EquipmentDetailsClient /> },
   { path: "add-tickets", element: <AddTickets /> },
   { path: "events", element: <EventListClient /> },
