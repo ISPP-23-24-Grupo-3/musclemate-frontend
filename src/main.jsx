@@ -46,6 +46,8 @@ import ProfileOwner from "./views/ProfileOwner/ProfileOwner";
 import GymStats from "./views/Gyms/GymStats";
 import ProfileGym from "./views/ProfileOwner/ProfileGym";
 import ReservationClient from "./views/Reservation/ReservationClient";
+import TicketManagementUser from "./views/TicketManagement/TicektManagementUser";
+import AddTicketFromDetails from "./views/Tickets/AddTicketFromDetails";
 
 const ownerRoutes = [
   { path: "home", element: <OwnerHomePage />},
@@ -97,6 +99,8 @@ const userRoutes = [
   { path: "profile", element: <ProfileClient /> },
   { path: "equipments", element: <EquipmentList /> },
   { path: "equipmentsClient", element: <EquipmentListClient /> },
+  { path: "tickets", element: <TicketManagementUser /> },
+  { path: "equipments/:equipmentId/add-tickets", element: <AddTicketFromDetails /> },
 ];
 
 const router = createBrowserRouter([

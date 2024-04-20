@@ -16,6 +16,7 @@ import { HiTicket } from "react-icons/hi";
 import { Checkbox } from "@radix-ui/themes";
 import { RHFSelect } from "../../components/RHFSelect.jsx";
 import { Ticket } from "../../components/Ticket/Ticket.jsx";
+import { RingLoader } from "react-spinners";
 
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
@@ -179,6 +180,7 @@ export default function EquipmentDetails() {
       console.error("Error updating ticket status:", error);
     }
   };
+  
 
   // Función para formatear la fecha
   const formatDate = (dateString) => {
@@ -470,10 +472,11 @@ export default function EquipmentDetails() {
       </FormContainer>
       <div className="mt-8 text-center md:m-0 m-5">
         <Heading size="7" className="text-radixgreen !mt-8 !mb-3 text-center">
-          Tickets
+          Incidencias
         </Heading>
         <ul>
-          {apiDataLoaded && currentTickets.length > 0 ? (
+        {apiDataLoaded ? (
+          currentTickets.length > 0 ? (
             currentTickets.map((ticket) => (
               <Ticket
                 key={ticket.id}
@@ -482,8 +485,13 @@ export default function EquipmentDetails() {
               />
             ))
           ) : (
-            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
-          )}
+            <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
+          )
+        ) : (
+          <div className="flex justify-center mt-4">
+            <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+          </div>
+        )}
         </ul>
         {/* Agregar controles de paginación */}
         <div className="flex justify-center mt-4">

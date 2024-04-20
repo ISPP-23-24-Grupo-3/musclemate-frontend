@@ -1,8 +1,7 @@
-import { Badge, Button, Flex } from "@radix-ui/themes";
+import { Button, Flex } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import AuthContext from "../../utils/context/AuthContext";
-import { IoMenu } from "react-icons/io5";
 import { useState } from "react";
 import { IoMdMenu } from "react-icons/io";
 import HeaderLink from "./HeaderLink";
@@ -12,9 +11,9 @@ const Header = () => {
 
   const [open, setOpen] = useState(false);
 
-  const handleMenu = () => {
-    setOpen(!open);
-  };
+    const handleMenu = useCallback(() => {
+      setOpen(!open)
+    }, [open])
 
   return (
     <header className="sticky top-0 shadow-md px-5 py-2 sm:px-10 bg-white font-sans min-h-[70px] z-10">
@@ -63,6 +62,7 @@ const Header = () => {
                 Máquinas del gimnasio
               </HeaderLink>
               <HeaderLink to="/user/events">Eventos</HeaderLink>
+              <HeaderLink to="user/tickets">Mis Incidencias</HeaderLink>
             </>
           ) : user?.rol === "gym" ? (
             <>
@@ -77,7 +77,11 @@ const Header = () => {
               <li className="max-lg:py-2 px-3 flex gap-4 items-center">
                 <Link
                   to={
-                    user.rol === "client" ? "/user/profile" : "/owner/profile"
+                    user.rol === "client"
+                      ? "/user/profile"
+                      : user.rol === "gym"
+                      ? "/gym/profile"
+                      : "/owner/profile"
                   }
                 >
                   <Button size="3" variant="surface" color="green">

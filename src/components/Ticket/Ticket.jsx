@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"; // Importar useEffect y useState
 import { Card, Heading, Text } from "@radix-ui/themes";
 import { FormContainer } from "../Form";
 import PropTypes from "prop-types";
@@ -10,7 +11,15 @@ const formatDate = (dateString) => {
   const options = { year: "numeric", month: "long", day: "numeric" };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
+
 export const Ticket = ({ ticket, onStatusChange, disabled }) => {
+  // Agregar estado local para controlar el estado del ticket
+  const [status, setStatus] = useState(ticket.status);
+
+  useEffect(() => {
+    setStatus(ticket.status); // Actualizar el estado local al estado del ticket
+  }, [ticket.status]);
+
   return (
     <FormContainer key={ticket.id}>
       <div className="flex flex-col gap-3">
@@ -20,15 +29,17 @@ export const Ticket = ({ ticket, onStatusChange, disabled }) => {
             <div className="flex items-center gap-2">
               <Checkbox
                 disabled={disabled}
-                onCheckedChange={(c) => onStatusChange(c, ticket.id)}
-                className="flex items-center gap-1  border rounded-md  p-1
-                          text-red-600 border-red-500 hover:bg-red-500/10
-                          data-state-checked:text-radixgreen data-state-checked:border-radixgreen hover:data-state-checked:bg-radixgreen/10
-                        "
+                onCheckedChange={(c) => {
+                  // Actualizar el estado local y llamar a la función de cambio de estado externa
+                  setStatus(c);
+                  onStatusChange(c, ticket.id);
+                }}
+                checked={status} // Usar el estado local para el estado del checkbox
+                className={`flex items-center gap-1 border rounded-md p-1 text-${status ? "green" : "red"}-600 border-${status ? "green" : "red"}-500 hover:bg-${status ? "green" : "red"}-500/10 data-state-checked:text-radixgreen data-state-checked:border-radixgreen hover:data-state-checked:bg-radixgreen/10`}
               >
                 <HiTicket className="size-6" />
                 <Text weight="bold" className="whitespace-pre">
-                  {ticket.status ? "Resuelto" : "No resuelto"}
+                  {status ? "Resuelto" : "No resuelto"}
                 </Text>
               </Checkbox>
             </div>

@@ -3,6 +3,7 @@ import { Button, Heading, Separator, TextField } from "@radix-ui/themes";
 import { getFromApi, putToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
+import { RemoveAccount } from "../../components/RemoveAccount";
 
 const ProfileOwner = () => {
   const { user } = useContext(AuthContext);
@@ -21,7 +22,7 @@ const ProfileOwner = () => {
   const handleInputChange = (e, field) => {
     setEditedOwner({
       ...editedOwner,
-      [field]: e.target.value
+      [field]: e.target.value,
     });
   };
 
@@ -34,7 +35,10 @@ const ProfileOwner = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await putToApi(`owners/update/${user.username}/`, editedOwner);
+      const response = await putToApi(
+        `owners/update/${user.username}/`,
+        editedOwner
+      );
       if (response.ok) {
         setOwnerProfile(editedOwner);
         setEditMode(false);
@@ -51,9 +55,15 @@ const ProfileOwner = () => {
       <div className="grid md:grid-cols-2 md:gap-4 md:mt-4 md:mb-4">
         <div className="flex justify-center md:m-0 m-5 items-center bg-radixgreen/30 border-2 border-radixgreen rounded-3xl py-2 md:px-5 pt-8 flex-col">
           <div>
-            <img className="w-80 h-80" src="https://i.imgur.com/Y23W1X9.png" alt="Profile" />
+            <img
+              className="w-80 h-80"
+              src="https://i.imgur.com/Y23W1X9.png"
+              alt="Profile"
+            />
           </div>
-          <p className="text-center text-radixgreen text-2xl font-bold mt-5 mb-3">{ownerProfile ? ownerProfile.user : "Cargando..."}</p>
+          <p className="text-center text-radixgreen text-2xl font-bold mt-5 mb-3">
+            {ownerProfile ? ownerProfile.user : "Cargando..."}
+          </p>
         </div>
         <div className="flex justify-center items-left flex-col md:pl-12 md:m-0 m-5">
           <FormContainer>
@@ -100,7 +110,9 @@ const ProfileOwner = () => {
                 <div className="flex justify-between">
                   <div className="flex gap-3">
                     <Button onClick={handleSaveChanges}>Guardar</Button>
-                    <Button variant="surface" onClick={toggleEditMode}>Cancelar</Button>
+                    <Button variant="surface" onClick={toggleEditMode}>
+                      Cancelar
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -110,6 +122,7 @@ const ProfileOwner = () => {
           </FormContainer>
         </div>
       </div>
+      <RemoveAccount />
     </>
   );
 };

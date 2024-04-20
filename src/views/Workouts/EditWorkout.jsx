@@ -75,7 +75,7 @@ const EditWorkout = () => {
     };
   
     fetchEquipoNames();
-  }, [workouts]);
+  }, []);
 
   const toggleFormVisibility = (workoutId) => {
     setHideForms((prevHideForms) => ({
