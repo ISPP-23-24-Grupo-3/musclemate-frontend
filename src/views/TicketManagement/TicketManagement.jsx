@@ -7,6 +7,7 @@ import { Checkbox } from "radix-ui";
 import { FormContainer } from "../../components/Form";
 import { FaLocationDot } from "react-icons/fa6";
 import { Ticket } from "../../components/Ticket/Ticket";
+import { RingLoader } from "react-spinners";
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -15,9 +16,11 @@ const TicketManagement = () => {
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage] = useState(4);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchTickets = async () => {
+      setLoading(true);
       try {
         const response = await getFromApi("tickets/");
         if (response.ok) {
@@ -33,21 +36,29 @@ const TicketManagement = () => {
       } catch (error) {
         console.error("Error fetching API tickets:", error);
       }
+      setLoading(false);
     };
 
     fetchTickets();
   }, []);
 
   useEffect(() => {
+    const normalizeText = (text) => {
+      return text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    };
+  
     const filtered = allTickets.filter(
       (ticket) =>
-        ticket.gym_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.equipment_name.toLowerCase().includes(searchTerm.toLowerCase()),
+        normalizeText(ticket.gym_name).includes(normalizeText(searchTerm)) ||
+        normalizeText(ticket.equipment_name).includes(normalizeText(searchTerm)),
     );
     setFilteredTickets(
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date)),
     ); // Ordenar por fecha
-  }, [searchTerm, allTickets]);
+  }, [searchTerm, allTickets, currentPage]);
 
   const indexOfLastTicket = currentPage * ticketsPerPage;
   const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
@@ -69,10 +80,10 @@ const TicketManagement = () => {
           ),
         );
       } else {
-        console.error("Error updating ticket status:", response.status);
+        console.error("Error updating incidencia status:", response.status);
       }
     } catch (error) {
-      console.error("Error updating ticket status:", error);
+      console.error("Error updating incidencia status:", error);
     }
   };
 
@@ -98,13 +109,13 @@ const TicketManagement = () => {
             ),
           );
         } else {
-          console.error("Error updating ticket status:", updateResponse.status);
+          console.error("Error updating incidencia status:", updateResponse.status);
         }
       } else {
-        console.error("Error fetching ticket details:", response.status);
+        console.error("Error fetching incidencis details:", response.status);
       }
     } catch (error) {
-      console.error("Error updating ticket status:", error);
+      console.error("Error updating incidencias status:", error);
     }
   };
 
@@ -112,7 +123,7 @@ const TicketManagement = () => {
     <div className="max-w-xl md:mx-auto">
       <Heading
         size="8"
-        className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+        className="text-radixgreen !mt-8 !mb-3 text-center md:text-center"
       >
         Lista de Incidencias
       </Heading>
@@ -130,16 +141,22 @@ const TicketManagement = () => {
         </TextField.Root>
       </div>
       <div className="flex flex-col gap-4">
-        {apiDataLoaded && currentTickets.length > 0 ? (
-          currentTickets.map((ticket) => (
-            <Ticket
-              ticket={ticket}
-              key={ticket.id}
-              onStatusChange={handleCheckboxChange}
-            />
-          ))
+        {loading ? (
+          <RingLoader color={"#123abc"} loading={loading} />
         ) : (
-          <p className="text-red-500">No hay tickets disponibles.</p>
+          <>
+            {apiDataLoaded && currentTickets.length > 0 ? (
+              currentTickets.map((ticket) => (
+                <Ticket
+                  ticket={ticket}
+                  key={ticket.id}
+                  onStatusChange={handleCheckboxChange}
+                />
+              ))
+            ) : (
+              <p className="text-red-500">No hay incidencias disponibles.</p>
+            )}
+          </>
         )}
       </div>
       {/* Agregar controles de paginación */}
