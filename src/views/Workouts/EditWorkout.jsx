@@ -33,6 +33,7 @@ ChartJS.register(
 );
 
 const EditWorkout = () => {
+  const [tipo, setTipo] = useState('peso');
   const [equipment, setEquipment] = useState({});
   const [chartData, setChartData] = useState([]);
   const [showChart, setShowChart] = useState(false);
@@ -160,40 +161,18 @@ const EditWorkout = () => {
           <div></div> {/* Sin este div el texto se mueve a la derecha */}
         </div>
         <div className="flex justify-center space-x-4 mt-5 mr-4">
-          <Button onClick={() => setShowChart(!showChart)} className='w-1/2' size="4">
-            <Text>Mostrar gráfica de la evolución</Text>
-          </Button>
+          <span>
+          Solo se muestran las series con fecha de hoy <strong>{new Date().toISOString().split('T')[0]}</strong>, para ver tu historial y tu evolución accede a 
+            <Link to={`/user/statistics`} className="w-8 h-8 text-green-500 hover:text-green-700">
+              &nbsp;<strong>estadísticas</strong>
+            </Link>
+          </span>
         </div>
         {showChart==true ? 
         <div>
           <EquipmentSelect
             onChange={(e) =>{ setEquipment(e.target.value)}}
           />
-          <div className='mt-7'>
-            <Line 
-              options={{
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                  },
-                },
-              }} 
-              data={{
-                labels: chartData.map((serie) => serie.date),
-                datasets: [
-                  {
-                    label: 'Mis Pesos',
-                    data: chartData.map((serie) => serie.weight),
-                    fill: true,
-                    borderColor: 'rgb(48, 164, 108)', 
-                    backgroundColor: 'rgba(48, 164, 108, 0.4)',
-                  },
-                ],
-              }} 
-            />
-          </div>
-
           <div className='mt-7'>
           <Line 
             options={{
@@ -208,8 +187,8 @@ const EditWorkout = () => {
               labels: chartData.map((serie) => serie.date),
               datasets: [
                 {
-                  label: 'Mis Repeticiones',
-                  data: chartData.map((serie) => serie.reps),
+                  label: `Mis ${tipo == 'peso' ? 'pesos' : 'repeticiones'}`,
+                  data: chartData.map((serie) => tipo == 'peso' ? serie.weight : serie.reps),
                   fill: true,
                   borderColor: 'rgb(48, 164, 108)', 
                   backgroundColor: 'rgba(48, 164, 108, 0.4)',
@@ -217,6 +196,17 @@ const EditWorkout = () => {
               ],
             }} 
           />
+          </div>
+          <div className="mt-5 mr-4 flex justify-center" >
+            {tipo == 'peso' ?
+              <Button onClick={() => setTipo('reps')} className='w-1/2' size="4">
+                <Text>Mostrar Repeticiones</Text>
+              </Button>
+            :  
+              <Button onClick={() => setTipo('peso')} className='w-1/2' size="4">
+                <Text>Mostrar Pesos</Text>
+              </Button>
+            }
           </div>
         </div>
       : undefined
