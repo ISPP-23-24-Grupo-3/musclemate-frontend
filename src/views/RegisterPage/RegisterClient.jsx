@@ -47,10 +47,8 @@ const ClientRegister = () => {
 
       const response = await postToApiRegister("owners/create/", requestBody);
       const data = await response.json();
-      console.log(data)
       if (response.ok) {
         setError(null);
-        console.log("Propietario creado exitosamente");
         setSuccess(true);
         setTimeout(() => {
           navigate("/login");
