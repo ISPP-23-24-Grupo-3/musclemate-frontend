@@ -20,6 +20,8 @@ const EquipmentDetailsClient = () => {
   const [machineDetails, setMachineDetails] = useState(null);
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ticketsPerPage] = useState(3); // 3 tickets por página
 
   const [actualRating, setActualRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
@@ -175,6 +177,16 @@ const EquipmentDetailsClient = () => {
     );
   }
 
+  // Paginación
+  const indexOfLastTicket = currentPage * ticketsPerPage;
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
+  const currentTickets = apiTickets.slice(
+    indexOfFirstTicket,
+    indexOfLastTicket,
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="max-w-xl mx-auto">
       <FormContainer className="">
@@ -268,16 +280,65 @@ const EquipmentDetailsClient = () => {
           </Button>
         </Link>
         <ul className="mt-4">
-        {apiDataLoaded && apiTickets.length > 0 ? (
-          apiTickets.map((ticket) => (
-            <Ticket ticket={ticket} key={ticket.id} disabled />
-          ))
-        ) : (
+          {apiDataLoaded ? (
+            currentTickets.length > 0 ? (
+              currentTickets.map((ticket) => (
+                <Ticket ticket={ticket} key={ticket.id} disabled />
+              ))
+            ) : (
+              <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
+            )
+          ) : (
+            <div className="flex justify-center mt-4">
+              <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+            </div>
+          )}
+        </ul>
+        {/* Agregar controles de paginación si hay más de tres tickets */}
+        {apiTickets.length > ticketsPerPage && (
           <div className="flex justify-center mt-4">
-            <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+            <ul className="flex">
+              <li className="mr-2">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+                >
+                  Anterior
+                </button>
+              </li>
+              {apiTickets.length > 0 &&
+                Array.from(
+                  { length: Math.ceil(apiTickets.length / ticketsPerPage) },
+                  (_, i) => (
+                    <li key={i} className="mr-2">
+                      <button
+                        onClick={() => paginate(i + 1)}
+                        className={`px-3 py-1 rounded-lg ${
+                          currentPage === i + 1
+                            ? "bg-radixgreen text-white"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ),
+                )}
+              <li>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={
+                    currentPage === Math.ceil(apiTickets.length / ticketsPerPage)
+                  }
+                  className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+                >
+                  Siguiente
+                </button>
+              </li>
+            </ul>
           </div>
         )}
-        </ul>
       </div>
     </div>
   );
