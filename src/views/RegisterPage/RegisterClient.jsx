@@ -35,9 +35,9 @@ const ClientRegister = () => {
 
       const requestBody = {
         name,
-        lastName,
+        last_name:lastName,
         email,
-        phoneNumber,
+        phone_number:phoneNumber,
         address,
         userCustom: {
           username,
@@ -47,10 +47,8 @@ const ClientRegister = () => {
 
       const response = await postToApiRegister("owners/create/", requestBody);
       const data = await response.json();
-
       if (response.ok) {
         setError(null);
-        console.log("Propietario creado exitosamente");
         setSuccess(true);
         setTimeout(() => {
           navigate("/login");
@@ -77,10 +75,6 @@ const ClientRegister = () => {
     mail: "Debes introducir una dirección correcta",
     username: "Este nombre de usuario ya existe, prueba con otro",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
-  };
-
-  const patterns = {
-    mail: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
   };
 
   useEffect(() => {
@@ -146,6 +140,9 @@ const ClientRegister = () => {
                   type="text"
                 />
               </TextField.Root>
+              {errors.lastName && (
+                <p className="text-red-500">{errors.lastName.message}</p>
+              )}
             </div>
 
             <div className="flex flex-col">
@@ -157,7 +154,9 @@ const ClientRegister = () => {
                 <TextField.Input
                   {...register("email", {
                     required: messages.req,
-                    pattern: { value: patterns.email, message: messages.email },
+                    pattern: { 
+                      value: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                      message: "Debes introducir una dirección de correo electrónico válida", },
                   })}
                   name="email"
                   type="email"
@@ -180,8 +179,8 @@ const ClientRegister = () => {
                   {...register("phoneNumber", {
                     required: messages.req,
                     pattern: {
-                      value: patterns.phoneNumber,
-                      message: messages.phoneNumber,
+                      value: /^\d{9}$/,
+                      message: "El número de teléfono debe tener 9 dígitos",
                     },
                   })}
                   name="phoneNumber"

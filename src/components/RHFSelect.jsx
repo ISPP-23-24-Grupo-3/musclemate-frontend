@@ -1,8 +1,8 @@
 import { Select } from "@radix-ui/themes";
-import React from "react";
+import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 
-export const RHFSelect = ({
+export const RHFSelect = forwardRef(({
   children,
   className,
   defaultValue,
@@ -12,7 +12,7 @@ export const RHFSelect = ({
   radius,
   variant,
   size,
-}) => {
+},ref) => {
   return (
     <Select.Root
       defaultValue={defaultValue}
@@ -29,7 +29,7 @@ export const RHFSelect = ({
       <Select.Content position="popper">{children}</Select.Content>
     </Select.Root>
   );
-};
+});
 
 RHFSelect.propTypes = {
   children: PropTypes.node,
