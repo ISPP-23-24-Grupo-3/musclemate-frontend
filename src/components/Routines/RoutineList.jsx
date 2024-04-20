@@ -43,7 +43,7 @@ export const RoutineList = () => {
     };
 
     fetchRoutines().then((r) => setRoutines(r));
-  });
+  }, []);
 
   return (
     <>
