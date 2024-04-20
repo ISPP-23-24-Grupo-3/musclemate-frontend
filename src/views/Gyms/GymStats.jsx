@@ -39,7 +39,6 @@ export default function GymStats() {
     const [actualMachines, setActualMachines] = useState([]);
     const [daily, setDaily] = useState(false);
     const [dailyStats, setDailyStats] = useState([]);
-    const [dailyMachines, setDailyMachines] = useState([]);
 
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const [month, setMonth] = useState("ANUAL");
@@ -57,7 +56,8 @@ export default function GymStats() {
     }
 
     useEffect(() => {
-        getFromApi(`gyms/usage/${gymId}/year/${year}/`)
+        if (month != 'ANUAL') {
+            getFromApi(`gyms/usage/${gymId}/year/${year}/`)
             .then((response) => {
                 if (response.ok) {
                     return response.json();
@@ -90,7 +90,7 @@ export default function GymStats() {
             .catch((error) => {
                 console.error(error);
             });
-
+        }
     }, [year]);
 
     useEffect(() => {
@@ -158,7 +158,7 @@ export default function GymStats() {
     }, [gymMonthStats, machines]);
 
     useEffect(() => {
-        if (daily) {
+        if (daily && month != 'ANUAL') {
             getFromApi(`gyms/usage/${gymId}/year/${year}/month/${month}/daily/`)
                 .then((response) => {
                     if (response.ok) {
@@ -179,7 +179,6 @@ export default function GymStats() {
                             }
                         }
                     }
-                    setDailyMachines(machs);
                     for (let i = 0; i < machs.length; i++) {
                         groupedDailyData[machs[i]] = new Array(31).fill(0);
                     }
@@ -199,10 +198,10 @@ export default function GymStats() {
     }, [daily, month, year]);
 
     useEffect(() => {
-        for (let i = 0; i < dailyMachines.length; i++) {
-            console.log(`${dailyMachines[i]}: `+dailyStats[dailyMachines[i]]);
+        if (month === 'ANUAL') {
+            setDaily(false);
         }
-    }, [dailyStats]);
+    }, [month]);
 
     return(
         <div className="mt-8 max-w-xl mx-auto">
