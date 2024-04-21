@@ -56,7 +56,7 @@ export default function GymStats() {
     }
 
     useEffect(() => {
-        if (month != 'ANUAL') {
+        if (month === 'ANUAL') {
             getFromApi(`gyms/usage/${gymId}/year/${year}/`)
             .then((response) => {
                 if (response.ok) {
@@ -84,7 +84,7 @@ export default function GymStats() {
                 equipment_name: key,
                 ...groupedYearData[key]
                 }));
-
+                console.log(resultYear);
                 setGymYearStats(resultYear);
             })
             .catch((error) => {
