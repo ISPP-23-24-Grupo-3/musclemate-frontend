@@ -3,8 +3,13 @@ import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 
-
 export default function GymHomePage() {
+
+  const { getOwnerSubscription, ownerSubscription } = useContext(SubscriptionContext);
+  
+  useEffect(() => {
+    getOwnerSubscription();
+  }, []);
 
   return (
     <>
@@ -46,6 +51,14 @@ export default function GymHomePage() {
             Mis Eventos
           </Button>
         </Link>
+        {ownerSubscription.owner_plan === "premium" ? (
+          <Link to="../stats">
+            <Button size="4" variant="classic" className="mt-4">
+              Estadísticas Globales
+            </Button>
+          </Link>
+        ): null}
+        
       </Flex>
     </>
   );

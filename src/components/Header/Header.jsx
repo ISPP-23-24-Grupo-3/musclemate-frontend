@@ -1,13 +1,19 @@
 import { Button, Flex } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import AuthContext from "../../utils/context/AuthContext";
+import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import { useState } from "react";
 import { IoMdMenu } from "react-icons/io";
 import HeaderLink from "./HeaderLink";
 
 const Header = () => {
-  const { user, logoutUser } = useContext(AuthContext);
+  const { user, logoutUser } = useContext(AuthContext);  
+  const { getOwnerSubscription, ownerSubscription } = useContext(SubscriptionContext);
+
+  useEffect(() => {
+    getOwnerSubscription();
+  }, []);
 
   const [open, setOpen] = useState(false);
 
@@ -71,6 +77,9 @@ const Header = () => {
               <HeaderLink to="/gym/users">Usuarios</HeaderLink>
               <HeaderLink to="/gym/tickets">Incidencias</HeaderLink>
               <HeaderLink to="/gym/events">Eventos</HeaderLink>
+              {ownerSubscription.owner_plan === "premium" ? (
+                <HeaderLink to="/gym/stats">Estadísticas Globales</HeaderLink>
+              ) : null}
             </>
           ) : null}
           {user ? (
