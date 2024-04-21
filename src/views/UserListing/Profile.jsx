@@ -136,14 +136,14 @@ const Profile = () => {
                   </label>
                   <TextField.Input
                     type="text"
-                    value={editedUser ? editedUser.lastName : ""}
+                    value={editedUser ? editedUser.last_name : ""}
                     onChange={(e) => handleInputChange(e, "lastName")}
                     placeholder="Apellido"
                   />
                 </>
               ) : (
                 <span>
-                  {user ? user.name + " " + user.lastName : "Cargando..."}
+                  {user ? user.name + " " + user.last_name : "Cargando..."}
                 </span>
               )}
             </div>
