@@ -1,7 +1,7 @@
 describe('AddTicketFromDetails', () => {
     beforeEach(() => {
         cy.visit('http://localhost:5173/'); // Asegúrate de ajustar la ruta según corresponda
-        cy.contains('Iniciar Sesión').click()
+        cy.contains('Iniciar Sesión').click();
         cy.get('input[name="username"]').type('carliberal');
         cy.get('input[name="password"]').type('musclemate123');
         cy.get('button[type="submit"]').click();
