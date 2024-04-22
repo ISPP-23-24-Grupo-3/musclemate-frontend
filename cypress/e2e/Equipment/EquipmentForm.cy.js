@@ -1,11 +1,13 @@
 describe('Gym Machine Form', () => {
     beforeEach(() => {
       cy.visit('http://localhost:5173/'); // Asegúrate de ajustar la ruta según corresponda
-      cy.contains('Entrar').click()
+      cy.contains('Iniciar Sesión').click();
       cy.get('input[name="username"]').type('aaromo');
       cy.get('input[name="password"]').type('musclemate123');
       cy.get('button[type="submit"]').click();
+      cy.get('button[class="lg:hidden').click();
       cy.contains('Mis Máquinas').click();
+      cy.get('button[class="lg:hidden').click();
       cy.contains('Añadir máquina').click();
     });
   
@@ -42,7 +44,7 @@ describe('Gym Machine Form', () => {
     
 
     it('debería mostrar un mensaje de error al intentar enviar el formulario con campos inválidos', () => {
-      cy.get('select[name="gym"]').select(''); // Gimnasio no seleccionado
+      cy.get('select[name="gym"]').select('', {force: true}); // Gimnasio no seleccionado
   
       cy.get('button[type="submit"]').click();
   
@@ -56,8 +58,8 @@ describe('Gym Machine Form', () => {
       cy.get('input[name="brand"]').type('Marca de prueba');
       cy.get('input[name="serial_number"]').type('123456');
       cy.get('textarea[name="description"]').type('Descripción de la máquina de prueba');
-      cy.get('select[name="muscular_group"]').select('arms'); // Seleccionar grupo muscular
-      cy.get('select[name="gym"]').select('MasMusculoFit Sevilla MMFit Gym'); // Seleccionar gimnasio existente
+      cy.get('select[name="muscular_group"]').select('arms', {force: true}); // Seleccionar grupo muscular
+      cy.get('select[name="gym"]').select('MasMusculoFit Sevilla MMFit Gym', {force: true}); // Seleccionar gimnasio existente
   
       // Enviar el formulario
       cy.get('button[type="submit"]').click();

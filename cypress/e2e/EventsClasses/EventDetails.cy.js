@@ -1,11 +1,13 @@
 describe('Gym Machine Form', () => {
     beforeEach(() => {
         cy.visit('http://localhost:5173/'); // Asegúrate de ajustar la ruta según corresponda
-        cy.contains('Entrar').click()
+        cy.contains('Iniciar Sesión').click();
         cy.get('input[name="username"]').type('aaromo');
         cy.get('input[name="password"]').type('musclemate123');
         cy.get('button[type="submit"]').click();
+        cy.get('button[class="lg:hidden').click();
         cy.contains('Mis Eventos').click();
+        cy.get('button[class="lg:hidden').click();
     });
 
 
