@@ -1,50 +1,55 @@
-import { Button, Flex, Heading } from '@radix-ui/themes'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Button, Container, Flex, Heading, Link } from "@radix-ui/themes";
+import { React, useContext, useEffect, useState } from "react";
+import { RoutineList } from "../../components/Routines/RoutineList";
+import AuthContext from "../../utils/context/AuthContext";
+import { getFromApi } from "../../utils/functions/api";
 
 export default function ClientHomePage() {
+
+  const { user } = useContext(AuthContext);
+  const [gymPlan, setGymPlan] = useState("");
+
+  useEffect(() => {
+    if (user) {
+        getFromApi("clients/detail/" + user.username + "/") 
+            .then((response) => response.json())
+            .then((data) => {
+              let gym = data.gym;
+              getFromApi("gyms/detail/" + gym + "/") 
+              .then((response) => response.json())
+              .then((data) => {
+                setGymPlan(data.subscription_plan);
+              });
+            });
+    }
+  }, [user]);
+
   return (
     <>
-      <Flex align="center" justify="center" direction="row">
-        <Heading
-          size="6"
-          className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
-        >
-          Bienvenido a
-        </Heading>
-        <img src="/pwa-64x64.png" alt="Logo" className="ml-2 mr-1 mt-3" />
-        <Heading size="6" className="!mt-8 !mb-3 text-center">
-          MuscleMate
-        </Heading>
-      </Flex>
-
-      <Flex direction="column" justify="center" align="center" gap="4">
-        <Link to="../routines">
-          <Button size="4" variant="classic" className="mt-4">
-            Mis Rutinas
-          </Button>
-        </Link>
-        <Link to="../add-tickets">
-          <Button size="4" variant="classic" className="mt-4">
-            Crear un ticket
-          </Button>
-        </Link>
-        <Link to="../events">
-          <Button size="4" variant="classic" className="mt-4">
-            Eventos
-          </Button>
-        </Link>
-        <Link to="../profile">
-          <Button size="4" variant="classic" className="mt-4">
-            Mi Perfil
-          </Button>
-        </Link>
-        <Link to="../equipmentsClient">
-          <Button size="4" variant="classic" className="mt-4">
-            Maquinas del gimnasio
-          </Button>
-        </Link>
-      </Flex>
+      <div className="flex flex-wrap gap-4">
+        <div>
+          <Heading as="h1" className="!mb-3">
+            <Link href="./routines">Tus Rutinas</Link>
+          </Heading>
+          {gymPlan !== "free" ? (
+            <RoutineList />
+          ) : (
+            <div className="text-red-700">La subscripción de tu gimnasio no incluye esta funcionalidad.</div>
+          )}
+        </div>
+        <div>
+          <Heading as="h1">
+            <Link href="./events">Tus Eventos</Link>
+          </Heading>
+          {/*TODO: Add booked events here*/}
+        </div>
+        <div>
+          <Heading as="h1">
+            <Link href="./statistics">Tu Evolución</Link>
+          </Heading>
+          {/*TODO: Add routine stats here*/}
+        </div>
+      </div>
     </>
-  )
+  );
 }

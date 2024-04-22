@@ -1,7 +1,11 @@
 import { Button, Flex, Heading } from "@radix-ui/themes";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
+import SubscriptionContext from "../../utils/context/SubscriptionContext";
+
 
 export default function OwnerHomePage() {
+
   return (
     <>
       <Flex align="center" justify="center" direction="row">
@@ -34,7 +38,7 @@ export default function OwnerHomePage() {
         </Link>
         <Link to="../tickets">
           <Button size="4" variant="classic" className="mt-4">
-            Ver Tickets
+            Ver Incidencias
           </Button>
         </Link>
         <Link to="../my-gyms">

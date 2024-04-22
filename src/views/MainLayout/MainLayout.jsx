@@ -7,20 +7,19 @@ import { SubscriptionProvider } from "../../utils/context/SubscriptionContext";
 
 const MainLayout = ({ children }) => {
   return (
-    <SubscriptionProvider>
-      <AuthProvider>
-      <Theme>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <Container>
-            {children}
-            <Outlet />
-          </Container>
-          <Footer />
-        </div>
-      </Theme>
+    <AuthProvider>
+      <SubscriptionProvider>
+        <Theme>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <Container size="4" my="7" mx={{ md: "9", xs: "6", initial: "4" }}>
+              <Outlet />
+            </Container>
+            <Footer />
+          </div>
+        </Theme>
+      </SubscriptionProvider>
     </AuthProvider>
-    </SubscriptionProvider>
   );
 };
 

@@ -1,7 +1,8 @@
 
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 
 
 const AuthContext = createContext();
@@ -11,17 +12,19 @@ export default AuthContext;
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const AuthProvider = ({ children }) => {
-    const [authTokens, setAuthTokens] = useState(() =>
-        localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null
-    );
-    const [user, setUser] = useState(() =>
-        localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null
+    const [authTokens, setAuthTokens] = useState(
+        useCallback(() =>
+        (localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null), [])
+    )
+    const [user, setUser] = useState(
+        useCallback(() =>
+        (localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null), [])
     );
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const loginUser = async ({ username, password }) => {
+    const loginUser = useCallback(async ({ username, password }) => {
         try {
             let response = await fetch(`${VITE_BACKEND_URL}/token/`, {
                 method: 'POST',
@@ -46,14 +49,14 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             setError('Se produjo un error durante el inicio de sesión. Por favor, inténtalo de nuevo más tarde.');
         }
-    };
+    }, [navigate]);
 
-    let logoutUser = () => {
+    let logoutUser = useCallback(() => {
         setAuthTokens(null);
         setUser(null);
         localStorage.removeItem('authTokens');
         navigate('/');
-    };
+    }, [navigate]);
 
 
     let updateToken = async () => {
@@ -71,9 +74,7 @@ export const AuthProvider = ({ children }) => {
             setAuthTokens(data);
             setUser(jwtDecode(data.access));
             localStorage.setItem('authTokens', JSON.stringify(data));
-        } else {
-            logoutUser();
-        }
+        } 
         if (loading) {
             setLoading(false);
         }
@@ -83,17 +84,17 @@ export const AuthProvider = ({ children }) => {
         if (loading) {
             updateToken();
         }
-        let fourMinutes = 1000 * 60 * 4;
+        let timeLeft = user ? user.exp * 1000 - Date.now() : 300000;
         let interval = setInterval(() => {
             if (authTokens) {
                 updateToken();
             }
-        }, fourMinutes);
+        }, timeLeft);
         return () => clearInterval(interval);
     }, [authTokens, loading]);
 
     return (
-        <AuthContext.Provider value={{ user, authTokens, loginUser, logoutUser, error }}>
+        <AuthContext.Provider value={useMemo(() => ({ user, authTokens, loginUser, logoutUser, error }), [authTokens, error, loginUser, logoutUser, user])}>
             { loading ? null : children }
         </AuthContext.Provider>
     );

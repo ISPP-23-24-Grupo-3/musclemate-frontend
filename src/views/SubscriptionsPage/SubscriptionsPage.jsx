@@ -26,6 +26,7 @@ function Gym({
   subscription_plan,
   handleCheck,
   notSubscribedGyms,
+  setError,
 }) {
   const location = useLocation();
   const { user } = useContext(AuthContext);
@@ -36,6 +37,10 @@ function Gym({
     const customer = await stripe.customers.retrieve(customer_id, {
       expand: ["subscriptions"],
     });
+    if (customer.subscriptions.data.length === 0) {
+      setError("No tienes suscripciones activas.");
+      return;
+    }
     const subcription_quantity = customer.subscriptions.data[0].quantity;
     if (subcription_quantity === 1) {
       await stripe.subscriptions.cancel(customer.subscriptions.data[0].id);
@@ -121,6 +126,7 @@ function SubscriptionsPage() {
       if (gimnasioIndex !== -1) {
         const updatedGimnasios = [...prevGimnasios];
         updatedGimnasios.splice(gimnasioIndex, 1);
+        if(updatedGimnasios.length === 0) setError("No tienes gimnasios suscritos.");
         return updatedGimnasios;
       } else {
         return [...prevGimnasios];
@@ -166,8 +172,9 @@ function SubscriptionsPage() {
     if (response.ok) {
       const data = await response.json();
       if (!location.state?.subscription_plan) {
-        setGyms(data.filter((gym) => gym.subscription_plan !== "free"));
-        if (gyms.length === 0) {
+        const filteredGyms = data.filter((gym) => gym.subscription_plan !== "free");
+        setGyms(filteredGyms);
+        if (filteredGyms.length === 0) {
           setError("No tienes gimnasios suscritos.");
         }
       }else{
@@ -195,9 +202,9 @@ function SubscriptionsPage() {
         </div>
       {!location.state?.subscription_plan ? (
       <>
-        {error && 
+        {gyms.length === 0 &&
         <>
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">{"No tienes gimnasios suscritos a ningún plan."}</p>
         <Link to="/owner/pricing">
           <Button color="radixgreen">Ver planes de suscripción</Button>
         </Link>
@@ -222,6 +229,7 @@ function SubscriptionsPage() {
               }
               notSubscribedGyms={notSubscribedGyms}
               handleCheck={handleCheck}
+              setError={setError}
             />
           ))}
         </div>

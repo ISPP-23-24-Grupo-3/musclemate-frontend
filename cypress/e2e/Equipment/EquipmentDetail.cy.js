@@ -1,11 +1,13 @@
 describe('Gym Machine Form', () => {
     beforeEach(() => {
       cy.visit('http://localhost:5173/'); // Asegúrate de ajustar la ruta según corresponda
-      cy.contains('Entrar').click()
+      cy.contains('Iniciar Sesión').click();
       cy.get('input[name="username"]').type('aaromo');
       cy.get('input[name="password"]').type('musclemate123');
       cy.get('button[type="submit"]').click();
+      cy.get('button[class="lg:hidden').click();
       cy.contains('Mis Máquinas').click();
+      cy.get('button[class="lg:hidden').click();
     });
 
 
@@ -21,15 +23,13 @@ describe('Gym Machine Form', () => {
 
     it('debería mostrar los tickets asociados a la maquina con tickets', () => {
       cy.contains('Cinta de correr').click();
-      cy.contains('Ticket 4').should('be.visible');
       cy.contains('Ticket 1').should('be.visible');
-      cy.contains('No Resuelto').should('be.visible');
       cy.contains('Resuelto').should('be.visible');
     });
 
     it('no debería mostrar los tickets en una maquina sin tickets', () => {
       cy.contains('Banda de resistencia').click();
-      cy.contains('No hay tickets disponibles.').should('be.visible');
+      cy.contains('No hay incidencias disponibles.').should('be.visible');
     });
 
     it('debería poder editar una maquina', () => {

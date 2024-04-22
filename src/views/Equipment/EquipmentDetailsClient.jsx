@@ -3,12 +3,15 @@ import { useParams, Link } from "react-router-dom";
 import { getFromApi, postToApi, putToApi } from "../../utils/functions/api";
 import { Button, TextField } from "@radix-ui/themes";
 
-import Rating from "../../components/Rating";
+import Rating, { EditableRating } from "../../components/Rating";
 
 import { HiTicket } from "react-icons/hi";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
 import AuthContext from "../../utils/context/AuthContext";
+import { FormContainer } from "../../components/Form";
+import { Ticket } from "../../components/Ticket/Ticket";
+import { RingLoader } from "react-spinners";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
@@ -17,6 +20,8 @@ const EquipmentDetailsClient = () => {
   const [machineDetails, setMachineDetails] = useState(null);
   const [apiTickets, setApiTickets] = useState([]);
   const [apiDataLoaded, setApiDataLoaded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ticketsPerPage] = useState(3); // 3 tickets por página
 
   const [actualRating, setActualRating] = useState(0);
   const [valuationOn, setValuationOn] = useState(false);
@@ -27,6 +32,8 @@ const EquipmentDetailsClient = () => {
   const [clientUsername, setClientUsername] = useState(null);
   const [clientId, setClientId] = useState(null);
   const [message, setMessage] = useState("");
+
+  const [gymPlan, setGymPlan] = useState("");
 
   // Traducción de los grupos musculares
   const translateMuscularGroup = (group) => {
@@ -71,6 +78,22 @@ const EquipmentDetailsClient = () => {
     }
   }, [clientUsername]);
 
+  // Datos de subscripción
+  useEffect(() => {
+    if (user) {
+      getFromApi("clients/detail/" + user.username + "/")
+        .then((response) => response.json())
+        .then((data) => {
+          let gym = data.gym;
+          getFromApi("gyms/detail/" + gym + "/")
+            .then((response) => response.json())
+            .then((data) => {
+              setGymPlan(data.subscription_plan);
+            });
+        });
+    }
+  }, [user]);
+
   // Machine Details
   useEffect(() => {
     if (equipmentId) {
@@ -93,15 +116,19 @@ const EquipmentDetailsClient = () => {
         })
         .then((data) => {
           const hasValor = data.some(
-            (valoration) => valoration.equipment === Number(equipmentId)
+            (valoration) => valoration.equipment === Number(equipmentId),
           );
           setHasValoration(hasValor);
           if (hasValor) {
             const valor = data
-              .filter((valoration) => valoration.equipment === Number(equipmentId))
+              .filter(
+                (valoration) => valoration.equipment === Number(equipmentId),
+              )
               .map((valoration) => valoration.stars);
             const valorationId = data
-              .filter((valoration) => valoration.equipment === Number(equipmentId))
+              .filter(
+                (valoration) => valoration.equipment === Number(equipmentId),
+              )
               .map((valoration) => valoration.id);
             setActualRating(valor);
             setValuationId(valorationId);
@@ -119,13 +146,18 @@ const EquipmentDetailsClient = () => {
   useEffect(() => {
     const fetchTicketsByClient = async () => {
       try {
-        const response = await getFromApi(`tickets/byEquipment/${equipmentId}/`);
+        const response = await getFromApi(
+          `tickets/byEquipment/${equipmentId}/`,
+        );
         if (response.ok) {
           const data = await response.json();
           setApiTickets(data);
           setApiDataLoaded(true);
         } else {
-          console.error("Error fetching API tickets by client:", response.statusText);
+          console.error(
+            "Error fetching API tickets by client:",
+            response.statusText,
+          );
         }
       } catch (error) {
         console.error("Error fetching API tickets by client:", error);
@@ -145,20 +177,33 @@ const EquipmentDetailsClient = () => {
     );
   }
 
+  // Paginación
+  const indexOfLastTicket = currentPage * ticketsPerPage;
+  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
+  const currentTickets = apiTickets.slice(
+    indexOfFirstTicket,
+    indexOfLastTicket,
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
-    <div className="mt-8 max-w-xl mx-auto">
-      <div className="p-10 border border-radixgreen rounded">
+    <div className="max-w-xl mx-auto">
+      <FormContainer className="">
         <h2 className="mb-6 text-radixgreen font-bold text-3xl text-center">
           Detalles de la Máquina de Gimnasio
         </h2>
         <div className="mb-4">
-          <strong className="text-radixgreen">Nombre:</strong> {machineDetails.name}
+          <strong className="text-radixgreen">Nombre:</strong>{" "}
+          {machineDetails.name}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Descripción:</strong> {machineDetails.description}
+          <strong className="text-radixgreen">Descripción:</strong>{" "}
+          {machineDetails.description}
         </div>
         <div className="mb-4">
-          <strong className="text-radixgreen">Marca:</strong> {machineDetails.brand}
+          <strong className="text-radixgreen">Marca:</strong>{" "}
+          {machineDetails.brand}
         </div>
         <div className="mb-4">
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
@@ -174,121 +219,126 @@ const EquipmentDetailsClient = () => {
               justifyContent: "space-between",
             }}
           >
-            <Rating rating={actualRating} />
-
-            {valuationOn && isClient && (
-              <div style={{ display: "flex" }}>
-                <TextField.Input
-                  type="number"
-                  value={actualRating}
+            {gymPlan === "free" ? (
+              <div className="text-red-700">
+                La subscripción de tu gimnasio no incluye esta funcionalidad.
+              </div>
+            ) : (
+              <>
+                <EditableRating
                   onChange={(e) => {
-                    e.target.value > 5
-                      ? (e.target.value = 5)
-                      : e.target.value < 0
-                      ? (e.target.value = 0)
-                      : e.target.value;
-                    setActualRating(e.target.value);
+                    setActualRating(e);
                   }}
-                  min="0"
-                  max="5"
-                  step="0.5"
                 />
 
-                <Button
-                  onClick={async () => {
-                    if (hasValoration) {
-                      await putToApi("assessments/update/" + valuationId + "/", {
-                        stars: Number(actualRating),
-                        equipment: Number(equipmentId),
-                        client: Number(clientId),
-                      });
-                    } else {
-                      await postToApi("assessments/create/", {
-                        stars: Number(actualRating),
-                        equipment: Number(equipmentId),
-                        client: Number(clientId),
-                      });
-                    }
-                    setValuationOn(false);
-                    setMessage("Valoración Enviada!");
-                  }}
-                  className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-                >
-                  Enviar
-                </Button>
-              </div>
+                {isClient && (
+                  <div style={{ display: "flex" }}>
+                    <Button
+                      onClick={async () => {
+                        if (hasValoration) {
+                          await putToApi(
+                            "assessments/update/" + valuationId + "/",
+                            {
+                              stars: Number(actualRating),
+                              equipment: Number(equipmentId),
+                              client: Number(clientId),
+                            },
+                          );
+                        } else {
+                          await postToApi("assessments/create/", {
+                            stars: Number(actualRating),
+                            equipment: Number(equipmentId),
+                            client: Number(clientId),
+                          });
+                        }
+                        setValuationOn(false);
+                        setMessage("¡Valoración Enviada!");
+                      }}
+                      className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
+                    >
+                      Enviar
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
-
-            <Button
-              onClick={() => setValuationOn(!valuationOn)}
-              className="ml-2 bg-radixgreen text-white px-2 py-1 rounded"
-            >
-              {valuationOn ? "Volver" : "Valorar"}
-            </Button>
           </div>
         </div>
+
         <div className="mt-4 flex justify-center items-center">
           <strong className="text-radixgreen">
             {message && <div>{message}</div>}
           </strong>
         </div>
-      </div>
+      </FormContainer>
       <div className="mt-8 text-center">
-        <h2 className="text-2xl font-semibold mb-2">Tickets</h2>
-        <Link to="../add-tickets">
+        <h2 className="text-2xl font-semibold mb-2">Incidencias</h2>
+        <Link to={`${window.location.pathname}/add-tickets`}>
           <Button>
             <IoMdAddCircleOutline className="size-6" />
-              Añadir ticket
+            Añadir incidencia
           </Button>
         </Link>
         <ul className="mt-4">
-          {apiDataLoaded && apiTickets.length > 0 ? (
-            apiTickets.map((ticket) => (
-              <li
-                key={ticket.id}
-                className={`bg-white shadow-md p-4 rounded-md mb-4 ${
-                  ticket.status ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                <div className="flex items-center mb-2">
-                  <HiTicket className="w-6 h-6 mr-2" />
-                  <div>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Usuario:{" "}
-                      <span className="text-black">
-                        {ticket.client.name} {ticket.client.lastName}
-                      </span>
-                      <span className="ml-7">
-                        Asunto: <span className="text-black">{ticket.label}</span>
-                      </span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Descripción: <span className="text-black">{ticket.description}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Gimnasio: <span className="text-black">{ticket.gym_name}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Email: <span className="text-black">{ticket.client.email}</span>
-                    </p>
-                    <p className="text-radixgreen font-bold mb-1">
-                      Fecha: <span className="text-black">{formatDate(ticket.date)}</span>
-                    </p>
-                  </div>
-                  <div className="ml-auto">
-                    {ticket.status ? (
-                      <span className="text-green-500 font-bold">Resuelto</span>
-                    ) : (
-                      <span className="text-red-500 font-bold">No resuelto</span>
-                    )}
-                  </div>
-                </div>
-              </li>
-            ))
+          {apiDataLoaded ? (
+            currentTickets.length > 0 ? (
+              currentTickets.map((ticket) => (
+                <Ticket ticket={ticket} key={ticket.id} disabled />
+              ))
+            ) : (
+              <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
+            )
           ) : (
-            <p className="text-red-500 mb-6">No hay tickets disponibles.</p>
+            <div className="flex justify-center mt-4">
+              <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+            </div>
           )}
         </ul>
+        {/* Agregar controles de paginación si hay más de tres tickets */}
+        {apiTickets.length > ticketsPerPage && (
+          <div className="flex justify-center mt-4">
+            <ul className="flex">
+              <li className="mr-2">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+                >
+                  Anterior
+                </button>
+              </li>
+              {apiTickets.length > 0 &&
+                Array.from(
+                  { length: Math.ceil(apiTickets.length / ticketsPerPage) },
+                  (_, i) => (
+                    <li key={i} className="mr-2">
+                      <button
+                        onClick={() => paginate(i + 1)}
+                        className={`px-3 py-1 rounded-lg ${
+                          currentPage === i + 1
+                            ? "bg-radixgreen text-white"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ),
+                )}
+              <li>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={
+                    currentPage === Math.ceil(apiTickets.length / ticketsPerPage)
+                  }
+                  className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
+                >
+                  Siguiente
+                </button>
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

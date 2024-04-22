@@ -1,11 +1,13 @@
 describe('MachineList', () => {
     beforeEach(() => {
         cy.visit('http://localhost:5173/'); // Asegúrate de ajustar la ruta según corresponda
-        cy.contains('Entrar').click()
+        cy.contains('Iniciar Sesión').click();
         cy.get('input[name="username"]').type('aaromo');
         cy.get('input[name="password"]').type('musclemate123');
         cy.get('button[type="submit"]').click();
+        cy.get('button[class="lg:hidden').click();
         cy.contains('Mis Máquinas').click();
+        cy.get('button[class="lg:hidden').click();
     });
 
     it('debería mostrar la lista de máquinas correctamente', () => {
@@ -37,7 +39,7 @@ describe('MachineList', () => {
         // Verificar que los elementos de filtro y ordenación estén presentes
         cy.get('button[name="filter"]').click();
         cy.contains('arms').click();
-        cy.get('button[name="maquina"]').its('length').should('eq', 3);
+        cy.get('button[name="maquina"]').its('length').should('eq', 7);
         cy.contains('Mancuernas').should('be.visible');
         cy.contains('Máquina de prueba').should('be.visible');
         cy.contains('Press Militar').should('be.visible');

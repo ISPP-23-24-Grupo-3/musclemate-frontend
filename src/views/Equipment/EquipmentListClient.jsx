@@ -11,7 +11,7 @@ import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { HiOutlineFilter } from "react-icons/hi";
 import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
+import { Link } from "react-router-dom";
 import { getFromApi } from "../../utils/functions/api";
 
 // TODO: Add picture support
@@ -24,9 +24,9 @@ export default function MachineList() {
   const [search, set_search] = useState("");
   const [machines, setMachines] = useState([]);
   const [machineRatings, setMachineRatings] = useState([]);
-
-  const[reviews, setReviews] = useState({});
-  const[issues, setIssues] = useState({});
+  const [reviews, setReviews] = useState({});
+  const [issues, setIssues] = useState({});
+  const [selectedGym, setSelectedGym] = useState(null);
 
   useEffect(() => {
     getFromApi("equipments/")
@@ -45,11 +45,9 @@ export default function MachineList() {
               .filter((assessment) => assessment.equipment === machine.id)
               .map((rating) => rating.stars);
             const rating = actualRate(machineRatings, machineRatings.length);
-            // console.log(rating);
 
             return { id: machine.id, ratings: rating };
           });
-          // console.log(ratingsData);
           setMachineRatings(ratingsData);
         });
     }
@@ -65,50 +63,57 @@ export default function MachineList() {
 
   const SORTING_FUNCTIONS = {
     name: (a, b) => a.name.localeCompare(b.name),
-    reviews: (a, b) => a.reviews - b.reviews,
-    issues: (a, b) => a.issues - b.issues,
-    rating: (a, b) => a.rating - b.rating,
+    reviews: (a, b) => reviews[b.id] - reviews[a.id],
+    issues: (a, b) => issues[b.id] - issues[a.id],
+    rating: (a, b) => machineRatings.find((item) => item.id === b.id)?.ratings - machineRatings.find((item) => item.id === a.id)?.ratings,
   };
 
   const addFilter = (filter) => set_filters([filter, ...filters]);
-  const removeFilter = (filter) =>
-    set_filters(filters.filter((f) => f != filter));
+  const removeFilter = (filter) => set_filters(filters.filter((f) => f !== filter));
 
+  const removeAccents = (str) => {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  };
+  
   const filtered_machine_list =
     machines.length > 0
       ? machines
-          .filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
+          .filter((m) => removeAccents(m.name).includes(removeAccents(search)))
           .filter((m) =>
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
-              : true
+              : true && (selectedGym === null || m.gym === selectedGym)
           )
-          .sort(
-            (a, b) =>
-              SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1)
-          )
+          .sort((a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1))
       : [];
 
-//  useEffect(() => {
-//    for(let i = 0; i < machines.length; i++){
-//      getFromApi(`assessments/equipment/${machines[i].id}/`)
-//        .then((response) => response.json())
-//        .then((data) => {
-//          setReviews(prevReviews => ({
-//            ...prevReviews,
-//            [machines[i].id]: data.length
-//          }));
-//        });
-//      getFromApi(`tickets/byEquipment/${machines[i].id}/`)
-//        .then((response) => response.json())
-//        .then((data) => {
-//          setIssues(prevIssues => ({
-//            ...prevIssues,
-//            [machines[i].id]: data.length
-//          }));
-//        });
-//    }
-//  }), [machines];
+
+  useEffect(() => {
+    const promises = machines.map((machine) => {
+      const assessmentPromise = getFromApi(`assessments/equipment/${machine.id}/`).then((response) => response.json());
+      const ticketsPromise = getFromApi(`tickets/byEquipment/${machine.id}/`).then((response) => response.json());
+  
+      return Promise.all([assessmentPromise, ticketsPromise]).then(([assessments, tickets]) => ({
+        id: machine.id,
+        reviews: assessments.length,
+        issues: tickets.length
+      }));
+    });
+
+    Promise.all(promises).then((data) => {
+      const reviewsObj = {};
+      const issuesObj = {};
+      data.forEach(({ id, reviews, issues }) => {
+        reviewsObj[id] = reviews;
+        issuesObj[id] = issues;
+      });
+      setReviews(reviewsObj);
+      setIssues(issuesObj);
+    });
+  }, [machines]);
 
   return (
     <>
@@ -213,13 +218,6 @@ export default function MachineList() {
             </Popover.Content>
           </Popover.Root>
         </div>
-        
-        <Link to="add">
-          <Button size="3" className="w-full">
-            <IoMdAddCircleOutline className="size-6" />
-            Añadir máquina
-          </Button>
-        </Link>
 
         {filtered_machine_list.map((machine) => {
           const machineRatingData = machineRatings.find(
@@ -228,7 +226,7 @@ export default function MachineList() {
           var value = machineRatingData ? machineRatingData.ratings : 0;
 
           return (
-            <Link to={`../equipments/${machine.id}`}>
+            <Link to={`../equipments/${machine.id}`} key={machine.id}>
               <Button
                 name = "maquina"
                 key={machine.id}
