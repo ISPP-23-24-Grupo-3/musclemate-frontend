@@ -27,6 +27,7 @@ function Gym({
   handleCheck,
   notSubscribedGyms,
   setError,
+  location_subscription_plan,
 }) {
   const location = useLocation();
   const { user } = useContext(AuthContext);
@@ -86,18 +87,26 @@ function Gym({
           )}
           
         </dl>
-        {location.state?.subscription_plan ? (
+        {location_subscription_plan ? (
           <div className="flex justify-center items-center mt-5">
-            <Checkbox.Root
+
+            {subscription_plan ? (
+              <Button color="red" onClick={() => handleClick(id)}>
+                Cancelar suscripción
+              </Button>
+            ) : (
+              <Checkbox.Root
               className="w-6 h-6 border border-black rounded-sm flex items-center justify-center"
               onCheckedChange={() =>
-                handleCheck(id, location.state?.subscription_plan)
+                handleCheck(id, location_subscription_plan)
               }
             >
               <Checkbox.Indicator className="bg-radixgreen w-full h-full flex justify-center items-center">
                 <CheckIcon color="white" />
               </Checkbox.Indicator>
             </Checkbox.Root>
+            )}
+            
           </div>
         ) : (
           <div className="flex justify-center items-center mt-5">
@@ -117,6 +126,7 @@ function SubscriptionsPage() {
     useContext(SubscriptionContext);
   const [gyms, setGyms] = useState([]);
   const [error, setError] = useState(null);
+  const [location_subscription_plan, setLocation_subscription_plan] = useState({priceId: location.state?.priceId, subscription_plan: location.state?.subscription_plan})
 
   function notSubscribedGyms(id) {
     setGyms((prevGimnasios) => {
@@ -178,7 +188,11 @@ function SubscriptionsPage() {
           setError("No tienes gimnasios suscritos.");
         }
       }else{
-      setGyms(data);
+        const filteredGyms = data.filter((gym) => gym.subscription_plan === "free");
+        if (filteredGyms.length === 0) {
+          setError("No hay gimnasios disponibles para suscribirse.");
+        }
+        setGyms(filteredGyms);
       }
     } else {
       setError("Error al cargar los gimnasios.");
@@ -186,6 +200,7 @@ function SubscriptionsPage() {
   };
 
   useEffect(() => {
+    console.log(location.state?.subscription_plan);
     cleanGymnSubscription();
     GetGyms();
   }, []);
@@ -195,12 +210,12 @@ function SubscriptionsPage() {
       <div className="flex flex-col items-center justify-center space-y-4 m-5">
         <div className="text-center ">
           <Heading size="5" className="text-radixgreen !mt-8 !mb-3 text-center">
-            {location.state?.subscription_plan
+            {location_subscription_plan.subscription_plan
               ? "Selecciona tus gimnasios"
               : "Gestiona tus gimnasios suscritos"}
           </Heading>
         </div>
-      {!location.state?.subscription_plan ? (
+      {!location_subscription_plan.subscription_plan ? (
       <>
         {gyms.length === 0 &&
         <>
@@ -230,18 +245,24 @@ function SubscriptionsPage() {
               notSubscribedGyms={notSubscribedGyms}
               handleCheck={handleCheck}
               setError={setError}
+              location_subscription_plan={location_subscription_plan.subscription_plan}
             />
           ))}
         </div>
-        {location.state?.priceId && (
+        {location_subscription_plan.priceId  && (
           <div className="flex flex-col justify-center items-center m-5 w-full">
-            {error && <p className="text-red-500">{error}</p>}
-            <button
+            {error && 
+            <p className="text-red-500">{error}</p>}
+
+            {error == "No tienes gimnasios suscritos." || error == "No hay gimnasios disponibles para suscribirse." ? null : (
+              <button
               className="bg-radixgreen text-white p-2 rounded-lg w-full"
-              onClick={() => handleClicked(location.state.priceId)}
+              onClick={() => handleClicked(location_subscription_plan.priceId)}
             >
               Pagar
             </button>
+            )}
+            
           </div>
         )}
       </div>
