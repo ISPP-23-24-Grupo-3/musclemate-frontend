@@ -4,12 +4,13 @@ import React, { useContext, useEffect, useState } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { getFromApi, putToApi } from "../../utils/functions/api";
-import { CreateCheckoutSession } from "../../utils/functions/stripe";
+import { CreateCheckoutSession, CreateCheckoutSessionForOwner } from "../../utils/functions/stripe";
 import { useLocation } from "react-router";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import AuthContext from "../../utils/context/AuthContext";
 import Stripe from "stripe";
 import { Link } from "react-router-dom";
+import { get } from "react-hook-form";
 
 const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
@@ -29,7 +30,6 @@ function Gym({
   setError,
   location_subscription_plan,
 }) {
-  const location = useLocation();
   const { user } = useContext(AuthContext);
 
   async function handleClick() {
@@ -38,6 +38,7 @@ function Gym({
     const customer = await stripe.customers.retrieve(customer_id, {
       expand: ["subscriptions"],
     });
+    console.log(customer.subscriptions);
     if (customer.subscriptions.data.length === 0) {
       setError("No tienes suscripciones activas.");
       return;
@@ -121,6 +122,7 @@ function Gym({
 }
 
 function SubscriptionsPage() {
+  const { user } = useContext(AuthContext);
   const location = useLocation();
   const { gymnSubscription, setGymnSubscription, saveGymnSubscription } =
     useContext(SubscriptionContext);
@@ -149,6 +151,12 @@ function SubscriptionsPage() {
     setGymnSubscription([]);
   }
 
+  async function getOwnerCustomerId() {
+    const owner = await getFromApi(`owners/detail/${user.username}/`);
+    const { customer_id } = await owner.json();
+    return customer_id;
+  }
+
   function handleCheck(id, subscription_plan) {
     setGymnSubscription((prevGimnasios) => {
       const gimnasioIndex = prevGimnasios.findIndex(
@@ -165,16 +173,23 @@ function SubscriptionsPage() {
     console.log(gymnSubscription);
   }
 
-  function handleClicked(priceId) {
+  async function handleClicked(priceId) {
     if (gymnSubscription.length === 0) {
       setError("Por favor selecciona al menos un gimnasio.");
       return;
     }
     saveGymnSubscription();
     const quantity = gymnSubscription.length;
+    const customer_id = await getOwnerCustomerId();
+    if (customer_id) {
+      CreateCheckoutSessionForOwner(priceId, quantity, customer_id).then((session) => {
+        window.location.href = JSON.parse(session).url;
+      });
+    } else {
     CreateCheckoutSession(priceId, quantity).then((session) => {
       window.location.href = JSON.parse(session).url;
     });
+  }
   }
 
   const GetGyms = async () => {
@@ -200,7 +215,7 @@ function SubscriptionsPage() {
   };
 
   useEffect(() => {
-    console.log(location.state?.subscription_plan);
+    getOwnerCustomerId();
     cleanGymnSubscription();
     GetGyms();
   }, []);
