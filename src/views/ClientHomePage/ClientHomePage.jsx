@@ -4,6 +4,7 @@ import { RoutineList } from "../../components/Routines/RoutineList";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi } from "../../utils/functions/api";
 import { EquipmentSelect } from "../../components/Equipments";
+import { IoPodiumOutline, IoCalendarClearOutline, IoBarbellOutline } from "react-icons/io5";
 
 import { Line } from 'react-chartjs-2';
 import {
@@ -162,8 +163,12 @@ export default function ClientHomePage() {
     <>
       <div className="flex flex-wrap gap-4">
         <div style={{flex: '1'}}>
-          <Heading as="h1" className="!mb-3">
-            <Link href="./routines">Mis Rutinas</Link>
+          <Heading as="h1">
+            <Link className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+            href="./routines">
+              <IoBarbellOutline className="w-8 h-8" />
+              <h3 className="text-lg font-semibold text-radixgreen">Mis Rutinas</h3>
+            </Link>
           </Heading>
           {gymPlan !== "free" ? (
             <RoutineList />
@@ -172,14 +177,22 @@ export default function ClientHomePage() {
           )}
         </div>
         <div style={{flex: '1'}}>
-          <Heading as="h1">
-            <Link href="./events">Mis Eventos</Link>
+        <Heading as="h1">
+            <Link className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+            href="./events">
+              <IoCalendarClearOutline className="w-8 h-8" />
+              <h3 className="text-lg font-semibold text-radixgreen">Mis Eventos</h3>
+            </Link>
           </Heading>
           {/*TODO: Add booked events here*/}
         </div>
         <div style={{flex: '1'}}>
           <Heading as="h1">
-            <Link href="./statistics">Mi Historial</Link>
+            <Link className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+            href="./statistics">
+              <IoPodiumOutline className="w-8 h-8" />
+              <h3 className="text-lg font-semibold text-radixgreen">Mi Historial</h3>
+            </Link>
           </Heading>
           <div className="flex items-center justify-center">
             <div className="mr-4 mt-2">
