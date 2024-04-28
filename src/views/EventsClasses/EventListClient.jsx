@@ -12,6 +12,8 @@ import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
 import * as Separator from "@radix-ui/react-separator";
 import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
 import { getFromApi } from "../../utils/functions/api";
+import { Checkbox } from "@radix-ui/themes";
+
 
 const INTENSITIES = ["L", "M", "H"];
 const INTENSITY_NAMES = { L: "Baja", M: "Media", H: "Alta" };
@@ -26,9 +28,12 @@ const EventListClient = () => {
   const [search, setSearch] = useState("");
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [reservations, setReservations] = useState(false);
+  const [isReservation, setIsReservation] = useState(false);
 
   useEffect(() => {
     getEvents();
+    getReservations();
   }, []);
 
   async function getEvents() {
@@ -37,6 +42,20 @@ const EventListClient = () => {
       if (response.ok) {
         const data = await response.json();
         setEvents(data);
+      } else {
+        console.error("Error al obtener los eventos:", response.status);
+      }
+    } catch (error) {
+      console.error("Error al obtener los eventos:", error);
+    }
+  }
+
+  async function getReservations() {
+    try {
+      const response = await getFromApi(`events/reservation/`);
+      if (response.ok) {
+        const data = await response.json();
+        setReservations(data);
       } else {
         console.error("Error al obtener los eventos:", response.status);
       }
@@ -66,7 +85,8 @@ const EventListClient = () => {
     setSelectedEvent(selected);
   };
 
-  const filteredEventList = events
+
+  const filteredEventList = (isReservation ? reservations : events)
     .filter((event) => event.name.toLowerCase().includes(search.toLowerCase()))
     .filter((event) =>
       Object.entries(filters).every(([key, values]) =>
@@ -184,7 +204,17 @@ const EventListClient = () => {
               </div>
             </Popover.Content>
           </Popover.Root>
+
         </div>
+
+        
+        <div className="flex gap-3 items-center">
+            <Checkbox
+              checked={isReservation}
+              onCheckedChange={(e) => setIsReservation(e)}
+            ></Checkbox>
+            <span> Mis eventos con reserva</span>
+          </div>
 
         {filteredEventList.map((event) => (
           <Link to={`/user/reservations/${event.id}`} key={event.id}>
