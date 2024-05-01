@@ -1,48 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getFromApi } from '../../utils/functions/api';
-import { EquipmentSelect } from "../../components/Equipments";
-import {Button,Text,Heading} from "@radix-ui/themes";
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend,
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
+import { Heading } from "@radix-ui/themes";
 
 const ShowStatistics = () => {
-    const [tipo, setTipo] = useState('peso');
-    const [equipment, setEquipment] = useState({});
-    const [chartData, setChartData] = useState([]);
     const [workouts, setWorkouts] = useState([]);
     const [routines, setRoutines] = useState([]);
     const [series, setSeries] = useState([]);
-
-    function formatDuration(duration) {
-        const minutes = Math.floor(duration / 60);
-        const seconds = duration % 60;
-      
-        const formattedMinutes = minutes.toString().padStart(2, '0');
-        const formattedSeconds = seconds.toString().padStart(2, '0');
-      
-        return `${formattedMinutes}:${formattedSeconds}`;
-    }
 
     useEffect(() => {
         const fetchRoutines = async () => {
@@ -140,62 +103,15 @@ const ShowStatistics = () => {
                 console.error('Error fetching API workout:', error);
                 }
             }
-            chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
-            setChartData(chartData);
             serie.sort((a, b) => new Date(b.date) - new Date(a.date));
             setSeries(serie)
         };
         fetchSeries();
-    },[workouts,equipment]);
+    },[workouts]);
 
     return (
         <>
-            <div className='text-radixgreen mt-8 mb-4 mx-auto text-center'>
-                <Heading size="8">Gráficas de tu evolución</Heading>
-            </div>
-            <div className="flex items-center justify-center">
-                <div className="mr-4">
-                    <EquipmentSelect
-                        onChange={(e) => { setEquipment(e.target.value) }}
-                    />
-                </div>
-                <div className="mt-5">
-                    {tipo === 'peso' ? (
-                        <Button onClick={() => setTipo('reps')} className="w-full" size="4">
-                            <Text>Mostrar Repeticiones</Text>
-                        </Button>
-                    ) : (
-                        <Button onClick={() => setTipo('peso')} className="w-full" size="4">
-                            <Text>Mostrar Pesos</Text>
-                        </Button>
-                    )}
-                </div>
-            </div>
-                <div className='mt-7'>
-                <Line 
-                    options={{
-                    responsive: true,
-                    scales: {
-                        y: {
-                        beginAtZero: true,
-                        },
-                    },
-                    }} 
-                    data={{
-                    labels: chartData.map((serie) => serie.date),
-                    datasets: [
-                        {
-                        label: `Mis ${tipo == 'peso' ? 'pesos' : 'repeticiones'}`,
-                        data: chartData.map((serie) => tipo == 'peso' ? serie.weight : serie.reps),
-                        fill: true,
-                        borderColor: 'rgb(48, 164, 108)', 
-                        backgroundColor: 'rgba(48, 164, 108, 0.4)',
-                        },
-                    ],
-                    }} 
-                />
-                </div>
-            <div className='text-radixgreen mt-10 mb-5 mx-auto text-center'>
+            <div className='text-radixgreen mb-5 mx-auto text-center'>
                 <Heading size="8">Historial de tus ejercicios</Heading>
             </div>
             <div className="mx-auto mt-1 m-5">

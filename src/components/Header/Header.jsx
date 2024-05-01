@@ -77,12 +77,12 @@ const Header = () => {
           ) : user?.rol === "client" ? (
             <>
               <HeaderLink to="/user/routines">Rutinas</HeaderLink>
-              <HeaderLink to="/user/statistics">Estadísticas</HeaderLink>
-              <HeaderLink to="/user/add-tickets">Crear incidencia</HeaderLink>
+              <HeaderLink to="/user/events">Eventos</HeaderLink>
+              <HeaderLink to="/user/statistics">Historial</HeaderLink>
               <HeaderLink to="/user/equipmentsClient">
                 Máquinas del gimnasio
               </HeaderLink>
-              <HeaderLink to="/user/events">Eventos</HeaderLink>
+              <HeaderLink to="/user/add-tickets">Crear incidencia</HeaderLink>
               <HeaderLink to="user/tickets">Mis Incidencias</HeaderLink>
             </>
           ) : user?.rol === "gym" ? (
