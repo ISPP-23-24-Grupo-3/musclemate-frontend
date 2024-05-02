@@ -1,57 +1,69 @@
-import { Button, Flex, Heading } from "@radix-ui/themes";
+import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
+import { IoAlertCircleOutline, IoCalendarClearOutline,IoPersonAddOutline, IoPeopleOutline} from "react-icons/io5";
+import { PiBarbell } from "react-icons/pi";
+import MachineIcon from "../../components/MachineIcon";
 
 
 export default function OwnerHomePage() {
 
   return (
     <>
-      <Flex align="center" justify="center" direction="row">
-        <Heading
-          size="6"
-          className="text-radixgreen !mt-8 !mb-3 text-center md:text-left"
+        <div className="flex flex-col gap-0  justify-center items-center mb-5">
+        <Heading className="text-4xl font-semibold text-radixgreen">Página principal</Heading>
+         </div>
+      <div className="container px-4 md:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link
+          className="bg-[#E6F6EB] rounded-lg border-2 border-opacity-20 border-radixgreen p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+          to="../equipments"
         >
-          Bienvenido a
-        </Heading>
-        <img src="/pwa-64x64.png" alt="Logo" className="ml-2 mr-1 mt-3" />
-        <Heading size="6" className="!mt-8 !mb-3 text-center">
-          MuscleMate
-        </Heading>
-      </Flex>
-      <Flex direction="column" justify="center" align="center" gap="4" className="mb-5">
-        <Link to="../equipments">
-          <Button size="4" variant="classic" className="mt-4">
-            Mis Máquinas
-          </Button>
+          <MachineIcon />
+          <h3 className="text-lg font-semibold text-radixgreen">Administrar máquinas</h3>
+          
         </Link>
-        <Link to="../users/register">
-          <Button size="4" variant="classic" className="mt-4">
-            Registrar Cliente
-          </Button>
+        <Link
+          className="bg-[#E6F6EB] rounded-lg p-6 border-2 border-opacity-20 border-radixgreen shadow-sm hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+          to="../users/register"
+        >
+          <IoPersonAddOutline className="w-8 h-8" />
+          <h3 className="text-lg font-semibold text-radixgreen">Registrar cliente</h3>
+          
         </Link>
-        <Link to="../users">
-          <Button size="4" variant="classic" className="mt-4">
-            Usuarios
-          </Button>
+        <Link
+          className="bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+          to="../users"
+        >
+          <IoPeopleOutline className="w-8 h-8" />
+          <h3 className="text-lg font-semibold text-radixgreen">Administrar usuarios</h3>
+          
         </Link>
-        <Link to="../tickets">
-          <Button size="4" variant="classic" className="mt-4">
-            Ver Incidencias
-          </Button>
+        <Link
+          className="bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+          to="../tickets"
+        >
+          <IoAlertCircleOutline className="w-8 h-8" />
+          <h3 className="text-lg font-semibold text-radixgreen">Administrar incidentes</h3>
+          
         </Link>
-        <Link to="../my-gyms">
-          <Button size="4" variant="classic" className="mt-4">
-            Mis Gimnasios
-          </Button>
+        <Link
+          className="bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+          to="../my-gyms"
+        >
+          <PiBarbell className="w-8 h-8" />
+          <h3 className="text-lg font-semibold text-radixgreen">Administrar gimnasios</h3>
+          
         </Link>
-        <Link to="../events">
-          <Button size="4" variant="classic" className="mt-4">
-            Mis Eventos
-          </Button>
+        <Link
+          className="bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+          to="../events"
+        >
+          <IoCalendarClearOutline className="w-8 h-8" />
+          <h3 className="text-lg font-semibold text-radixgreen">Administrar eventos</h3>
+          
         </Link>
-      </Flex>
+      </div>
     </>
   );
 }
