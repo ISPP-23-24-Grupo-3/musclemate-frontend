@@ -222,7 +222,6 @@ const EventListClient = () => {
               name="event"
               key={event.id}
               size="3"
-              onClick={() => handleEventClick(event.id)}
               variant="soft"
               className="flex !justify-between !h-fit !p-2 !px-4 w-full"
             >
