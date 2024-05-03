@@ -22,7 +22,7 @@ export const EquipmentSelect = forwardRef((props, ref) => {
   }, [props.equipment]);
 
   return (
-    <RHFSelect {...props} placeholder="Selecciona una máquina">
+    <RHFSelect {...props} placeholder="Selecciona Máquina">
       {equipment &&
         equipment.map((e) => (
           <Select.Item key={e.id} value={e.id.toString()}>
