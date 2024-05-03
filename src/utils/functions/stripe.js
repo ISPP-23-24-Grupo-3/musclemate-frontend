@@ -21,6 +21,9 @@ export async function CreateCheckoutSession(priceId, quantity = 1){
             },
         ],
         mode: 'subscription',
+        subscription_data: {
+            trial_period_days: 30,
+        },
         success_url: `${window.location.origin}/owner/success?session_id={CHECKOUT_SESSION_ID}&priceId=${priceId}`,
         cancel_url: `${window.location.origin}/owner/pricing`,
     });
