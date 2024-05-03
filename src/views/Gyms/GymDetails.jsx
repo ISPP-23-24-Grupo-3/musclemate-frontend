@@ -111,7 +111,7 @@ export default function GymDetails() {
             <strong className="text-radixgreen">Descripción</strong>{" "}
             {gymDetails.descripcion}
           </div>
-          <div className="mt-4 text-center space-x-10">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3">
             <Link to={`../gyms/${gymId}/stats`}>
               <Button
                 className="text-white font-bold py-2 px-4 rounded"

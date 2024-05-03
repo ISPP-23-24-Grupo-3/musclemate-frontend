@@ -87,7 +87,7 @@ const AddTickets = () => {
 
   return (
     <div className="mt-8 flex justify-center mb-8">
-      <FormContainer className="w-1/2">
+      <FormContainer>
         <h2 className="mb-4 text-radixgreen font-bold text-3xl text-center">
           Crear Incidencia
         </h2>

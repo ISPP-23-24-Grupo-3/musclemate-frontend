@@ -119,28 +119,24 @@ const ShowStatistics = () => {
                     {series.length > 0 ? (
                     series.map((serie) => (
                         <li key={serie.id} className={`bg-white p-4 rounded-md mb-4`} style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px -2px 2px rgba(0, 0, 0, 0.1)" }}>
-                            <div className="flex items-center mb-2">
-                                <div className='flex justify-around w-full md:text-center'>
-                                    <div className="mr-4 flex items-center">
-                                        <div className={`text-radixgreen font-bold mb-1 text-xl`}>
+                                    <div className="grid md:grid-cols-4 md:grid-rows-1 md:gap-0 gap-3 grid-cols-2 grid-rows-2">
+                                        <div className={`flex-col justify-center text-radixgreen font-bold mb-1 md:text-xl text-sm`}>
                                             <p>Fecha de creación:</p>
-                                            <span className="text-black">{serie.date}</span>
+                                            <span className="text-black md:text-lg text-sm">{serie.date}</span>
                                         </div>
-                                        <div className={`ml-12 text-radixgreen font-bold mb-1 text-xl`}>
+                                        <div className={`flex-col justify-center items-center text-radixgreen font-bold mb-1 md:text-xl text-sm`}>
                                             <p>Repeticiones:</p>
-                                            <span className="text-black">{serie.reps}</span>
+                                            <span className="text-black md:text-lg text-sm">{serie.reps}</span>
                                         </div>
-                                        <div className={`ml-12 text-radixgreen font-bold mb-1 text-xl`}>
+                                        <div className={`flex-col justify-center items-center text-radixgreen font-bold mb-1 md:text-xl text-sm`}>
                                             <p>Peso:</p>
-                                            <span className="text-black">{serie.weight}</span>
+                                            <span className="text-black md:text-lg text-sm">{serie.weight}</span>
                                         </div>
-                                        <div className={`ml-12 text-radixgreen font-bold mb-1 text-xl`}>
+                                        <div className={`flex-col justify-center items-center text-radixgreen font-bold mb-1 md:text-xl text-sm`}>
                                             <p>Entrenamiento:</p>
-                                            <span className="text-black">{serie.equipment}</span>
+                                            <span className="text-black md:text-lg text-sm">{serie.equipment}</span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
                         </li>
 
                     ))
