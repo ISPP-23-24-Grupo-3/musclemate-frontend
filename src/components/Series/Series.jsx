@@ -317,30 +317,29 @@ export const Series = (workoutID) => {
                 <li 
                   key={serie.id} className={`bg-white p-4 rounded-md mb-4 ${editor[serie.id] ? "editing" : ""}`}
                   style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1), 0px -2px 2px rgba(0, 0, 0, 0.1)" }}>
-                  <div className="flex items-center mb-2">
-                    <div className='flex justify-around w-full md:text-center'>
-                      <div>
-                        <div className="mt-2">
+                    <div className='md:flex justify-around w-full text-center grid grid-cols-1 gap-4 '>
+                      <div className='flex md:flex-col flex-row md:items-center justify-center gap-3'>
+                        <div className="">
                           <IconButton size="2" radius="full" onClick={() =>{setEditor(prev => ({ ...prev, [serie.id]: !prev[serie.id] })); startEditing(serie.id)}}>
                             <LuPencil />
                           </IconButton>
                         </div>
-                        <div className="mt-3">
+                        <div className="">
                           <IconButton size="2" radius="full" color="red" onClick={() => deleteSerie(serie)}>
                             <CgTrash />
                           </IconButton>
                         </div>
                       </div>
-                      <div className="mr-4 flex items-center">
+                      <div className="flex justify-center items-center gap-5">
                         
-                        <div className={`${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 mr-4 text-xl`}>
+                        <div className={`${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold text-xl`}>
                           <p>Repeticiones: <span className="text-black">{serie.reps}</span></p>
                         </div>
-                        <div className={`ml-8 ${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold mb-1 text-xl`}>
-                          <p>Peso: <span className="text-black">{serie.weight}</span></p>
+                        <div className={` ${editor[serie.id] ? "hidden" : undefined} text-radixgreen font-bold text-xl`}>
+                          <p>Peso: <span className="text-black">{serie.weight}Kg</span></p>
                         </div>
                       </div>
-                      <div className="mr-4">
+                      <div className={`${editor[serie.id] ? undefined : "absolute"}`}>
                         <form className={`${editor[serie.id] ? undefined : "hidden"} text-radixgreen font-bold`}
                         onSubmit={handleSubmit((r) => {
                           editSerie(serie.id, r[`reps${serie.id}`], r[`peso${serie.id}`]);
@@ -366,6 +365,7 @@ export const Series = (workoutID) => {
                                   <TextField.Input
                                     className="w-30"
                                     color={`${errors[`peso${serie.id}`] ? "red" : "green"}`}
+                                    placeholder='En Kg'
                                     defaultValue={serie.weight}
                                     {...register(`peso${serie.id}`, {
                                       validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
@@ -379,6 +379,7 @@ export const Series = (workoutID) => {
                                   <TextField.Input
                                     color={`${errors[`durationn${serie.id}`] ? "red" : "green"}`}
                                     defaultValue={duration === 0 ? serie.duration : duration}
+                                    placeholder='En segundos'
                                     onChange={(e) =>{ setDuration(e.target.value)}}
                                     {...register(`durationn${serie.id}`, {
                                       validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
@@ -395,7 +396,7 @@ export const Series = (workoutID) => {
                           </div>
                         </form>
                       </div>
-                      <div className="flex items-center">
+                      <div className="grid grid-cols-1 md:flex md:items-center">
                         <div>
                           <p className="text-radixgreen font-bold mb-1">
                           </p>
@@ -412,7 +413,6 @@ export const Series = (workoutID) => {
                           </div>
                         )}
                     </div>
-                  </div>
                 </li>
               ))
               ) : (
@@ -468,7 +468,9 @@ export const Series = (workoutID) => {
               <div className='text-xl mx-1'>
                 <div className="flex flex-col items-center">
                   <Text>Peso: </Text>
-                  <TextField.Input {...register("peso", {
+                  <TextField.Input 
+                  placeholder='En Kg'   
+                  {...register("peso", {
                     validate: value => (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
                   })} ></TextField.Input>
                 </div>
@@ -476,7 +478,9 @@ export const Series = (workoutID) => {
               <div className='text-xl mx-1'>
                 <div className="flex flex-col items-center">
                   <Text>Duración: </Text>
-                  <TextField.Input {...register("duration", {
+                  <TextField.Input 
+                  placeholder='En segundos'
+                  {...register("duration", {
                     validate: value => (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
                   })} ></TextField.Input>
                 </div>

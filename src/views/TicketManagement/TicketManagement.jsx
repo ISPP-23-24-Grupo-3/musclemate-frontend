@@ -142,7 +142,9 @@ const TicketManagement = () => {
       </div>
       <div className="flex flex-col gap-4">
         {loading ? (
-          <RingLoader color={"#123abc"} loading={loading} />
+          <div className="flex justify-center">
+          <RingLoader color={"#30A46C"} loading={loading} />
+          </div>
         ) : (
           <>
             {apiDataLoaded && currentTickets.length > 0 ? (

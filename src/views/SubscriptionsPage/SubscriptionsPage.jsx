@@ -4,12 +4,13 @@ import React, { useContext, useEffect, useState } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { getFromApi, putToApi } from "../../utils/functions/api";
-import { CreateCheckoutSession } from "../../utils/functions/stripe";
+import { CreateCheckoutSession, CreateCheckoutSessionForOwner } from "../../utils/functions/stripe";
 import { useLocation } from "react-router";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import AuthContext from "../../utils/context/AuthContext";
 import Stripe from "stripe";
 import { Link } from "react-router-dom";
+import { get } from "react-hook-form";
 
 const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
@@ -27,8 +28,8 @@ function Gym({
   handleCheck,
   notSubscribedGyms,
   setError,
+  location_subscription_plan,
 }) {
-  const location = useLocation();
   const { user } = useContext(AuthContext);
 
   async function handleClick() {
@@ -37,6 +38,7 @@ function Gym({
     const customer = await stripe.customers.retrieve(customer_id, {
       expand: ["subscriptions"],
     });
+    console.log(customer.subscriptions);
     if (customer.subscriptions.data.length === 0) {
       setError("No tienes suscripciones activas.");
       return;
@@ -86,18 +88,26 @@ function Gym({
           )}
           
         </dl>
-        {location.state?.subscription_plan ? (
+        {location_subscription_plan ? (
           <div className="flex justify-center items-center mt-5">
-            <Checkbox.Root
+
+            {subscription_plan ? (
+              <Button color="red" onClick={() => handleClick(id)}>
+                Cancelar suscripción
+              </Button>
+            ) : (
+              <Checkbox.Root
               className="w-6 h-6 border border-black rounded-sm flex items-center justify-center"
               onCheckedChange={() =>
-                handleCheck(id, location.state?.subscription_plan)
+                handleCheck(id, location_subscription_plan)
               }
             >
               <Checkbox.Indicator className="bg-radixgreen w-full h-full flex justify-center items-center">
                 <CheckIcon color="white" />
               </Checkbox.Indicator>
             </Checkbox.Root>
+            )}
+            
           </div>
         ) : (
           <div className="flex justify-center items-center mt-5">
@@ -112,11 +122,13 @@ function Gym({
 }
 
 function SubscriptionsPage() {
+  const { user } = useContext(AuthContext);
   const location = useLocation();
   const { gymnSubscription, setGymnSubscription, saveGymnSubscription } =
     useContext(SubscriptionContext);
   const [gyms, setGyms] = useState([]);
   const [error, setError] = useState(null);
+  const [location_subscription_plan, setLocation_subscription_plan] = useState({priceId: location.state?.priceId, subscription_plan: location.state?.subscription_plan})
 
   function notSubscribedGyms(id) {
     setGyms((prevGimnasios) => {
@@ -139,6 +151,12 @@ function SubscriptionsPage() {
     setGymnSubscription([]);
   }
 
+  async function getOwnerCustomerId() {
+    const owner = await getFromApi(`owners/detail/${user.username}/`);
+    const { customer_id } = await owner.json();
+    return customer_id;
+  }
+
   function handleCheck(id, subscription_plan) {
     setGymnSubscription((prevGimnasios) => {
       const gimnasioIndex = prevGimnasios.findIndex(
@@ -155,16 +173,23 @@ function SubscriptionsPage() {
     console.log(gymnSubscription);
   }
 
-  function handleClicked(priceId) {
+  async function handleClicked(priceId) {
     if (gymnSubscription.length === 0) {
       setError("Por favor selecciona al menos un gimnasio.");
       return;
     }
     saveGymnSubscription();
     const quantity = gymnSubscription.length;
+    const customer_id = await getOwnerCustomerId();
+    if (customer_id) {
+      CreateCheckoutSessionForOwner(priceId, quantity, customer_id).then((session) => {
+        window.location.href = JSON.parse(session).url;
+      });
+    } else {
     CreateCheckoutSession(priceId, quantity).then((session) => {
       window.location.href = JSON.parse(session).url;
     });
+  }
   }
 
   const GetGyms = async () => {
@@ -178,7 +203,11 @@ function SubscriptionsPage() {
           setError("No tienes gimnasios suscritos.");
         }
       }else{
-      setGyms(data);
+        const filteredGyms = data.filter((gym) => gym.subscription_plan === "free");
+        if (filteredGyms.length === 0) {
+          setError("No hay gimnasios disponibles para suscribirse.");
+        }
+        setGyms(filteredGyms);
       }
     } else {
       setError("Error al cargar los gimnasios.");
@@ -186,6 +215,7 @@ function SubscriptionsPage() {
   };
 
   useEffect(() => {
+    getOwnerCustomerId();
     cleanGymnSubscription();
     GetGyms();
   }, []);
@@ -195,12 +225,12 @@ function SubscriptionsPage() {
       <div className="flex flex-col items-center justify-center space-y-4 m-5">
         <div className="text-center ">
           <Heading size="5" className="text-radixgreen !mt-8 !mb-3 text-center">
-            {location.state?.subscription_plan
+            {location_subscription_plan.subscription_plan
               ? "Selecciona tus gimnasios"
               : "Gestiona tus gimnasios suscritos"}
           </Heading>
         </div>
-      {!location.state?.subscription_plan ? (
+      {!location_subscription_plan.subscription_plan ? (
       <>
         {gyms.length === 0 &&
         <>
@@ -230,18 +260,24 @@ function SubscriptionsPage() {
               notSubscribedGyms={notSubscribedGyms}
               handleCheck={handleCheck}
               setError={setError}
+              location_subscription_plan={location_subscription_plan.subscription_plan}
             />
           ))}
         </div>
-        {location.state?.priceId && (
+        {location_subscription_plan.priceId  && (
           <div className="flex flex-col justify-center items-center m-5 w-full">
-            {error && <p className="text-red-500">{error}</p>}
-            <button
+            {error && 
+            <p className="text-red-500">{error}</p>}
+
+            {error == "No tienes gimnasios suscritos." || error == "No hay gimnasios disponibles para suscribirse." ? null : (
+              <button
               className="bg-radixgreen text-white p-2 rounded-lg w-full"
-              onClick={() => handleClicked(location.state.priceId)}
+              onClick={() => handleClicked(location_subscription_plan.priceId)}
             >
               Pagar
             </button>
+            )}
+            
           </div>
         )}
       </div>

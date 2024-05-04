@@ -5,10 +5,20 @@ import { FaCheck } from "react-icons/fa";
 
 function PricingCard({ priceId, name, price, features, background = "light" }) {
   return (
+    <>
+
+      
     <div
       className={`${background === "light" ? "bg-[#E6F6EB] text-[#333]" : "bg-radixgreen text-white"} rounded-xl relative overflow-hidden transition-all`}
     >
       <div className="p-6">
+        {name == "Estándar" && (
+          <p
+            className="top-0 py-1.5 px-4 bg-radixgreen text-white text-center rounded-full md:text-sm text-xs font-semibold uppercase tracking-wide transform -translate-y-1/2"
+          >
+            Primer mes gratis
+          </p>
+        )}
         <div className="text-left flex flex-col gap-2">
           <Heading size="4">{name}</Heading>
           <div>
@@ -47,6 +57,7 @@ function PricingCard({ priceId, name, price, features, background = "light" }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
