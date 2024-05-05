@@ -90,14 +90,6 @@ const ShowStatistics = () => {
                         }));
                     serie.push(...dataWithEquipment)
                     data.sort((a, b) => new Date(a.date) - new Date(b.date));
-                    let workoutChartData = data.map(serie => ({
-                    reps:serie.reps,
-                    weight: serie.weight,
-                    date: serie.date,
-                    }));
-                    if (workout.equipment.includes(Number(equipment))) {
-                        chartData.push(...workoutChartData);
-                    }
                 }
                 }catch (error) {
                 console.error('Error fetching API workout:', error);

@@ -3,7 +3,6 @@ import {
   IoMdSearch,
   IoIosClose,
   IoIosArrowRoundUp,
-  IoMdAddCircleOutline,
 } from "react-icons/io";
 import * as Toggle from "@radix-ui/react-toggle";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
@@ -13,7 +12,6 @@ import * as Separator from "@radix-ui/react-separator";
 import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
 import { getFromApi } from "../../utils/functions/api";
 import { Checkbox } from "@radix-ui/themes";
-
 
 const INTENSITIES = ["L", "M", "H"];
 const INTENSITY_NAMES = { L: "Baja", M: "Media", H: "Alta" };
@@ -30,11 +28,16 @@ const EventListClient = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [reservations, setReservations] = useState(false);
   const [isReservation, setIsReservation] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     getEvents();
     getReservations();
   }, []);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [filters, sorting, sortingReverse, search, events]);
 
   async function getEvents() {
     try {
@@ -66,6 +69,8 @@ const EventListClient = () => {
 
   const SORTING_FUNCTIONS = {
     capacity: (a, b) => b.capacity - a.capacity,
+    intensity: (a, b) =>
+      INTENSITIES.indexOf(a.intensity) - INTENSITIES.indexOf(b.intensity),
   };
 
   const addFilter = (filterCategory, filter) =>
@@ -116,7 +121,7 @@ const EventListClient = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </TextField.Root>
-          <Popover.Root>
+          <Popover.Root open={open} onOpenChange={setOpen}>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
                 <Button radius="none" size="2" variant="soft" className="m-0">
@@ -145,6 +150,7 @@ const EventListClient = () => {
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
                   name="reverse_sort"
+                  defaultPressed={sortingReverse}
                   onPressedChange={(p) => setSortingReverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -153,7 +159,7 @@ const EventListClient = () => {
               </div>
               <ToggleGroup.Root
                 type="single"
-                defaultValue="capacity"
+                defaultValue= {sorting}
                 onValueChange={(v) => v && setSorting(v)}
                 className="gap-2 flex"
               >
