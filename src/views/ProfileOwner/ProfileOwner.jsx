@@ -23,7 +23,22 @@ const ProfileOwner = () => {
     }
   }, [user, reset]);
 
-  const handleSaveChanges = async (formData) => {
+  const handleInputChange = (e, field) => {
+    setEditedOwner({
+      ...editedOwner,
+      [field]: e,
+    });
+  };
+
+  const toggleEditMode = () => {
+    if (!editMode) {
+      setEditedOwner(ownerProfile);
+    }
+    setEditMode(!editMode);
+  };
+
+  const handleSaveChanges = async () => {
+
     try {
       const response = await putToApi(
         `owners/update/${user.username}/`,
@@ -63,81 +78,53 @@ const ProfileOwner = () => {
               </Heading>
               <Separator size="4" color="green" />
             </div>
-            <form onSubmit={handleSubmit(handleSaveChanges)}>
-              <div className="grid grid-cols-2 gap-x-4">
-                <UserInfoInput
-                  label="Nombre"
-                  name="name"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ required: "Este campo es obligatorio" }}
-                  error={errors.name}
-                />
-                <UserInfoInput
-                  label="Apellidos"
-                  name="last_name"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ required: "Este campo es obligatorio" }}
-                  error={errors.lastName}
-                />
-                <UserInfoInput
-                  label="Correo Electrónico"
-                  name="email"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ 
-                    required: "Este campo es obligatorio", 
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Correo electrónico inválido"
-                    }
-                  }}
-                  error={errors.email}
-                />
-                <UserInfoInput
-                  label="Número de Teléfono"
-                  name="phone_number"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ 
-                    required: "Este campo es obligatorio", 
-                    pattern: { 
-                      value: /^[0-9]+$/, 
-                      message: "Ingrese solo números"
-                    }, 
-                    minLength: { value: 10, message: "Mínimo 10 números" }, 
-                    maxLength: { value: 12, message: "Máximo 12 números" } 
-                  }}
-                  error={errors.phoneNumber}
-                />
-                <UserInfoInput
-                  label="Dirección"
-                  name="address"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ required: "Este campo es obligatorio" }}
-                  error={errors.address}
-                />
-              </div>
-              <div className="mt-4 text-center">
-                {editMode ? (
-                  <div className="flex justify-between">
-                    <div className="flex gap-3">
-                      <Button type="submit">Guardar</Button>
-                      <Button
-                        type="button"
-                        variant="surface"
-                        onClick={() => setEditMode(false)}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
+            <div className="grid grid-cols-2 gap-x-4">
+
+              <UserInfoInput
+                type="text"
+                label="Nombre"
+                value={ownerProfile ? ownerProfile.name : "Cargando..."}
+                editMode={editMode}
+                onChange={(e) => handleInputChange(e, "name")}
+              />
+              <UserInfoInput
+                type="text"
+                label="Apellidos"
+                value={ownerProfile ? ownerProfile.last_name : "Cargando..."}
+                editMode={editMode}
+                onChange={(e) => handleInputChange(e, "lastName")}
+              />
+              <UserInfoInput
+                type="text"
+                label="Correo Electrónico"
+                value={ownerProfile ? ownerProfile.email : "Cargando..."}
+                editMode={editMode}
+                onChange={(e) => handleInputChange(e, "email")}
+              />
+              <UserInfoInput
+                type="number"
+                label="Número de Teléfono"
+                value={ownerProfile ? ownerProfile.phone_number : "Cargando..."}
+                editMode={editMode}
+                onChange={(e) => handleInputChange(e, "phoneNumber")}
+              />
+              <UserInfoInput
+                type="text"
+                label="Dirección"
+                value={ownerProfile ? ownerProfile.address : "Cargando..."}
+                editMode={editMode}
+                onChange={(e) => handleInputChange(e, "address")}
+              />
+            </div>
+            <div className="mt-4 text-center">
+              {editMode ? (
+                <div className="flex justify-between">
+                  <div className="flex gap-3">
+                    <Button onClick={handleSaveChanges}>Guardar</Button>
+                    <Button variant="surface" onClick={toggleEditMode}>
+                      Cancelar
+                    </Button>
+
                   </div>
                 ) : (
                   <Button onClick={() => setEditMode(true)}>Editar</Button>
@@ -152,27 +139,22 @@ const ProfileOwner = () => {
   );
 };
 
-const UserInfoInput = ({ label, name, control, defaultValue, disabled, rules, error }) => (
+const UserInfoInput = ({ type, label, value, editMode, onChange }) => (
   <div className="flex flex-col mb-3">
     <span className="text-radixgreen font-bold mt-5">{label}:</span>
-    <Controller
-      name={name}
-      control={control}
-      defaultValue={defaultValue}
-      rules={rules}
-      render={({ field }) => (
-        <>
-          <TextField.Input
-            type="text"
-            className="text-black"
-            {...field}
-            disabled={disabled}
-            placeholder={label}
-          />
-          {error && <span className="text-red-500">{error.message}</span>}
-        </>
-      )}
-    />
+    {editMode ? (
+      <TextField.Root>
+        <TextField.Input
+          type={type}
+          className="text-black"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={label}
+        />
+      </TextField.Root>
+    ) : (
+      <span className="text-black">{value}</span>
+    )}
   </div>
 );
 

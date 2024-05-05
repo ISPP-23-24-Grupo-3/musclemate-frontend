@@ -5,6 +5,7 @@ import { IoMdSearch } from "react-icons/io";
 import AuthContext from "../../utils/context/AuthContext";
 import { RingLoader } from "react-spinners";
 import { Ticket } from "../../components/Ticket/Ticket";
+import { Link } from "react-router-dom";
 
 const TicketManagementUser = () => {
   const { user } = useContext(AuthContext);
@@ -103,7 +104,16 @@ const TicketManagementUser = () => {
           {apiDataLoaded ? (
             currentTickets.length > 0 ? (
               currentTickets.map((ticket) => (
-                <Ticket ticket={ticket} key={ticket.id} disabled />
+                <>
+                  {ticket.status === "open" ? (
+                  <Link to={`${ticket.id}`} key={ticket.id}>
+                    <Ticket ticket={ticket} key={ticket.id} disabled />
+                  </Link> 
+                  ) : ( 
+                    <Ticket ticket={ticket} key={ticket.id} disabled />
+                )}
+
+                </>
               ))
             ) : (
               <p className="text-red-500">No hay incidencias disponibles.</p>

@@ -8,6 +8,8 @@ import { FormContainer } from "../../components/Form";
 import { FaLocationDot } from "react-icons/fa6";
 import { Ticket } from "../../components/Ticket/Ticket";
 import { RingLoader } from "react-spinners";
+import { Link } from "react-router-dom";
+
 
 const TicketManagement = () => {
   const [allTickets, setAllTickets] = useState([]);
@@ -17,6 +19,7 @@ const TicketManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage] = useState(4);
   const [loading, setLoading] = useState(false);
+  const [ticketResponse, setTicketResponse] = useState("");
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -49,7 +52,7 @@ const TicketManagement = () => {
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
     };
-  
+
     const filtered = allTickets.filter(
       (ticket) =>
         normalizeText(ticket.gym_name).includes(normalizeText(searchTerm)) ||
@@ -69,38 +72,44 @@ const TicketManagement = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const toggleStatus = async (ticketId) => {
-    try {
-      const response = await getFromApi(`tickets/detail/${ticketId}/`);
-      if (response.ok) {
-        const updatedTicket = await response.json();
-        setAllTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            ticket.id === ticketId ? updatedTicket : ticket,
-          ),
-        );
-      } else {
-        console.error("Error updating incidencia status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error updating incidencia status:", error);
-    }
+  const handleResponesChange = async (ticketResponse) => {
+    setTicketResponse(ticketResponse);
   };
 
-  const handleCheckboxChange = async (checked, ticketId) => {
-    console.log(checked);
+  const handleStatusChange = async (checked, ticketId) => {
     try {
       const response = await getFromApi(`tickets/detail/${ticketId}/`);
       if (response.ok) {
         const updatedTicket = await response.json();
         updatedTicket.status = checked;
         const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
-          label: updatedTicket.label,
-          description: updatedTicket.description,
-          gym: updatedTicket.gym,
-          equipment: updatedTicket.equipment,
-          client: updatedTicket.client,
           status: updatedTicket.status,
+        });
+        if (updateResponse.ok) {
+          setAllTickets((prevTickets) =>
+            prevTickets.map((ticket) =>
+              ticket.id === ticketId ? updatedTicket : ticket,
+            ),
+          );
+        } else {
+          console.error("Error updating incidencia status:", updateResponse.status);
+        }
+      } else {
+        console.error("Error fetching incidencis details:", response.status);
+      }
+    } catch (error) {
+      console.error("Error updating incidencias status:", error);
+    }
+  };
+
+  const handleResponseSubmit = async (ticketId) => {
+    try {
+      const response = await getFromApi(`tickets/detail/${ticketId}/`);
+      if (response.ok) {
+        const updatedTicket = await response.json();
+        updatedTicket.response = ticketResponse;
+        const updateResponse = await putToApi(`tickets/update/${ticketId}/`, {
+          response: updatedTicket.response
         });
         if (updateResponse.ok) {
           setAllTickets((prevTickets) =>
@@ -143,17 +152,21 @@ const TicketManagement = () => {
       <div className="flex flex-col gap-4">
         {loading ? (
           <div className="flex justify-center">
-          <RingLoader color={"#30A46C"} loading={loading} />
+            <RingLoader color={"#30A46C"} loading={loading} />
           </div>
         ) : (
           <>
             {apiDataLoaded && currentTickets.length > 0 ? (
               currentTickets.map((ticket) => (
+
                 <Ticket
-                  ticket={ticket}
-                  key={ticket.id}
-                  onStatusChange={handleCheckboxChange}
-                />
+                ticket={ticket}
+                key={ticket.id}
+                onStatusChange={handleStatusChange}
+                onResponseChange={handleResponesChange}
+                onResponseSubmit={(e) => handleResponseSubmit(ticket.id)}
+              /> 
+
               ))
             ) : (
               <p className="text-red-500">No hay incidencias disponibles.</p>
@@ -180,11 +193,10 @@ const TicketManagement = () => {
                 <li key={i} className="mr-2">
                   <button
                     onClick={() => paginate(i + 1)}
-                    className={`px-3 py-1 rounded-lg ${
-                      currentPage === i + 1
+                    className={`px-3 py-1 rounded-lg ${currentPage === i + 1
                         ? "bg-radixgreen text-white"
                         : "bg-gray-200 text-gray-600"
-                    }`}
+                      }`}
                   >
                     {i + 1}
                   </button>
