@@ -11,7 +11,7 @@ export function GetPricingPlans(){
     });
 }
 
-export async function CreateCheckoutSession(priceId, quantity = 1){
+export async function CreateCheckoutFreeSession(priceId, quantity = 1){
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -24,6 +24,22 @@ export async function CreateCheckoutSession(priceId, quantity = 1){
         subscription_data: {
             trial_period_days: 30,
         },
+        success_url: `${window.location.origin}/owner/success?session_id={CHECKOUT_SESSION_ID}&priceId=${priceId}`,
+        cancel_url: `${window.location.origin}/owner/pricing`,
+    });
+    return JSON.stringify({url: session.url});
+}
+
+export async function CreateCheckoutSession(priceId, quantity = 1){
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+            {
+                price: priceId,
+                quantity: quantity,
+            },
+        ],
+        mode: 'subscription',
         success_url: `${window.location.origin}/owner/success?session_id={CHECKOUT_SESSION_ID}&priceId=${priceId}`,
         cancel_url: `${window.location.origin}/owner/pricing`,
     });
