@@ -4,20 +4,24 @@ import { getFromApi, putToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
 import { RemoveAccount } from "../../components/RemoveAccount";
+import { useForm, Controller } from "react-hook-form";
 
 const ProfileOwner = () => {
   const { user } = useContext(AuthContext);
   const [ownerProfile, setOwnerProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [editedOwner, setEditedOwner] = useState(null);
+  const { handleSubmit, control, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
     if (user) {
       getFromApi("owners/detail/" + user.username + "/")
         .then((response) => response.json())
-        .then((data) => setOwnerProfile(data));
+        .then((data) => {
+          setOwnerProfile(data);
+          reset(data);
+        });
     }
-  }, [user]);
+  }, [user, reset]);
 
   const handleInputChange = (e, field) => {
     setEditedOwner({
@@ -34,13 +38,14 @@ const ProfileOwner = () => {
   };
 
   const handleSaveChanges = async () => {
+
     try {
       const response = await putToApi(
         `owners/update/${user.username}/`,
-        editedOwner
+        formData
       );
       if (response.ok) {
-        setOwnerProfile(editedOwner);
+        setOwnerProfile(formData);
         setEditMode(false);
       } else {
         console.error("Error updating owner:", response.status);
@@ -119,12 +124,13 @@ const ProfileOwner = () => {
                     <Button variant="surface" onClick={toggleEditMode}>
                       Cancelar
                     </Button>
+
                   </div>
-                </div>
-              ) : (
-                <Button onClick={toggleEditMode}>Editar</Button>
-              )}
-            </div>
+                ) : (
+                  <Button onClick={() => setEditMode(true)}>Editar</Button>
+                )}
+              </div>
+            </form>
           </FormContainer>
         </div>
       </div>

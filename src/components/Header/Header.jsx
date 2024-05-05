@@ -70,7 +70,9 @@ const Header = () => {
               <HeaderLink to="/owner/equipments">Mis máquinas</HeaderLink>
               <HeaderLink to="/owner/users">Usuarios</HeaderLink>
               <HeaderLink to="/owner/tickets">Incidencias</HeaderLink>
-              <HeaderLink to="/owner/events">Eventos</HeaderLink>
+              {ownerSubscription.owner_plan === "premium" ? (
+                <HeaderLink to="/owner/events">Eventos</HeaderLink>
+                ) : null}
               <HeaderLink to="/owner/pricing">Planes</HeaderLink>
               <HeaderLink to="/owner/subscriptions">Subscripciones</HeaderLink>
             </>
