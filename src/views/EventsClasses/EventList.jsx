@@ -27,13 +27,22 @@ const EventList = () => {
   const [search, setSearch] = useState("");
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const { getOwnerSubscription, ownerSubscription } =
-    useContext(SubscriptionContext);
+  const [selectedValue, setSelectedValue] = useState("capacity");
+  const [open, setOpen] = useState(false);
+  const { getOwnerSubscription, ownerSubscription } = useContext(SubscriptionContext);
 
   useEffect(() => {
     getEvents();
     getOwnerSubscription();
   }, []);
+
+  useEffect(() => {
+    setSelectedValue(sorting === "intensity" ? "intensity" : "capacity");
+  }, [filters])
+
+  useEffect(() => {
+    setOpen(false);
+  }, [filters, sorting, sortingReverse, search, events]);
 
   async function getEvents() {
     try {
@@ -106,7 +115,7 @@ const EventList = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </TextField.Root>
-            <Popover.Root>
+            <Popover.Root open={open} onOpenChange={setOpen}>
               <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
                 <Popover.Trigger>
                   <Button
@@ -141,6 +150,7 @@ const EventList = () => {
                   <span className="text-lg font-bold">Ordenar por</span>
                   <Toggle.Root
                     name="reverse_sort"
+                    pressed={sortingReverse}
                     onPressedChange={(p) => setSortingReverse(p)}
                     className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                   >
@@ -149,8 +159,11 @@ const EventList = () => {
                 </div>
                 <ToggleGroup.Root
                   type="single"
-                  defaultValue="capacity"
-                  onValueChange={(v) => v && setSorting(v)}
+                  defaultValue= {selectedValue}
+                  onValueChange={(v) => {
+                    v && setSorting(v);
+                    setSelectedValue(v);
+                  }}
                   className="gap-2 flex"
                 >
                   <ToggleGroup.Item
@@ -176,7 +189,7 @@ const EventList = () => {
                         key={intensity}
                         value={intensity}
                         className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
-                        defaultPressed={filters.intensity.includes(intensity)}
+                        pressed={filters.intensity.includes(intensity)}
                         onPressedChange={(p) =>
                           p
                             ? addFilter("intensity", intensity)

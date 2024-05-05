@@ -31,6 +31,11 @@ export default function MachineList() {
   const [machineRatings, setMachineRatings] = useState([]);
   const [reviews, setReviews] = useState({});
   const [issues, setIssues] = useState({});
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [filters, sorting, sorting_reverse, search, machines]);
 
   useEffect(() => {
     if (user?.rol === "owner") {
@@ -174,7 +179,7 @@ export default function MachineList() {
               onChange={(e) => set_search(e.target.value)}
             ></TextField.Input>
           </TextField.Root>
-          <Popover.Root>
+          <Popover.Root open={open} onOpenChange={setOpen}>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
                 <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
@@ -201,6 +206,7 @@ export default function MachineList() {
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
                   name="reverse_sort"
+                  pressed={sorting_reverse}
                   onPressedChange={(p) => set_sorting_reverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -209,8 +215,16 @@ export default function MachineList() {
               </div>
               <ToggleGroup.Root
                 type="single"
-                defaultValue="name"
-                onValueChange={(v) => v && set_sorting(v)}
+                defaultValue= {sorting}
+                onValueChange={(v) => {v && set_sorting(v)
+                  if(v === "reviews") {
+                    handleSortingChangeReviews(sorting_reverse ? "desc" : "asc");
+                  } else if(v === "issues") {
+                    handleSortingChangeIssues(sorting_reverse ? "desc" : "asc");
+                  } else if(v === "rating") {
+                    handleSortingChangeRating(sorting_reverse ? "desc" : "asc");
+                  }
+                }}
                 className="gap-2 flex"
               >
                 <ToggleGroup.Item
@@ -222,21 +236,18 @@ export default function MachineList() {
                 <ToggleGroup.Item
                   value="reviews"
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
-                  onValueChange={handleSortingChangeReviews}
                 >
                   Nº reseñas
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="issues"
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
-                  onValueChange={handleSortingChangeIssues}
                 >
                   Nº incidencias
                 </ToggleGroup.Item>
                 <ToggleGroup.Item
                   value="rating"
                   className="transition-colors data-state-on:bg-radixgreen rounded-full bg-radixgreen/10 text-radixgreen data-state-on:text-white px-2 py-1 border border-radixgreen"
-                  onValueChange={handleSortingChangeRating}
                 >
                   Valoración
                 </ToggleGroup.Item>
@@ -244,11 +255,12 @@ export default function MachineList() {
               <Separator.Root className="border-b my-3" />
               <div className="flex"></div>
               <span className="text-lg font-bold">Filtrar por musculos</span>
-              <div className="flex gap-3">
+              <div className="flex gap-3 mb-3 ">
                 {MUSCLES.map((m) => (
                   <Toggle.Root
                     className="capitalize transition-colors bg-radixgreen/10 text-radixgreen data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
                     key={m}
+                    pressed={filters.includes(m)}
                     onPressedChange={(p) =>
                       p ? addFilter(m) : removeFilter(m)
                     }
@@ -265,10 +277,14 @@ export default function MachineList() {
                     {gyms.map((gym) => (
                       <Toggle.Root
                         key={gym.id}
+                        pressed={selectedGym === gym.id}
                         className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
                           selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
                           py-1 px-2 border border-radixgreen rounded-full`}
-                        onPressedChange={(p) => p ? setSelectedGym(gym.id) : setSelectedGym(null)}
+                        onPressedChange={(p) => {
+                          p ? setSelectedGym(gym.id) : setSelectedGym(null);
+                          setOpen(false);
+                        }}
                       >
                         {gym.name}
                       </Toggle.Root>

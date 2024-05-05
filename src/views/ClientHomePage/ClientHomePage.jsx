@@ -169,7 +169,6 @@ export default function ClientHomePage() {
     const fetchReservations = async () => {
       const response = await getFromApi("events/reservation/");
       const fetchedReservations = await response.json();
-      console.log(fetchedReservations)
       return fetchedReservations;
     };
 

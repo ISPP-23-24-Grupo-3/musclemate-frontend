@@ -1,7 +1,6 @@
 import * as Separator from "@radix-ui/react-separator";
 import Rating from "../../components/Rating";
 import {
-  IoMdAddCircleOutline,
   IoMdSearch,
   IoIosClose,
   IoIosArrowRoundUp,
@@ -27,6 +26,11 @@ export default function MachineList() {
   const [reviews, setReviews] = useState({});
   const [issues, setIssues] = useState({});
   const [selectedGym, setSelectedGym] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [filters, sorting, sorting_reverse, search, machines]);
 
   useEffect(() => {
     getFromApi("equipments/")
@@ -134,7 +138,7 @@ export default function MachineList() {
               onChange={(e) => set_search(e.target.value)}
             ></TextField.Input>
           </TextField.Root>
-          <Popover.Root>
+          <Popover.Root open={open} onOpenChange={setOpen}>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
                 <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
@@ -161,6 +165,7 @@ export default function MachineList() {
                 <span className="text-lg font-bold">Ordenar por</span>
                 <Toggle.Root
                   name="reverse_sort"
+                  pressed={sorting_reverse}
                   onPressedChange={(p) => set_sorting_reverse(p)}
                   className="bg-radixgreen/10 border border-radixgreen rounded-full text-radixgreen data-state-on:rotate-180 transition-transform"
                 >
@@ -169,7 +174,7 @@ export default function MachineList() {
               </div>
               <ToggleGroup.Root
                 type="single"
-                defaultValue="name"
+                defaultValue= {sorting}
                 onValueChange={(v) => v && set_sorting(v)}
                 className="gap-2 flex"
               >
@@ -206,6 +211,7 @@ export default function MachineList() {
                   <Toggle.Root
                     className="capitalize transition-colors bg-radixgreen/10 text-radixgreen data-state-on:bg-radixgreen data-state-on:text-white py-1 px-2 border border-radixgreen rounded-full"
                     key={m}
+                    pressed={filters.includes(m)}
                     onPressedChange={(p) =>
                       p ? addFilter(m) : removeFilter(m)
                     }
