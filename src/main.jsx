@@ -48,6 +48,7 @@ import GymStats from "./views/Gyms/GymStats";
 import ProfileGym from "./views/ProfileOwner/ProfileGym";
 import ReservationClient from "./views/Reservation/ReservationClient";
 import TicketManagementUser from "./views/TicketManagement/TicektManagementUser";
+import TicketDetail from "./views/TicketManagement/TicketDetail";
 import AddTicketFromDetails from "./views/Tickets/AddTicketFromDetails";
 import GymPremiumStats from "./views/GymHomePage/GymPremiumStats";
 
@@ -104,6 +105,7 @@ const userRoutes = [
   { path: "equipments", element: <EquipmentList /> },
   { path: "equipmentsClient", element: <EquipmentListClient /> },
   { path: "tickets", element: <TicketManagementUser /> },
+  { path: "tickets/:ticketId", element: <TicketDetail />},
   { path: "equipments/:equipmentId/add-tickets", element: <AddTicketFromDetails /> },
 ];
 

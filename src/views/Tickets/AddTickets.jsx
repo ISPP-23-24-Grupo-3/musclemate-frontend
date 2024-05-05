@@ -1,17 +1,22 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Importa useNavigate desde react-router-dom
-import { postToApi, getFromApi } from "../../utils/functions/api";
+import { postToApi, getFromApi, postFormToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
 import { Button, Select, TextArea, TextField } from "@radix-ui/themes";
-import { EquipmentSelect } from "../../components/Equipments";
+import { EquipmentSelect } from "../../components/Equipments"
+import axios from 'axios';
+
+import { FaFileImage } from "react-icons/fa";
 
 const AddTickets = () => {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const { user } = useContext(AuthContext);
   const navigate = useNavigate(); // Usa useNavigate para obtener la función de navegación
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
   const [equipmentId, setEquipmentId] = useState("");
+  const [image, setImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [gymPlan, setGymPlan] = useState("");
@@ -32,14 +37,22 @@ const AddTickets = () => {
       return;
     }
     try {
-      const response = await postToApi("tickets/create/", {
-        label,
-        description,
-        equipment: equipmentId,
-        client: user.id,
-        status: false,
+      const formData = new FormData();
+      formData.append("label", label);
+      formData.append("description", description);
+      formData.append("equipment", equipmentId);
+      formData.append("client", user.id);
+      formData.append("status", false);
+      formData.append('image', image);
+
+      const response = await axios.post(`${BASE_URL}/tickets/create/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
+        },
       });
-      if (response.ok) {
+      console.log(response);
+      if (response.status == 201) {
         setSuccessMessage("Incidencia creada exitosamente");
         setErrorMessage("");
         setLabel("");
@@ -98,7 +111,7 @@ const AddTickets = () => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="label">Asunto:</label>
+            <strong className="text-radixgreen">Asunto:</strong>{" "}
               <TextField.Input
                 type="text"
                 id="label"
@@ -108,7 +121,7 @@ const AddTickets = () => {
               />
             </div>
             <div>
-              <label htmlFor="description">Descripción:</label>
+            <strong className="text-radixgreen">Descripción:</strong>{" "}
               <TextArea
                 id="description"
                 value={description}
@@ -117,14 +130,23 @@ const AddTickets = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label htmlFor="equipmentId" className="text-gray-800">
-                Equipo:
-              </label>
+            <strong className="text-radixgreen">Equipo:</strong>{" "}
               <EquipmentSelect
                 id="equipmentId"
                 onChange={(eq) => setEquipmentId(eq.target.value)}
                 searchable // Habilitar búsqueda
                 searchPlaceholder="Buscar máquina..." // Placeholder del campo de búsqueda
+              />
+            </div>
+            <div>
+            <strong className="text-radixgreen">Imagen:</strong>{" "}
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={(e) => {
+                  console.log(e.target.files[0])
+                  setImage(e.target.files[0])}}
               />
             </div>
             {successMessage && (

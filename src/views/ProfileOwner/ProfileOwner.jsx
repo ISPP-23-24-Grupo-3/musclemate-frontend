@@ -22,7 +22,7 @@ const ProfileOwner = () => {
   const handleInputChange = (e, field) => {
     setEditedOwner({
       ...editedOwner,
-      [field]: e.target.value,
+      [field]: e,
     });
   };
 
@@ -74,31 +74,37 @@ const ProfileOwner = () => {
               <Separator size="4" color="green" />
             </div>
             <div className="grid grid-cols-2 gap-x-4">
+
               <UserInfoInput
+                type="text"
                 label="Nombre"
                 value={ownerProfile ? ownerProfile.name : "Cargando..."}
                 editMode={editMode}
                 onChange={(e) => handleInputChange(e, "name")}
               />
               <UserInfoInput
+                type="text"
                 label="Apellidos"
-                value={ownerProfile ? ownerProfile.lastName : "Cargando..."}
+                value={ownerProfile ? ownerProfile.last_name : "Cargando..."}
                 editMode={editMode}
                 onChange={(e) => handleInputChange(e, "lastName")}
               />
               <UserInfoInput
+                type="text"
                 label="Correo Electrónico"
                 value={ownerProfile ? ownerProfile.email : "Cargando..."}
                 editMode={editMode}
                 onChange={(e) => handleInputChange(e, "email")}
               />
               <UserInfoInput
+                type="number"
                 label="Número de Teléfono"
-                value={ownerProfile ? ownerProfile.phoneNumber : "Cargando..."}
+                value={ownerProfile ? ownerProfile.phone_number : "Cargando..."}
                 editMode={editMode}
                 onChange={(e) => handleInputChange(e, "phoneNumber")}
               />
               <UserInfoInput
+                type="text"
                 label="Dirección"
                 value={ownerProfile ? ownerProfile.address : "Cargando..."}
                 editMode={editMode}
@@ -127,17 +133,19 @@ const ProfileOwner = () => {
   );
 };
 
-const UserInfoInput = ({ label, value, editMode, onChange }) => (
+const UserInfoInput = ({ type, label, value, editMode, onChange }) => (
   <div className="flex flex-col mb-3">
     <span className="text-radixgreen font-bold mt-5">{label}:</span>
     {editMode ? (
-      <TextField.Input
-        type="text"
-        className="text-black"
-        value={value}
-        onChange={onChange}
-        placeholder={label}
-      />
+      <TextField.Root>
+        <TextField.Input
+          type={type}
+          className="text-black"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={label}
+        />
+      </TextField.Root>
     ) : (
       <span className="text-black">{value}</span>
     )}
