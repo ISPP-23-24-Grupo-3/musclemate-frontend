@@ -14,6 +14,7 @@ const ClientRegister = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   const navigate = useNavigate();
 
@@ -24,10 +25,7 @@ const ClientRegister = () => {
     watch,
   } = useForm();
 
-  const password = watch("password");
-
   const onSubmit = async (formData) => {
-
     setLoading(true);
     try {
       const {
@@ -74,7 +72,7 @@ const ClientRegister = () => {
       setError("Hubo un error al crear el propietario");
       console.error("Hubo un error al crear el propietario:", error);
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
   };
 
@@ -84,6 +82,7 @@ const ClientRegister = () => {
     mail: "Debes introducir una dirección correcta",
     username: "Este nombre de usuario ya existe, prueba con otro",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
+    confirmPass: "Las contraseñas no coinciden",
   };
 
   useEffect(() => {
@@ -95,6 +94,13 @@ const ClientRegister = () => {
     }
     return () => clearTimeout(redirectTimer);
   }, [success, navigate]);
+
+  const watchPassword = watch("password", "");
+
+  const handlePasswordConfirmationChange = (e) => {
+    const { value } = e.target;
+    setPasswordConfirmation(value);
+  };
 
   return (
     <div className="flex gap-10 flex-col md:flex-row justify-center items-center">
@@ -164,7 +170,7 @@ const ClientRegister = () => {
                   {...register("email", {
                     required: messages.req,
                     pattern: { 
-                      value: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                      value: /^[a-zA-Z0-9.!#$%&’+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$/,
                       message: "Debes introducir una dirección de correo electrónico válida", },
                   })}
                   name="email"
@@ -263,25 +269,28 @@ const ClientRegister = () => {
             </div>
 
             <div className="flex flex-col">
-              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiLockClosed className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("confirmPassword", {
-                    required: "Debes confirmar tu contraseña",
-                    validate: (value) =>
-                      value === password || "Las contraseñas no coinciden"
-                  })}
-                  name="confirmPassword"
-                  type="password"
-                />
-              </TextField.Root>
-              {errors.confirmPassword && (
-                <p className="text-red-500">{errors.confirmPassword.message}</p>
-              )}
-            </div>
+            <label htmlFor="passwordConfirmation" className="mr-3">
+              Confirmar contraseña
+            </label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("passwordConfirmation", {
+                  required: messages.req,
+                  validate: (value) =>
+                    value === watchPassword || messages.confirmPass,
+                })}
+                name="passwordConfirmation"
+                type="password"
+                onChange={handlePasswordConfirmationChange}
+              />
+            </TextField.Root>
+            {errors.passwordConfirmation && (
+              <p className="text-red-500">{errors.passwordConfirmation.message}</p>
+            )}
+          </div>
 
             <div className="flex gap-3 items-center">
             <Checkbox
@@ -322,4 +331,4 @@ const ClientRegister = () => {
   );
 };
 
-export default ClientRegister;
+export default ClientRegister;

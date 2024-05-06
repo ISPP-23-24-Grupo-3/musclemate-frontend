@@ -61,7 +61,7 @@ const ProfileClient = () => {
               />
               <UserInfoRow
                 label="Apellidos"
-                value={userProfile ? userProfile.lastName : "Cargando..."}
+                value={userProfile ? userProfile.last_name : "Cargando..."}
               />
               <UserInfoRow
                 label="Fecha de Nacimiento"
@@ -73,7 +73,7 @@ const ProfileClient = () => {
               />
               <UserInfoRow
                 label="Número de Teléfono"
-                value={userProfile ? userProfile.phoneNumber : "Cargando..."}
+                value={userProfile ? userProfile.phone_number : "Cargando..."}
               />
               <UserInfoRow
                 label="Dirección"
