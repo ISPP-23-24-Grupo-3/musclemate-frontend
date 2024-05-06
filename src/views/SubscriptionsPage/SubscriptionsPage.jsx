@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { getFromApi, putToApi } from "../../utils/functions/api";
-import { CreateCheckoutSession, CreateCheckoutSessionForOwner } from "../../utils/functions/stripe";
+import { CreateCheckoutSession, CreateCheckoutSessionForOwner, CreateCheckoutFreeSession } from "../../utils/functions/stripe";
 import { useLocation } from "react-router";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import AuthContext from "../../utils/context/AuthContext";
@@ -186,9 +186,15 @@ function SubscriptionsPage() {
         window.location.href = JSON.parse(session).url;
       });
     } else {
-    CreateCheckoutSession(priceId, quantity).then((session) => {
-      window.location.href = JSON.parse(session).url;
-    });
+    if (location_subscription_plan.subscription_plan === "Estándar") {
+      CreateCheckoutFreeSession(priceId, quantity).then((session) => {
+        window.location.href = JSON.parse(session).url;
+      });
+    } else {
+      CreateCheckoutSession(priceId, quantity).then((session) => {
+        window.location.href = JSON.parse(session).url;
+      });
+    }
   }
   }
 

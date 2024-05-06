@@ -7,11 +7,13 @@ import { postToApiRegister } from "../../utils/functions/api";
 import { useNavigate, Link } from "react-router-dom";
 import { FormContainer } from "../../components/Form";
 import { Checkbox } from "@radix-ui/themes";
+import { ClipLoader } from "react-spinners";
 
 const ClientRegister = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -19,9 +21,14 @@ const ClientRegister = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
 
+  const password = watch("password");
+
   const onSubmit = async (formData) => {
+
+    setLoading(true);
     try {
       const {
         name,
@@ -66,6 +73,8 @@ const ClientRegister = () => {
     } catch (error) {
       setError("Hubo un error al crear el propietario");
       console.error("Hubo un error al crear el propietario:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -253,6 +262,27 @@ const ClientRegister = () => {
               )}
             </div>
 
+            <div className="flex flex-col">
+              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <TextField.Root>
+                <TextField.Slot>
+                  <HiLockClosed className="size-6 text-radixgreen" />
+                </TextField.Slot>
+                <TextField.Input
+                  {...register("confirmPassword", {
+                    required: "Debes confirmar tu contraseña",
+                    validate: (value) =>
+                      value === password || "Las contraseñas no coinciden"
+                  })}
+                  name="confirmPassword"
+                  type="password"
+                />
+              </TextField.Root>
+              {errors.confirmPassword && (
+                <p className="text-red-500">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
             <div className="flex gap-3 items-center">
             <Checkbox
               checked={isChecked}
@@ -274,7 +304,7 @@ const ClientRegister = () => {
               className="w-full py-3"
               disabled={!isChecked} // Deshabilita el botón si !isChecked es true
             >
-              Registrarse
+              {loading ? <ClipLoader color="#ffffff" /> : 'Registrarse'}
             </Button>
 
           </form>
