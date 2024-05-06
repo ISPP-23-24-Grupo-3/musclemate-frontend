@@ -28,21 +28,9 @@ const ProfileOwner = () => {
     }
   }, [user, reset]);
 
-  const handleInputChange = (e, field) => {
-    setEditedOwner({
-      ...editedOwner,
-      [field]: e,
-    });
-  };
+  
 
-  const toggleEditMode = () => {
-    if (!editMode) {
-      setEditedOwner(ownerProfile);
-    }
-    setEditMode(!editMode);
-  };
-
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (formData) => {
     try {
       const response = await putToApi(
         `owners/update/${user.username}/`,
@@ -126,8 +114,12 @@ const ProfileOwner = () => {
                 {editMode ? (
                   <div className="flex justify-between">
                     <div className="flex gap-3">
-                      <Button onClick={handleSaveChanges}>Guardar</Button>
-                      <Button variant="surface" onClick={toggleEditMode}>
+                      <Button type="submit">Guardar</Button>
+                      <Button
+                        type="button"
+                        variant="surface"
+                        onClick={() => setEditMode(false)}
+                      >
                         Cancelar
                       </Button>
                     </div>
@@ -145,22 +137,27 @@ const ProfileOwner = () => {
   );
 };
 
-const UserInfoInput = ({ type, label, value, editMode, onChange }) => (
+const UserInfoInput = ({ label, name, control, defaultValue, disabled, rules, error }) => (
   <div className="flex flex-col mb-3">
     <span className="text-radixgreen font-bold mt-5">{label}:</span>
-    {editMode ? (
-      <TextField.Root>
-        <TextField.Input
-          type={type}
-          className="text-black"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={label}
-        />
-      </TextField.Root>
-    ) : (
-      <span className="text-black">{value}</span>
-    )}
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({ field }) => (
+        <>
+          <TextField.Input
+            type="text"
+            className="text-black"
+            {...field}
+            disabled={disabled}
+            placeholder={label}
+          />
+          {error && <span className="text-red-500">{error.message}</span>}
+        </>
+      )}
+    />
   </div>
 );
 
