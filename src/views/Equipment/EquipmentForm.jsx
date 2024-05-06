@@ -7,17 +7,21 @@ import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
 import { GymSelect } from "../../components/Gyms";
 import { RHFSelect } from "../../components/RHFSelect";
+import axios from "axios";
+import { EquipmentImage } from "../../components/Images";
 
 const GymMachineForm = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [gym, setGym] = useState([]);
+  const [createSuccess, setCreateSuccess] = useState(false);
+  const [image, setImage] = useState();
 
   useEffect(() => {
     if (user?.rol === "gym") {
       getFromApi("gyms/detail/" + user?.username + "/")
-      .then((response) => response.json())
-      .then((data) => setGym(data));
+        .then((response) => response.json())
+        .then((data) => setGym(data));
     }
   }, []);
 
@@ -30,15 +34,28 @@ const GymMachineForm = () => {
   const onSubmit = async (machineInfo) => {
     if (user?.rol === "gym") machineInfo.gym = gym.id;
     try {
-      const response = await postToApi("equipments/create/", machineInfo);
-
-      if (!response.ok) {
-        throw new Error("Error al agregar la máquina");
-      }
+      const formData = new FormData();
+      Object.keys(machineInfo).forEach((key) => {
+        formData.append(key, machineInfo[key]);
+      });
+      formData.set("image", machineInfo.image[0]);
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/equipments/create/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem("authTokens"))?.access}`,
+          },
+        },
+      );
 
       console.log("Máquina agregada exitosamente");
-      if (user?.rol === "owner") navigate("/owner/equipments");
-      else if (user?.rol === "gym") navigate("/gym/equipments");
+      setCreateSuccess(true);
+      setTimeout(() => {
+        if (user?.rol === "owner") navigate("/owner/equipments");
+        else if (user?.rol === "gym") navigate("/gym/equipments");
+      }, 2500);
     } catch (error) {
       console.error("Hubo un error al agregar la máquina:", error);
     }
@@ -54,7 +71,27 @@ const GymMachineForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="max-w-xl mx-auto">
+      {createSuccess && (
+        <FormContainer role="alert">
+          <strong className="font-bold">Éxito!</strong>
+          <span className="block sm:inline">
+            {" "}
+            La máquina ha sido creada correctamente.
+          </span>
+          <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg
+              className="fill-current h-6 w-6 text-green-500"
+              role="button"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <title>Close</title>
+              <path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z" />
+            </svg>
+          </span>
+        </FormContainer>
+      )}
       <FormContainer>
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Agregar máquina de gimnasio
@@ -115,6 +152,30 @@ const GymMachineForm = () => {
           </div>
 
           <div className="flex flex-col">
+            <label htmlFor="image" className="mr-3">
+              Imagen
+            </label>
+            <input
+              {...register("image")}
+              type="file"
+              onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
+            />
+            {(image && (
+              <span className="size-36 rounded-xl border-2 border-radixgreen overflow-hidden mt-2">
+                <img src={image} />
+              </span>
+            )) || (
+              <EquipmentImage
+                equipment={{}}
+                className="size-36 rounded-xl border-2 border-radixgreen mt-2"
+              />
+            )}
+            {errors.image && (
+              <p className="text-red-500">{errors.image.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
             <label htmlFor="description" className="mr-3">
               Descripción
             </label>
@@ -149,14 +210,16 @@ const GymMachineForm = () => {
               <p className="text-red-500">{errors.muscular_group.message}</p>
             )}
           </div>
-          
-          { user?.rol === "owner" &&
+
+          {user?.rol === "owner" && (
             <div className="flex flex-col ">
               <label htmlFor="gym">Gimnasio</label>
               <GymSelect {...register("gym", { required: messages.req })} />
-              {errors.gym && <p className="text-red-500">{errors.gym.message}</p>}
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
             </div>
-          }
+          )}
 
           <Button
             type="submit"

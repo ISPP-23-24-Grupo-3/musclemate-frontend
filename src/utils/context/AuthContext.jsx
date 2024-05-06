@@ -75,6 +75,9 @@ export const AuthProvider = ({ children }) => {
             setUser(jwtDecode(data.access));
             localStorage.setItem('authTokens', JSON.stringify(data));
         } 
+        if (response.status === 401) {
+            logoutUser();
+        }
         if (loading) {
             setLoading(false);
         }
@@ -84,7 +87,7 @@ export const AuthProvider = ({ children }) => {
         if (loading) {
             updateToken();
         }
-        let timeLeft = user ? user.exp * 1000 - Date.now() : 300000;
+        let timeLeft = user ? user.exp * 1000 - Date.now() - 100 : 200000;
         let interval = setInterval(() => {
             if (authTokens) {
                 updateToken();

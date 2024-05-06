@@ -14,6 +14,7 @@ import { FormContainer } from "../../components/Form";
 import { GymSelect } from "../../components/Gyms";
 import { RHFSelect } from "../../components/RHFSelect";
 import AuthContext from "../../utils/context/AuthContext";
+import { ClipLoader } from "react-spinners";
 
 const UserRegister = () => {
   const { user } = useContext(AuthContext);
@@ -24,6 +25,8 @@ const UserRegister = () => {
   const [errorMessageUser, setErrorMessageUser] = useState("");
   const [errorMessageMail, setErrorMessageMail] = useState("");
   const [errorMessageDate, setErrorMessageDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   const handleEmailChange = () => {
     setErrorMessageMail(null); // Limpiar el mensaje de error del email
@@ -62,9 +65,11 @@ const UserRegister = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
 
   const onSubmit = async (formData) => {
+    setLoading(true);
     try {
       const {
         name,
@@ -126,6 +131,8 @@ const UserRegister = () => {
       else if (user?.rol === "gym") navigate("/gym/users");
     } catch (error) {
       console.error("Hubo un error al crear el usuario:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -136,12 +143,20 @@ const UserRegister = () => {
     password: "La contraseña tiene que ser mayor a 10 caracteres",
     phoneNumber: "Tiene que ser un número de 9 cifras",
     zipCode: "Tiene que ser un númeroo de 5 cifras",
+    confirmPass: "Las contraseñas no coinciden",
   };
 
   const patterns = {
     mail: /\S+@\S+\.\S+/,
     phoneNumber: /^\d{9}$/,
     zipCode: /^\d{5}$/,
+  };
+
+  const watchPassword = watch("password", "");
+
+  const handlePasswordConfirmationChange = (e) => {
+    const { value } = e.target;
+    setPasswordConfirmation(value);
   };
 
   return (
@@ -405,6 +420,30 @@ const UserRegister = () => {
             )}
           </div>
 
+          <div className="flex flex-col">
+            <label htmlFor="passwordConfirmation" className="mr-3">
+              Confirmar contraseña
+            </label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("passwordConfirmation", {
+                  required: messages.req,
+                  validate: (value) =>
+                    value === watchPassword || messages.confirmPass,
+                })}
+                name="passwordConfirmation"
+                type="password"
+                onChange={handlePasswordConfirmationChange}
+              />
+            </TextField.Root>
+            {errors.passwordConfirmation && (
+              <p className="text-red-500">{errors.passwordConfirmation.message}</p>
+            )}
+          </div>
+
           {user?.rol === "owner" && (
             <div className="flex flex-col">
               <label htmlFor="gym" className="mr-3">
@@ -425,7 +464,7 @@ const UserRegister = () => {
             color="green"
             className="w-full py-3"
           >
-            Registrarse
+            {loading ? <ClipLoader color="#ffffff" /> : 'Registrar'}
           </Button>
         </form>
       </FormContainer>

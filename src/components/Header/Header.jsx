@@ -1,18 +1,23 @@
 import { Button, Flex } from "@radix-ui/themes";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useContext, useEffect } from "react";
 import AuthContext from "../../utils/context/AuthContext";
 import SubscriptionContext from "../../utils/context/SubscriptionContext";
 import { useState } from "react";
 import { IoMdMenu } from "react-icons/io";
 import HeaderLink from "./HeaderLink";
+import {  } from "react-router-dom";
 
 const Header = () => {
   const { user, logoutUser } = useContext(AuthContext);  
   const { getOwnerSubscription, ownerSubscription } = useContext(SubscriptionContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     getOwnerSubscription();
+    
   }, []);
 
   const [open, setOpen] = useState(false);
@@ -20,6 +25,15 @@ const Header = () => {
     const handleMenu = useCallback(() => {
       setOpen(!open)
     }, [open])
+
+    useEffect(() => {
+      return navigate(location.pathname);
+    }, [location.pathname, navigate]);
+
+    useEffect(() => {
+      setOpen(false); 
+    }, [location]);
+
 
   return (
     <header className="sticky top-0 shadow-md px-5 py-2 sm:px-10 bg-white font-sans min-h-[70px] z-10">
@@ -56,19 +70,21 @@ const Header = () => {
               <HeaderLink to="/owner/equipments">Mis máquinas</HeaderLink>
               <HeaderLink to="/owner/users">Usuarios</HeaderLink>
               <HeaderLink to="/owner/tickets">Incidencias</HeaderLink>
-              <HeaderLink to="/owner/events">Eventos</HeaderLink>
+              {ownerSubscription.owner_plan === "premium" ? (
+                <HeaderLink to="/owner/events">Eventos</HeaderLink>
+                ) : null}
               <HeaderLink to="/owner/pricing">Planes</HeaderLink>
               <HeaderLink to="/owner/subscriptions">Subscripciones</HeaderLink>
             </>
           ) : user?.rol === "client" ? (
             <>
               <HeaderLink to="/user/routines">Rutinas</HeaderLink>
-              <HeaderLink to="/user/statistics">Estadísticas</HeaderLink>
-              <HeaderLink to="/user/add-tickets">Crear incidencia</HeaderLink>
+              <HeaderLink to="/user/events">Eventos</HeaderLink>
+              <HeaderLink to="/user/statistics">Historial</HeaderLink>
               <HeaderLink to="/user/equipmentsClient">
                 Máquinas del gimnasio
               </HeaderLink>
-              <HeaderLink to="/user/events">Eventos</HeaderLink>
+              <HeaderLink to="/user/add-tickets">Crear incidencia</HeaderLink>
               <HeaderLink to="user/tickets">Mis Incidencias</HeaderLink>
             </>
           ) : user?.rol === "gym" ? (

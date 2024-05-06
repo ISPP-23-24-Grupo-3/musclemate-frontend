@@ -137,7 +137,7 @@ const Profile = () => {
                   <TextField.Input
                     type="text"
                     value={editedUser ? editedUser.last_name : ""}
-                    onChange={(e) => handleInputChange(e, "lastName")}
+                    onChange={(e) => handleInputChange(e, "last_name")}
                     placeholder="Apellido"
                   />
                 </>
@@ -179,11 +179,11 @@ const Profile = () => {
               </span>
               {editMode ? (
                 <TextField.Input
-                  value={editedUser ? editedUser.phoneNumber : ""}
-                  onChange={(e) => handleInputChange(e, "phoneNumber")}
+                  value={editedUser ? editedUser.phone_number : ""}
+                  onChange={(e) => handleInputChange(e, "phone_number")}
                 />
               ) : (
-                <span>{user ? user.phoneNumber : "Cargando..."}</span>
+                <span>{user ? user.phone_number : "Cargando..."}</span>
               )}
             </div>
 
