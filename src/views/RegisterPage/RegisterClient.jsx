@@ -7,11 +7,14 @@ import { postToApiRegister } from "../../utils/functions/api";
 import { useNavigate, Link } from "react-router-dom";
 import { FormContainer } from "../../components/Form";
 import { Checkbox } from "@radix-ui/themes";
+import { ClipLoader } from "react-spinners";
 
 const ClientRegister = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   const navigate = useNavigate();
 
@@ -19,9 +22,11 @@ const ClientRegister = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
 
   const onSubmit = async (formData) => {
+    setLoading(true);
     try {
       const {
         name,
@@ -66,6 +71,8 @@ const ClientRegister = () => {
     } catch (error) {
       setError("Hubo un error al crear el propietario");
       console.error("Hubo un error al crear el propietario:", error);
+    } finally {
+    setLoading(false);
     }
   };
 
@@ -75,6 +82,7 @@ const ClientRegister = () => {
     mail: "Debes introducir una dirección correcta",
     username: "Este nombre de usuario ya existe, prueba con otro",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
+    confirmPass: "Las contraseñas no coinciden",
   };
 
   useEffect(() => {
@@ -86,6 +94,13 @@ const ClientRegister = () => {
     }
     return () => clearTimeout(redirectTimer);
   }, [success, navigate]);
+
+  const watchPassword = watch("password", "");
+
+  const handlePasswordConfirmationChange = (e) => {
+    const { value } = e.target;
+    setPasswordConfirmation(value);
+  };
 
   return (
     <div className="flex gap-10 flex-col md:flex-row justify-center items-center">
@@ -155,7 +170,7 @@ const ClientRegister = () => {
                   {...register("email", {
                     required: messages.req,
                     pattern: { 
-                      value: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                      value: /^[a-zA-Z0-9.!#$%&’+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$/,
                       message: "Debes introducir una dirección de correo electrónico válida", },
                   })}
                   name="email"
@@ -253,6 +268,30 @@ const ClientRegister = () => {
               )}
             </div>
 
+            <div className="flex flex-col">
+            <label htmlFor="passwordConfirmation" className="mr-3">
+              Confirmar contraseña
+            </label>
+            <TextField.Root>
+              <TextField.Slot>
+                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
+              </TextField.Slot>
+              <TextField.Input
+                {...register("passwordConfirmation", {
+                  required: messages.req,
+                  validate: (value) =>
+                    value === watchPassword || messages.confirmPass,
+                })}
+                name="passwordConfirmation"
+                type="password"
+                onChange={handlePasswordConfirmationChange}
+              />
+            </TextField.Root>
+            {errors.passwordConfirmation && (
+              <p className="text-red-500">{errors.passwordConfirmation.message}</p>
+            )}
+          </div>
+
             <div className="flex gap-3 items-center">
             <Checkbox
               checked={isChecked}
@@ -274,7 +313,7 @@ const ClientRegister = () => {
               className="w-full py-3"
               disabled={!isChecked} // Deshabilita el botón si !isChecked es true
             >
-              Registrarse
+              {loading ? <ClipLoader color="#ffffff" /> : 'Registrarse'}
             </Button>
 
           </form>
@@ -292,4 +331,4 @@ const ClientRegister = () => {
   );
 };
 
-export default ClientRegister;
+export default ClientRegister;
