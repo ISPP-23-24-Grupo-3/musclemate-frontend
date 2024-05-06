@@ -4,6 +4,7 @@ import { postToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { Button, TextArea, TextField } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form";
+import axios from "axios";
 
 const AddTicketFromDetails = () => {
   const { user } = useContext(AuthContext);
@@ -12,38 +13,45 @@ const AddTicketFromDetails = () => {
 
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (event) => {
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
     event.preventDefault();
     if (!label || !description) {
       setErrorMessage("El asunto y la descripción son obligatorios.");
       return;
     }
     try {
-      const response = await postToApi("tickets/create/", {
-        label,
-        description,
-        equipment: equipmentId, // Usar el equipmentId obtenido de la URL
-        client: user.id,
-        status: false,
-      });
-      if (response.ok) {
-        setSuccessMessage("Incidencia creada exitosamente");
-        setErrorMessage("");
-        setLabel("");
-        setDescription("");
-        navigate("/user/tickets"); // Realiza la redirección a la página de incidencias después de crear una incidencia exitosamente
-      } else {
-        setErrorMessage(
-          "Error al crear la incidencia. Por favor, inténtelo de nuevo más tarde."
-        );
-        setSuccessMessage("");
-      }
+      const formData = new FormData();
+      formData.append("label", label);
+      formData.append("description", description);
+      formData.append("equipment", equipmentId);
+      formData.append("client", user.id);
+      formData.append("status", false);
+      formData.append("image", image);
+
+      const response = await axios.post(
+        `${BASE_URL}/tickets/create/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem("authTokens"))?.access}`,
+          },
+        },
+      );
+
+      setSuccessMessage("Incidencia creada exitosamente");
+      setErrorMessage("");
+      setLabel("");
+      setDescription("");
+      navigate("/user/tickets"); // Realiza la redirección a la página de incidencias después de crear una incidencia exitosamente
     } catch (error) {
       setErrorMessage(
-        "Error de red o del servidor. Por favor, inténtelo de nuevo más tarde."
+        "Error de red o del servidor. Por favor, inténtelo de nuevo más tarde.",
       );
       setSuccessMessage("");
     }
@@ -75,12 +83,22 @@ const AddTicketFromDetails = () => {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="image">Imagen:</label>
+            <input
+              type="file"
+              id="image"
+              accept="image/*"
+              onChange={(e) => {
+                console.log(e.target.files[0]);
+                setImage(e.target.files[0]);
+              }}
+            />
+          </div>
           {successMessage && (
             <div className="text-green-700">{successMessage}</div>
           )}
-          {errorMessage && (
-            <div className="text-red-700">{errorMessage}</div>
-          )}
+          {errorMessage && <div className="text-red-700">{errorMessage}</div>}
           <Button className="w-full" type="submit">
             Agregar Incidencia
           </Button>

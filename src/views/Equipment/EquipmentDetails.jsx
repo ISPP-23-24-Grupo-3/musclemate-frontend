@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getFromApi, putToApi, deleteFromApi } from "../../utils/functions/api";
+import {
+  getFromApi,
+  putToApi,
+  deleteFromApi,
+  postToApi,
+} from "../../utils/functions/api";
 import {
   Button,
   Heading,
@@ -17,6 +22,9 @@ import { Checkbox } from "@radix-ui/themes";
 import { RHFSelect } from "../../components/RHFSelect.jsx";
 import { Ticket } from "../../components/Ticket/Ticket.jsx";
 import { RingLoader } from "react-spinners";
+import { EquipmentImage } from "../../components/Images.jsx";
+import { parseImageURL } from "../../utils/functions/images.js";
+import axios from "axios";
 
 export default function EquipmentDetails() {
   const { equipmentId } = useParams();
@@ -32,6 +40,7 @@ export default function EquipmentDetails() {
   const [valuationOn, setValuationOn] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketsPerPage] = useState(3); //Salen 3 tickets x pagina
+  const [updateImage, setUpdateImage] = useState();
 
   const [editMode, setEditMode] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState(null);
@@ -180,7 +189,6 @@ export default function EquipmentDetails() {
       console.error("Error updating ticket status:", error);
     }
   };
-  
 
   // Función para formatear la fecha
   const formatDate = (dateString) => {
@@ -275,17 +283,24 @@ export default function EquipmentDetails() {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await putToApi(
-        `equipments/update/${equipmentId}/`,
+      const formData = new FormData();
+      Object.keys(updatedDetails).forEach((key) => {
+        formData.append(key, updatedDetails[key]);
+      });
+
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/equipments/update/${equipmentId}/`,
         updatedDetails,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem("authTokens"))?.access}`,
+          },
+        },
       );
-      if (response.ok) {
-        setMachineDetails(updatedDetails);
-        setEditMode(false);
-      } else {
-        const data = await response.json();
-        setError(data.detail || "Error al guardar los cambios.");
-      }
+
+      setMachineDetails(response.data);
+      setEditMode(false);
     } catch (error) {
       setError("Error al guardar los cambios.");
     }
@@ -308,14 +323,6 @@ export default function EquipmentDetails() {
     // Si la ejecución llega a este punto, significa que hubo un problema durante la eliminación
     setError("Error al eliminar el equipo."); // Muestra un mensaje de error genérico
   };
-
-  if (error) {
-    return (
-      <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">
-        {error}
-      </div>
-    );
-  }
 
   if (!machineDetails) {
     return (
@@ -433,6 +440,40 @@ export default function EquipmentDetails() {
               <span>{machineDetails.serial_number}</span>
             )}
           </div>
+          <div className="flex flex-col gap-1">
+            <strong className="text-radixgreen">Imagen</strong>
+            {editMode ? (
+              <>
+                <input
+                  type="file"
+                  id="image"
+                  accept="image/*"
+                  onChange={(e) => {
+                    setUpdatedDetails((d) => {
+                      const obj = { ...d, image: e.target.files[0] };
+                      setUpdateImage(URL.createObjectURL(e.target.files[0]));
+                      return obj;
+                    });
+                  }}
+                />
+                {(updateImage && (
+                  <span className="size-36 rounded-xl border-2 border-radixgreen overflow-hidden">
+                    <img src={updateImage} />
+                  </span>
+                )) || (
+                  <EquipmentImage
+                    equipment={machineDetails}
+                    className="size-36 rounded-xl border-2 border-radixgreen"
+                  />
+                )}
+              </>
+            ) : (
+              <EquipmentImage
+                equipment={machineDetails}
+                className="size-36 rounded-xl border-2 border-radixgreen"
+              />
+            )}
+          </div>
           <div>
             <strong className="text-radixgreen">Valoración:</strong>
             <div
@@ -468,6 +509,12 @@ export default function EquipmentDetails() {
               </button>
             </div>
           )}
+
+          {error && (
+            <div className="mt-8 p-4 border border-red-500 rounded bg-red-100 text-red-700 text-center">
+              {error}
+            </div>
+          )}
         </div>
       </FormContainer>
       <div className="mt-8 text-center md:m-0 m-5">
@@ -475,23 +522,26 @@ export default function EquipmentDetails() {
           Incidencias
         </Heading>
         <ul>
-        {apiDataLoaded ? (
-          currentTickets.length > 0 ? (
-            currentTickets.map((ticket) => (
-              <Ticket
-                key={ticket.id}
-                ticket={ticket}
-                onStatusChange={handleCheckboxChange}
-              />
-            ))
+          {apiDataLoaded ? (
+            currentTickets.length > 0 ? (
+              currentTickets.map((ticket) => (
+                <Ticket
+                  key={ticket.id}
+                  ticket={ticket}
+                  onStatusChange={handleCheckboxChange}
+                />
+              ))
+            ) : (
+              <p className="text-red-500 mb-6">
+                No hay incidencias disponibles.
+              </p>
+            )
           ) : (
-            <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
-          )
-        ) : (
-          <div className="flex justify-center mt-4">
-            <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
-          </div>
-        )}
+            <div className="flex justify-center mt-4">
+              <RingLoader color={"#123abc"} loading={!apiDataLoaded} />{" "}
+              {/* Loader para los tickets */}
+            </div>
+          )}
         </ul>
         {/* Agregar controles de paginación */}
         {apiTickets.length > 3 && (
@@ -527,7 +577,8 @@ export default function EquipmentDetails() {
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={
-                    currentPage === Math.ceil(apiTickets.length / ticketsPerPage)
+                    currentPage ===
+                    Math.ceil(apiTickets.length / ticketsPerPage)
                   }
                   className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
                 >

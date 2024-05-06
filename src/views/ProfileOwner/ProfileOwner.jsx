@@ -10,7 +10,12 @@ const ProfileOwner = () => {
   const { user } = useContext(AuthContext);
   const [ownerProfile, setOwnerProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const { handleSubmit, control, reset, formState: { errors } } = useForm();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     if (user) {
@@ -29,7 +34,7 @@ const ProfileOwner = () => {
     try {
       const response = await putToApi(
         `owners/update/${user.username}/`,
-        formData
+        formData,
       );
       if (response.ok) {
         setOwnerProfile(formData);
@@ -65,66 +70,44 @@ const ProfileOwner = () => {
               </Heading>
               <Separator size="4" color="green" />
             </div>
-            <form onSubmit={handleSubmit(handleSaveChanges)}>
+            <form>
               <div className="grid grid-cols-2 gap-x-4">
                 <UserInfoInput
+                  type="text"
                   label="Nombre"
-                  name="name"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ required: "Este campo es obligatorio" }}
-                  error={errors.name}
+                  value={ownerProfile ? ownerProfile.name : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "name")}
                 />
                 <UserInfoInput
+                  type="text"
                   label="Apellidos"
-                  name="last_name"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ required: "Este campo es obligatorio" }}
-                  error={errors.lastName}
+                  value={ownerProfile ? ownerProfile.last_name : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "lastName")}
                 />
                 <UserInfoInput
+                  type="text"
                   label="Correo Electrónico"
-                  name="email"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ 
-                    required: "Este campo es obligatorio", 
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Correo electrónico inválido"
-                    }
-                  }}
-                  error={errors.email}
+                  value={ownerProfile ? ownerProfile.email : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "email")}
                 />
                 <UserInfoInput
+                  type="number"
                   label="Número de Teléfono"
-                  name="phone_number"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ 
-                    required: "Este campo es obligatorio", 
-                    pattern: { 
-                      value: /^[0-9]+$/, 
-                      message: "Ingrese solo números"
-                    }, 
-                    minLength: { value: 10, message: "Mínimo 10 números" }, 
-                    maxLength: { value: 12, message: "Máximo 12 números" } 
-                  }}
-                  error={errors.phoneNumber}
+                  value={
+                    ownerProfile ? ownerProfile.phone_number : "Cargando..."
+                  }
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "phoneNumber")}
                 />
                 <UserInfoInput
+                  type="text"
                   label="Dirección"
-                  name="address"
-                  control={control}
-                  defaultValue=""
-                  disabled={!editMode}
-                  rules={{ required: "Este campo es obligatorio" }}
-                  error={errors.address}
+                  value={ownerProfile ? ownerProfile.address : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "address")}
                 />
               </div>
               <div className="mt-4 text-center">

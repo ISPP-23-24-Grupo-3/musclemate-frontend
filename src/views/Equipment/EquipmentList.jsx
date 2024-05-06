@@ -14,6 +14,7 @@ import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom"; // Importamos Link de react-router-dom
 import { getFromApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
+import { EquipmentImage } from "../../components/Images";
 
 // TODO: Add picture support
 const MUSCLES = ["arms", "legs", "core", "chest", "back", "shoulders", "other"];
@@ -40,16 +41,16 @@ export default function MachineList() {
   useEffect(() => {
     if (user?.rol === "owner") {
       getFromApi("gyms/")
-      .then((response) => response.json())
-      .then((data) => setGyms(data));
+        .then((response) => response.json())
+        .then((data) => setGyms(data));
     }
   }, []);
 
   useEffect(() => {
     if (user?.rol === "gym") {
       getFromApi("gyms/detail/" + user?.username + "/")
-      .then((response) => response.json())
-      .then((data) => setGym(data));
+        .then((response) => response.json())
+        .then((data) => setGym(data));
     }
   }, []);
 
@@ -90,11 +91,14 @@ export default function MachineList() {
     name: (a, b) => a.name.localeCompare(b.name),
     reviews: (a, b) => reviews[b.id] - reviews[a.id],
     issues: (a, b) => issues[b.id] - issues[a.id],
-    rating: (a, b) => machineRatings.find((item) => item.id === b.id)?.ratings - machineRatings.find((item) => item.id === a.id)?.ratings,
+    rating: (a, b) =>
+      machineRatings.find((item) => item.id === b.id)?.ratings -
+      machineRatings.find((item) => item.id === a.id)?.ratings,
   };
 
   const addFilter = (filter) => set_filters([filter, ...filters]);
-  const removeFilter = (filter) => set_filters(filters.filter((f) => f !== filter));
+  const removeFilter = (filter) =>
+    set_filters(filters.filter((f) => f !== filter));
 
   const removeAccents = (str) => {
     return str
@@ -102,7 +106,7 @@ export default function MachineList() {
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
   };
-  
+
   const filtered_machine_list =
     machines.length > 0
       ? machines
@@ -110,38 +114,47 @@ export default function MachineList() {
           .filter((m) =>
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
-              : true && (selectedGym === null || m.gym === selectedGym)
+              : true && (selectedGym === null || m.gym === selectedGym),
           )
-          .sort((a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1))
+          .sort(
+            (a, b) =>
+              SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1),
+          )
       : [];
 
   useEffect(() => {
     const promises = machines.map((machine) => {
-      const assessmentPromise = getFromApi(`assessments/equipment/${machine.id}/`).then((response) => response.json());
-      const ticketsPromise = getFromApi(`tickets/byEquipment/${machine.id}/`).then((response) => response.json());
-  
-      return Promise.all([assessmentPromise, ticketsPromise]).then(([assessments, tickets]) => ({
-        machineId: machine.id,
-        reviews: assessments.length,
-        issues: tickets.length
-      }));
+      const assessmentPromise = getFromApi(
+        `assessments/equipment/${machine.id}/`,
+      ).then((response) => response.json());
+      const ticketsPromise = getFromApi(
+        `tickets/byEquipment/${machine.id}/`,
+      ).then((response) => response.json());
+
+      return Promise.all([assessmentPromise, ticketsPromise]).then(
+        ([assessments, tickets]) => ({
+          machineId: machine.id,
+          reviews: assessments.length,
+          issues: tickets.length,
+        }),
+      );
     });
-  
+
     Promise.all(promises)
       .then((results) => {
         const reviewsData = {};
         const issuesData = {};
-  
+
         results.forEach((result) => {
           reviewsData[result.machineId] = result.reviews;
           issuesData[result.machineId] = result.issues;
         });
-  
+
         setReviews(reviewsData);
         setIssues(issuesData);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       });
   }, [machines]);
 
@@ -182,7 +195,13 @@ export default function MachineList() {
           <Popover.Root open={open} onOpenChange={setOpen}>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
-                <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
+                <Button
+                  name="filter"
+                  radius="none"
+                  size="2"
+                  variant="soft"
+                  className="m-0"
+                >
                   <HiOutlineFilter />
                 </Button>
               </Popover.Trigger>
@@ -215,13 +234,16 @@ export default function MachineList() {
               </div>
               <ToggleGroup.Root
                 type="single"
-                defaultValue= {sorting}
-                onValueChange={(v) => {v && set_sorting(v)
-                  if(v === "reviews") {
-                    handleSortingChangeReviews(sorting_reverse ? "desc" : "asc");
-                  } else if(v === "issues") {
+                defaultValue={sorting}
+                onValueChange={(v) => {
+                  v && set_sorting(v);
+                  if (v === "reviews") {
+                    handleSortingChangeReviews(
+                      sorting_reverse ? "desc" : "asc",
+                    );
+                  } else if (v === "issues") {
                     handleSortingChangeIssues(sorting_reverse ? "desc" : "asc");
-                  } else if(v === "rating") {
+                  } else if (v === "rating") {
                     handleSortingChangeRating(sorting_reverse ? "desc" : "asc");
                   }
                 }}
@@ -270,16 +292,21 @@ export default function MachineList() {
                 ))}
               </div>
 
-              { user?.rol === "owner" &&
+              {user?.rol === "owner" && (
                 <>
-                  <span className="text-lg font-bold">Filtrar por gimnasios</span>
+                  <span className="text-lg font-bold">
+                    Filtrar por gimnasios
+                  </span>
                   <div className="flex gap-3">
                     {gyms.map((gym) => (
                       <Toggle.Root
                         key={gym.id}
                         pressed={selectedGym === gym.id}
                         className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
-                          selectedGym === gym.id ? 'data-state-on:bg-radixgreen data-state-on:text-white' : ''} 
+                          selectedGym === gym.id
+                            ? "data-state-on:bg-radixgreen data-state-on:text-white"
+                            : ""
+                        } 
                           py-1 px-2 border border-radixgreen rounded-full`}
                         onPressedChange={(p) => {
                           p ? setSelectedGym(gym.id) : setSelectedGym(null);
@@ -291,12 +318,11 @@ export default function MachineList() {
                     ))}
                   </div>
                 </>
-              }
-              
+              )}
             </Popover.Content>
           </Popover.Root>
         </div>
-        
+
         <Link to="add">
           <Button size="3" className="w-full">
             <IoMdAddCircleOutline className="size-6" />
@@ -306,22 +332,30 @@ export default function MachineList() {
 
         {filtered_machine_list.map((machine) => {
           const machineRatingData = machineRatings.find(
-            (ratingData) => ratingData.id === machine.id
+            (ratingData) => ratingData.id === machine.id,
           );
           var value = machineRatingData ? machineRatingData.ratings : 0;
 
           return (
             <Link to={`${machine.id}`} key={machine.id}>
               <Button
-                name = "maquina"
+                name="maquina"
                 key={machine.id}
                 variant="soft"
                 size="3"
                 className="flex !justify-between !h-fit !p-2 !px-4 w-full"
               >
                 <div className="flex flex-col justify-between items-start">
-                  <p className="font-semibold">{machine.name}</p>
-                  <Rating rating={value} />
+                  <div className="flex items-center gap-3">
+                    <EquipmentImage
+                      equipment={machine}
+                      className="size-24 rounded-xl"
+                    />
+                    <span>
+                      <p className="font-semibold">{machine.name}</p>
+                      <Rating rating={value} />
+                    </span>
+                  </div>
                 </div>
                 <div className="flex flex-col items-start gap-1">
                   <span>
@@ -358,3 +392,4 @@ export default function MachineList() {
     </>
   );
 }
+

@@ -1,10 +1,6 @@
 import * as Separator from "@radix-ui/react-separator";
 import Rating from "../../components/Rating";
-import {
-  IoMdSearch,
-  IoIosClose,
-  IoIosArrowRoundUp,
-} from "react-icons/io";
+import { IoMdSearch, IoIosClose, IoIosArrowRoundUp } from "react-icons/io";
 import * as Toggle from "@radix-ui/react-toggle";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { HiOutlineFilter } from "react-icons/hi";
@@ -12,6 +8,8 @@ import { Button, Popover, TextField, Heading } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getFromApi } from "../../utils/functions/api";
+import { PlaceholderImage } from "../../components/Images";
+import { EquipmentImage } from "../../components/Images";
 
 // TODO: Add picture support
 const MUSCLES = ["arms", "legs", "core", "chest", "back", "shoulders", "other"];
@@ -69,11 +67,14 @@ export default function MachineList() {
     name: (a, b) => a.name.localeCompare(b.name),
     reviews: (a, b) => reviews[b.id] - reviews[a.id],
     issues: (a, b) => issues[b.id] - issues[a.id],
-    rating: (a, b) => machineRatings.find((item) => item.id === b.id)?.ratings - machineRatings.find((item) => item.id === a.id)?.ratings,
+    rating: (a, b) =>
+      machineRatings.find((item) => item.id === b.id)?.ratings -
+      machineRatings.find((item) => item.id === a.id)?.ratings,
   };
 
   const addFilter = (filter) => set_filters([filter, ...filters]);
-  const removeFilter = (filter) => set_filters(filters.filter((f) => f !== filter));
+  const removeFilter = (filter) =>
+    set_filters(filters.filter((f) => f !== filter));
 
   const removeAccents = (str) => {
     return str
@@ -81,7 +82,7 @@ export default function MachineList() {
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
   };
-  
+
   const filtered_machine_list =
     machines.length > 0
       ? machines
@@ -89,22 +90,30 @@ export default function MachineList() {
           .filter((m) =>
             filters.length !== 0
               ? filters.some((f) => m.muscular_group.includes(f))
-              : true && (selectedGym === null || m.gym === selectedGym)
+              : true && (selectedGym === null || m.gym === selectedGym),
           )
-          .sort((a, b) => SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1))
+          .sort(
+            (a, b) =>
+              SORTING_FUNCTIONS[sorting](a, b) * (sorting_reverse ? -1 : 1),
+          )
       : [];
-
 
   useEffect(() => {
     const promises = machines.map((machine) => {
-      const assessmentPromise = getFromApi(`assessments/equipment/${machine.id}/`).then((response) => response.json());
-      const ticketsPromise = getFromApi(`tickets/byEquipment/${machine.id}/`).then((response) => response.json());
-  
-      return Promise.all([assessmentPromise, ticketsPromise]).then(([assessments, tickets]) => ({
-        id: machine.id,
-        reviews: assessments.length,
-        issues: tickets.length
-      }));
+      const assessmentPromise = getFromApi(
+        `assessments/equipment/${machine.id}/`,
+      ).then((response) => response.json());
+      const ticketsPromise = getFromApi(
+        `tickets/byEquipment/${machine.id}/`,
+      ).then((response) => response.json());
+
+      return Promise.all([assessmentPromise, ticketsPromise]).then(
+        ([assessments, tickets]) => ({
+          id: machine.id,
+          reviews: assessments.length,
+          issues: tickets.length,
+        }),
+      );
     });
 
     Promise.all(promises).then((data) => {
@@ -141,7 +150,13 @@ export default function MachineList() {
           <Popover.Root open={open} onOpenChange={setOpen}>
             <div className="rounded flex-1 flex items-center gap-3 border border-radixgreen">
               <Popover.Trigger>
-                <Button name="filter" radius="none" size="2" variant="soft" className="m-0">
+                <Button
+                  name="filter"
+                  radius="none"
+                  size="2"
+                  variant="soft"
+                  className="m-0"
+                >
                   <HiOutlineFilter />
                 </Button>
               </Popover.Trigger>
@@ -174,7 +189,7 @@ export default function MachineList() {
               </div>
               <ToggleGroup.Root
                 type="single"
-                defaultValue= {sorting}
+                defaultValue={sorting}
                 onValueChange={(v) => v && set_sorting(v)}
                 className="gap-2 flex"
               >
@@ -220,29 +235,36 @@ export default function MachineList() {
                   </Toggle.Root>
                 ))}
               </div>
-              
             </Popover.Content>
           </Popover.Root>
         </div>
 
         {filtered_machine_list.map((machine) => {
           const machineRatingData = machineRatings.find(
-            (ratingData) => ratingData.id === machine.id
+            (ratingData) => ratingData.id === machine.id,
           );
           var value = machineRatingData ? machineRatingData.ratings : 0;
 
           return (
             <Link to={`../equipments/${machine.id}`} key={machine.id}>
               <Button
-                name = "maquina"
+                name="maquina"
                 key={machine.id}
                 variant="soft"
                 size="3"
                 className="flex !justify-between !h-fit !p-2 !px-4 w-full"
               >
                 <div className="flex flex-col justify-between items-start">
-                  <p className="font-semibold">{machine.name}</p>
-                  <Rating rating={value} />
+                  <div className="flex items-center gap-3">
+                    <EquipmentImage
+                      equipment={machine}
+                      className="size-24 rounded-xl"
+                    />
+                    <span>
+                      <p className="font-semibold">{machine.name}</p>
+                      <Rating rating={value} />
+                    </span>
+                  </div>
                 </div>
                 <div className="flex flex-col items-start gap-1">
                   <span>

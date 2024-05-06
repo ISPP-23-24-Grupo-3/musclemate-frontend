@@ -6,6 +6,7 @@ import { FormContainer } from "../../components/Form";
 import { Button, Select, TextArea, TextField } from "@radix-ui/themes";
 import { EquipmentSelect } from "../../components/Equipments";
 import { useParams } from "react-router-dom";
+import { parseImageURL } from "../../utils/functions/images";
 
 const AddTickets = () => {
   const { user } = useContext(AuthContext);
@@ -19,10 +20,9 @@ const AddTickets = () => {
 
   const [error, setError] = useState("");
 
-
   const [gymPlan, setGymPlan] = useState("");
   const [ticket, setTicket] = useState(null);
-  const [updatedDetails, setUpdatedDetails] = useState("");
+  const [updatedDetails, setUpdatedDetails] = useState();
   const [equipmentName, setEquipmentName] = useState(null);
 
   const handleSaveChanges = async () => {
@@ -97,7 +97,9 @@ const AddTickets = () => {
           }
         })
         .catch((error) => {
-          setErrorMessage("No se encontró la incidencia con la ID proporcionada.");
+          setErrorMessage(
+            "No se encontró la incidencia con la ID proporcionada.",
+          );
         });
     };
     fetchTicket();
@@ -119,7 +121,9 @@ const AddTickets = () => {
         </h2>
         {gymPlan === "free" ? (
           <div className="text-red-700">
-            La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
+            La subscripción "{gymPlan}" de tu gimnasio no incluye esta
+            funcionalidad. ¡Contacta con tu gimnasio para adquirir
+            funcionalidades como esta!
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -133,7 +137,6 @@ const AddTickets = () => {
                   maxLength={50}
                   onChange={(e) => handleInputChange(e.target.value, "label")}
                 />
-
               ) : (
                 <span>{ticket.label}</span>
               )}
@@ -146,9 +149,10 @@ const AddTickets = () => {
                   type="text"
                   value={updatedDetails.description}
                   maxLength={250}
-                  onChange={(e) => handleInputChange(e.target.value, "description")}
+                  onChange={(e) =>
+                    handleInputChange(e.target.value, "description")
+                  }
                 />
-
               ) : (
                 <span>{ticket.description}</span>
               )}
@@ -159,18 +163,36 @@ const AddTickets = () => {
                 <EquipmentSelect
                   name="equipmentId"
                   equipmentName={equipmentName}
-                  onChange={(eq) => handleInputChange(eq.target.value, "equipment")}
+                  onChange={(eq) =>
+                    handleInputChange(eq.target.value, "equipment")
+                  }
                   searchable // Habilitar búsqueda// Placeholder del campo de búsqueda
                 />
               ) : (
                 <span>{equipmentName}</span>
               )}
             </div>
+            <div className="flex flex-col">
+              <strong className="text-radixgreen">Equipo:</strong>{" "}
+              {editMode ? (
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    setUpdatedDetails((d) => ({
+                      ...d,
+                      image: e.target.files[0],
+                    }))
+                  }
+                />
+              ) : (
+                ticket.image && <img src={parseImageURL(ticket.image)} />
+              )}
+            </div>
             {successMessage && (
               <div className="text-green-700">{successMessage}</div>
             )}
             {errorMessage && <div className="text-red-700">{errorMessage}</div>}
-            {!editMode && user.rol === "client" && ticket.status === "open" &&
+            {!editMode && user.rol === "client" && ticket.status === "open" && (
               <Button
                 size="3"
                 variant="solid"
@@ -178,8 +200,9 @@ const AddTickets = () => {
                 onClick={toggleEditMode}
               >
                 Editar
-              </Button>}
-            {editMode &&
+              </Button>
+            )}
+            {editMode && (
               <div className="flex gap-3 self-center">
                 <Button size="3" onClick={handleSaveChanges}>
                   Guardar
@@ -188,7 +211,7 @@ const AddTickets = () => {
                   Cancelar
                 </Button>
               </div>
-            }
+            )}
           </div>
         )}
       </FormContainer>
