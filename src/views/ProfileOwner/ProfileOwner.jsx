@@ -10,7 +10,12 @@ const ProfileOwner = () => {
   const { user } = useContext(AuthContext);
   const [ownerProfile, setOwnerProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const { handleSubmit, control, reset, formState: { errors } } = useForm();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     if (user) {
@@ -38,11 +43,10 @@ const ProfileOwner = () => {
   };
 
   const handleSaveChanges = async () => {
-
     try {
       const response = await putToApi(
         `owners/update/${user.username}/`,
-        formData
+        formData,
       );
       if (response.ok) {
         setOwnerProfile(formData);
@@ -78,53 +82,55 @@ const ProfileOwner = () => {
               </Heading>
               <Separator size="4" color="green" />
             </div>
-            <div className="grid grid-cols-2 gap-x-4">
-
-              <UserInfoInput
-                type="text"
-                label="Nombre"
-                value={ownerProfile ? ownerProfile.name : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "name")}
-              />
-              <UserInfoInput
-                type="text"
-                label="Apellidos"
-                value={ownerProfile ? ownerProfile.last_name : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "lastName")}
-              />
-              <UserInfoInput
-                type="text"
-                label="Correo Electrónico"
-                value={ownerProfile ? ownerProfile.email : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "email")}
-              />
-              <UserInfoInput
-                type="number"
-                label="Número de Teléfono"
-                value={ownerProfile ? ownerProfile.phone_number : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "phoneNumber")}
-              />
-              <UserInfoInput
-                type="text"
-                label="Dirección"
-                value={ownerProfile ? ownerProfile.address : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "address")}
-              />
-            </div>
-            <div className="mt-4 text-center">
-              {editMode ? (
-                <div className="flex justify-between">
-                  <div className="flex gap-3">
-                    <Button onClick={handleSaveChanges}>Guardar</Button>
-                    <Button variant="surface" onClick={toggleEditMode}>
-                      Cancelar
-                    </Button>
-
+            <form>
+              <div className="grid grid-cols-2 gap-x-4">
+                <UserInfoInput
+                  type="text"
+                  label="Nombre"
+                  value={ownerProfile ? ownerProfile.name : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "name")}
+                />
+                <UserInfoInput
+                  type="text"
+                  label="Apellidos"
+                  value={ownerProfile ? ownerProfile.last_name : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "lastName")}
+                />
+                <UserInfoInput
+                  type="text"
+                  label="Correo Electrónico"
+                  value={ownerProfile ? ownerProfile.email : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "email")}
+                />
+                <UserInfoInput
+                  type="number"
+                  label="Número de Teléfono"
+                  value={
+                    ownerProfile ? ownerProfile.phone_number : "Cargando..."
+                  }
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "phoneNumber")}
+                />
+                <UserInfoInput
+                  type="text"
+                  label="Dirección"
+                  value={ownerProfile ? ownerProfile.address : "Cargando..."}
+                  editMode={editMode}
+                  onChange={(e) => handleInputChange(e, "address")}
+                />
+              </div>
+              <div className="mt-4 text-center">
+                {editMode ? (
+                  <div className="flex justify-between">
+                    <div className="flex gap-3">
+                      <Button onClick={handleSaveChanges}>Guardar</Button>
+                      <Button variant="surface" onClick={toggleEditMode}>
+                        Cancelar
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <Button onClick={() => setEditMode(true)}>Editar</Button>
