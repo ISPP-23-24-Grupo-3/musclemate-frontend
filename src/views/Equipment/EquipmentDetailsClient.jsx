@@ -12,6 +12,7 @@ import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
 import { Ticket } from "../../components/Ticket/Ticket";
 import { RingLoader } from "react-spinners";
+import { EquipmentImage } from "../../components/Images";
 
 const EquipmentDetailsClient = () => {
   const { user } = useContext(AuthContext);
@@ -209,7 +210,13 @@ const EquipmentDetailsClient = () => {
           <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
           {translateMuscularGroup(machineDetails.muscular_group)}
         </div>
-
+        <div className="flex flex-col gap-1">
+          <strong className="text-radixgreen">Imagen</strong>
+          <EquipmentImage
+            equipment={machineDetails}
+            className="size-36 rounded-xl border-2 border-radixgreen"
+          />
+        </div>
         <div className="mb-1">
           <strong className="text-radixgreen">Tu Valoración:</strong>
           <div
@@ -286,11 +293,14 @@ const EquipmentDetailsClient = () => {
                 <Ticket ticket={ticket} key={ticket.id} disabled />
               ))
             ) : (
-              <p className="text-red-500 mb-6">No hay incidencias disponibles.</p>
+              <p className="text-red-500 mb-6">
+                No hay incidencias disponibles.
+              </p>
             )
           ) : (
             <div className="flex justify-center mt-4">
-              <RingLoader color={"#123abc"} loading={!apiDataLoaded} /> {/* Loader para los tickets */}
+              <RingLoader color={"#123abc"} loading={!apiDataLoaded} />{" "}
+              {/* Loader para los tickets */}
             </div>
           )}
         </ul>
@@ -329,7 +339,8 @@ const EquipmentDetailsClient = () => {
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={
-                    currentPage === Math.ceil(apiTickets.length / ticketsPerPage)
+                    currentPage ===
+                    Math.ceil(apiTickets.length / ticketsPerPage)
                   }
                   className="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg"
                 >
@@ -345,3 +356,4 @@ const EquipmentDetailsClient = () => {
 };
 
 export default EquipmentDetailsClient;
+
