@@ -12,6 +12,7 @@ const GymMachineForm = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [gym, setGym] = useState([]);
+  const [createSuccess, setCreateSuccess] = useState(false);
 
   useEffect(() => {
     if (user?.rol === "gym") {
@@ -37,8 +38,12 @@ const GymMachineForm = () => {
       }
 
       console.log("Máquina agregada exitosamente");
-      if (user?.rol === "owner") navigate("/owner/equipments");
-      else if (user?.rol === "gym") navigate("/gym/equipments");
+      setCreateSuccess(true);
+      setTimeout(() => {
+        if (user?.rol === "owner") navigate("/owner/equipments");
+        else if (user?.rol === "gym") navigate("/gym/equipments");
+      }, 2500);
+      
     } catch (error) {
       console.error("Hubo un error al agregar la máquina:", error);
     }
@@ -54,7 +59,29 @@ const GymMachineForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="max-w-xl mx-auto">
+      {createSuccess && (
+                <FormContainer role="alert">
+                    <strong className="font-bold">Éxito!</strong>
+                    <span className="block sm:inline">
+                        {" "}
+                        La máquina ha sido creada correctamente.
+                    </span>
+                    <span
+                        className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    >
+                        <svg
+                            className="fill-current h-6 w-6 text-green-500"
+                            role="button"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                        >
+                            <title>Close</title>
+                            <path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z" />
+                        </svg>
+                    </span>
+                </FormContainer>
+            )}
       <FormContainer>
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
           Agregar máquina de gimnasio

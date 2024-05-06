@@ -121,7 +121,7 @@ export const EditRoutine = () => {
               </IconButton>
             </div>
           </div>
-          <div>
+          <div className="ml-5">
             <Button onClick={startRoutine}>
               <IoMdFitness className="size-5 -rotate-45" />
               Entrenar

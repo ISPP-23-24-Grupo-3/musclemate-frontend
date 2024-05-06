@@ -17,7 +17,6 @@ function SuccessPage() {
 
     async function updateGymSubscription() {
          const session = await stripe.checkout.sessions.retrieve(searchParams.get('session_id'))
-         console.log(session.customer)
          const customer = await stripe.customers.retrieve(session.customer, {
             expand: ['subscriptions']
         })
@@ -29,8 +28,6 @@ function SuccessPage() {
                 "subscription_plan": gym.subscription_plan == "Estándar" ? "standard" : "premium"
             })
         })
-
-        console.log("Gyms and Customer updated successfully")
 
         return Promise.all(gymsPromises)
     }

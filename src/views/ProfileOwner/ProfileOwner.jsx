@@ -4,43 +4,35 @@ import { getFromApi, putToApi } from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
 import { RemoveAccount } from "../../components/RemoveAccount";
+import { useForm, Controller } from "react-hook-form";
 
 const ProfileOwner = () => {
   const { user } = useContext(AuthContext);
   const [ownerProfile, setOwnerProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [editedOwner, setEditedOwner] = useState(null);
+  const { handleSubmit, control, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
     if (user) {
       getFromApi("owners/detail/" + user.username + "/")
         .then((response) => response.json())
-        .then((data) => setOwnerProfile(data));
+        .then((data) => {
+          setOwnerProfile(data);
+          reset(data);
+        });
     }
-  }, [user]);
+  }, [user, reset]);
 
-  const handleInputChange = (e, field) => {
-    setEditedOwner({
-      ...editedOwner,
-      [field]: e.target.value,
-    });
-  };
+  
 
-  const toggleEditMode = () => {
-    if (!editMode) {
-      setEditedOwner(ownerProfile);
-    }
-    setEditMode(!editMode);
-  };
-
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (formData) => {
     try {
       const response = await putToApi(
         `owners/update/${user.username}/`,
-        editedOwner
+        formData
       );
       if (response.ok) {
-        setOwnerProfile(editedOwner);
+        setOwnerProfile(formData);
         setEditMode(false);
       } else {
         console.error("Error updating owner:", response.status);
@@ -73,52 +65,87 @@ const ProfileOwner = () => {
               </Heading>
               <Separator size="4" color="green" />
             </div>
-            <div className="grid grid-cols-2 gap-x-4">
-              <UserInfoInput
-                label="Nombre"
-                value={ownerProfile ? ownerProfile.name : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "name")}
-              />
-              <UserInfoInput
-                label="Apellidos"
-                value={ownerProfile ? ownerProfile.lastName : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "lastName")}
-              />
-              <UserInfoInput
-                label="Correo Electrónico"
-                value={ownerProfile ? ownerProfile.email : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "email")}
-              />
-              <UserInfoInput
-                label="Número de Teléfono"
-                value={ownerProfile ? ownerProfile.phoneNumber : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "phoneNumber")}
-              />
-              <UserInfoInput
-                label="Dirección"
-                value={ownerProfile ? ownerProfile.address : "Cargando..."}
-                editMode={editMode}
-                onChange={(e) => handleInputChange(e, "address")}
-              />
-            </div>
-            <div className="mt-4 text-center">
-              {editMode ? (
-                <div className="flex justify-between">
-                  <div className="flex gap-3">
-                    <Button onClick={handleSaveChanges}>Guardar</Button>
-                    <Button variant="surface" onClick={toggleEditMode}>
-                      Cancelar
-                    </Button>
+            <form onSubmit={handleSubmit(handleSaveChanges)}>
+              <div className="grid grid-cols-2 gap-x-4">
+                <UserInfoInput
+                  label="Nombre"
+                  name="name"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ required: "Este campo es obligatorio" }}
+                  error={errors.name}
+                />
+                <UserInfoInput
+                  label="Apellidos"
+                  name="last_name"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ required: "Este campo es obligatorio" }}
+                  error={errors.lastName}
+                />
+                <UserInfoInput
+                  label="Correo Electrónico"
+                  name="email"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ 
+                    required: "Este campo es obligatorio", 
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Correo electrónico inválido"
+                    }
+                  }}
+                  error={errors.email}
+                />
+                <UserInfoInput
+                  label="Número de Teléfono"
+                  name="phone_number"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ 
+                    required: "Este campo es obligatorio", 
+                    pattern: { 
+                      value: /^[0-9]+$/, 
+                      message: "Ingrese solo números"
+                    }, 
+                    minLength: { value: 10, message: "Mínimo 10 números" }, 
+                    maxLength: { value: 12, message: "Máximo 12 números" } 
+                  }}
+                  error={errors.phoneNumber}
+                />
+                <UserInfoInput
+                  label="Dirección"
+                  name="address"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ required: "Este campo es obligatorio" }}
+                  error={errors.address}
+                />
+              </div>
+              <div className="mt-4 text-center">
+                {editMode ? (
+                  <div className="flex justify-between">
+                    <div className="flex gap-3">
+                      <Button type="submit">Guardar</Button>
+                      <Button
+                        type="button"
+                        variant="surface"
+                        onClick={() => setEditMode(false)}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <Button onClick={toggleEditMode}>Editar</Button>
-              )}
-            </div>
+                ) : (
+                  <Button onClick={() => setEditMode(true)}>Editar</Button>
+                )}
+              </div>
+            </form>
           </FormContainer>
         </div>
       </div>
@@ -127,20 +154,27 @@ const ProfileOwner = () => {
   );
 };
 
-const UserInfoInput = ({ label, value, editMode, onChange }) => (
+const UserInfoInput = ({ label, name, control, defaultValue, disabled, rules, error }) => (
   <div className="flex flex-col mb-3">
     <span className="text-radixgreen font-bold mt-5">{label}:</span>
-    {editMode ? (
-      <TextField.Input
-        type="text"
-        className="text-black"
-        value={value}
-        onChange={onChange}
-        placeholder={label}
-      />
-    ) : (
-      <span className="text-black">{value}</span>
-    )}
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+      rules={rules}
+      render={({ field }) => (
+        <>
+          <TextField.Input
+            type="text"
+            className="text-black"
+            {...field}
+            disabled={disabled}
+            placeholder={label}
+          />
+          {error && <span className="text-red-500">{error.message}</span>}
+        </>
+      )}
+    />
   </div>
 );
 

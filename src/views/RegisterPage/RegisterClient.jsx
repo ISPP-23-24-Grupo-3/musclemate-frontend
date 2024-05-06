@@ -8,6 +8,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FormContainer } from "../../components/Form";
 import { Checkbox } from "@radix-ui/themes";
 import { ClipLoader } from "react-spinners";
+import { ClipLoader } from "react-spinners";
 
 const ClientRegister = () => {
   const [isChecked, setIsChecked] = useState(false);
@@ -23,7 +24,10 @@ const ClientRegister = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    watch,
   } = useForm();
+
+  const password = watch("password");
 
   const onSubmit = async (formData) => {
     setLoading(true);
@@ -313,6 +317,7 @@ const ClientRegister = () => {
               className="w-full py-3"
               disabled={!isChecked} // Deshabilita el botón si !isChecked es true
             >
+              {loading ? <ClipLoader color="#ffffff" /> : 'Registrarse'}
               {loading ? <ClipLoader color="#ffffff" /> : 'Registrarse'}
             </Button>
 
