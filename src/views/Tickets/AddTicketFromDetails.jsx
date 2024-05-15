@@ -97,7 +97,7 @@ const AddTicketFromDetails = () => {
             />
           </div>
           <div className="flex flex-col">
-            <strong className="text-radixgreen">Equipo:</strong>{" "}
+            <strong className="text-radixgreen">Máquina:</strong>{" "}
             <EquipmentSelect defaultValue={equipmentId.toString()} disabled />
           </div>
           {successMessage && (

@@ -1,14 +1,25 @@
-import { Button, Container, Text, Heading, Link, IconButton } from "@radix-ui/themes";
+import {
+  Button,
+  Container,
+  Text,
+  Heading,
+  Link,
+  IconButton,
+} from "@radix-ui/themes";
 import { React, useContext, useEffect, useState } from "react";
 import { RoutineList } from "../../components/Routines/RoutineList";
 import AuthContext from "../../utils/context/AuthContext";
 import { getFromApi, deleteFromApi } from "../../utils/functions/api";
 import { EquipmentSelect } from "../../components/Equipments";
-import { IoPodiumOutline, IoCalendarClearOutline, IoBarbellOutline } from "react-icons/io5";
+import {
+  IoPodiumOutline,
+  IoCalendarClearOutline,
+  IoBarbellOutline,
+} from "react-icons/io5";
 import { CgTrash } from "react-icons/cg";
 import { FormContainer } from "../../components/Form.jsx";
 
-import { Line } from 'react-chartjs-2';
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,7 +30,7 @@ import {
   Tooltip,
   Filler,
   Legend,
-} from 'chart.js';
+} from "chart.js";
 
 ChartJS.register(
   CategoryScale,
@@ -29,14 +40,13 @@ ChartJS.register(
   Title,
   Tooltip,
   Filler,
-  Legend
+  Legend,
 );
 
 export default function ClientHomePage() {
-
   const { user } = useContext(AuthContext);
   const [gymPlan, setGymPlan] = useState("");
-  const [tipo, setTipo] = useState('peso');
+  const [tipo, setTipo] = useState("peso");
   const [equipment, setEquipment] = useState({});
   const [workouts, setWorkouts] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -47,24 +57,24 @@ export default function ClientHomePage() {
   const [error, setError] = useState(null);
 
   const equipmentName = async (equipmentsId) => {
-    let equipName = []
+    let equipName = [];
     if (equipmentsId.length > 0) {
       for (let i = 0; i < equipmentsId.length; i++) {
-        const response = await getFromApi("equipments/detail/" + equipmentsId[i] + "/");
+        const response = await getFromApi(
+          "equipments/detail/" + equipmentsId[i] + "/",
+        );
         if (response.ok) {
           let data = await response.json();
           if (i < equipmentsId.length - 1) {
             equipName.push(data.name + ", ");
-          }
-          else {
+          } else {
             equipName.push(data.name);
           }
         }
       }
-    }
-    else {
+    } else {
       let equipName = "Sin máquinas asignadas";
-      return equipName
+      return equipName;
     }
     return equipName;
   };
@@ -75,12 +85,12 @@ export default function ClientHomePage() {
         const response = await getFromApi(`routines/`);
         if (response.ok) {
           let data = await response.json();
-          setRoutines(data)
+          setRoutines(data);
         } else {
-          console.error('Error fetching API workouts:', response.status);
+          console.error("Error fetching API workouts:", response.status);
         }
       } catch (error) {
-        console.error('Error fetching API workouts:', error);
+        console.error("Error fetching API workouts:", error);
       }
     };
     fetchRoutines();
@@ -92,16 +102,18 @@ export default function ClientHomePage() {
       let workouts = [];
       for (let routine of routines) {
         try {
-          const response = await getFromApi(`workouts/byRoutine/${routine.id}/`);
+          const response = await getFromApi(
+            `workouts/byRoutine/${routine.id}/`,
+          );
           if (response.ok) {
             let data = await response.json();
 
-            workouts.push(...data)
+            workouts.push(...data);
           } else {
-            console.error('Error fetching API workouts:', response.status);
+            console.error("Error fetching API workouts:", response.status);
           }
         } catch (error) {
-          console.error('Error fetching API workouts:', error);
+          console.error("Error fetching API workouts:", error);
         }
       }
       setWorkouts(workouts);
@@ -109,19 +121,18 @@ export default function ClientHomePage() {
     fetchWorkouts();
   }, [routines]);
 
-
   useEffect(() => {
     const fetchSeries = async () => {
       let chartData = [];
       let serie = [];
       for (let workout of workouts) {
         try {
-          let workoutId = workout.id
+          let workoutId = workout.id;
           const name = await equipmentName(workout.equipment);
           const response = await getFromApi(`series/workout/${workoutId}/`);
           if (response.ok) {
             let data = await response.json();
-            let dataWithEquipment = data.map(serie => ({
+            let dataWithEquipment = data.map((serie) => ({
               id: serie.id,
               reps: serie.reps,
               weight: serie.weight,
@@ -129,9 +140,9 @@ export default function ClientHomePage() {
               equipment: name,
               duration: serie.duration,
             }));
-            serie.push(...dataWithEquipment)
+            serie.push(...dataWithEquipment);
             data.sort((a, b) => new Date(a.date) - new Date(b.date));
-            let workoutChartData = data.map(serie => ({
+            let workoutChartData = data.map((serie) => ({
               reps: serie.reps,
               weight: serie.weight,
               date: serie.date,
@@ -141,7 +152,7 @@ export default function ClientHomePage() {
             }
           }
         } catch (error) {
-          console.error('Error fetching API workout:', error);
+          console.error("Error fetching API workout:", error);
         }
       }
       chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -175,13 +186,16 @@ export default function ClientHomePage() {
     fetchReservations().then((r) => setReservations(r));
   }, []);
 
-
   const handleDelete = async (event) => {
     try {
-      const response_reservation = await getFromApi(`reservations/byClientEvent/${event.id}/`);
+      const response_reservation = await getFromApi(
+        `reservations/byClientEvent/${event.id}/`,
+      );
       if (response_reservation.ok) {
         const reservation_delete = await response_reservation.json();
-        const response = await deleteFromApi(`reservations/delete/${reservation_delete[0].id}/`);
+        const response = await deleteFromApi(
+          `reservations/delete/${reservation_delete[0].id}/`,
+        );
         if (response.ok) {
           // Si la eliminación es exitosa, mostramos el mensaje de éxito
           setDeleteSuccess(true);
@@ -194,36 +208,46 @@ export default function ClientHomePage() {
       // Si la respuesta no fue exitosa, se ejecutará el código a continuación
     } catch (error) {
       // Si hay un error durante la solicitud, se ejecutará el código a continuación
-      setError("Error al eliminar el equipo.");
+      setError("Error al eliminar la máquina.");
       return;
     }
     // Si la ejecución llega a este punto, significa que hubo un problema durante la eliminación
-    setError("Error al eliminar el equipo."); // Muestra un mensaje de error genérico
+    setError("Error al eliminar la máquina."); // Muestra un mensaje de error genérico
   };
 
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        <div style={{ flex: '1' }}>
+        <div style={{ flex: "1" }}>
           <Heading as="h1">
-            <Link className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
-              href="./routines">
+            <Link
+              className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+              href="./routines"
+            >
               <IoBarbellOutline className="w-8 h-8" />
-              <h3 className="text-lg font-semibold text-radixgreen">Mis Rutinas</h3>
+              <h3 className="text-lg font-semibold text-radixgreen">
+                Mis Rutinas
+              </h3>
             </Link>
           </Heading>
           {gymPlan !== "free" ? (
             <RoutineList />
           ) : (
-            <div className="text-red-700">La subscripción de tu gimnasio no incluye esta funcionalidad.</div>
+            <div className="text-red-700">
+              La subscripción de tu gimnasio no incluye esta funcionalidad.
+            </div>
           )}
         </div>
-        <div style={{ flex: '1' }}>
+        <div style={{ flex: "1" }}>
           <Heading as="h1">
-            <Link className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
-              href="./events">
+            <Link
+              className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+              href="./events"
+            >
               <IoCalendarClearOutline className="w-8 h-8" />
-              <h3 className="text-lg font-semibold text-radixgreen">Mis Eventos</h3>
+              <h3 className="text-lg font-semibold text-radixgreen">
+                Mis Eventos
+              </h3>
             </Link>
           </Heading>
           {deleteSuccess && (
@@ -250,64 +274,85 @@ export default function ClientHomePage() {
             </FormContainer>
           )}
           <div>
-              {reservation[0] ? (reservation.map((event) => (
-                  <Link to={`/user/reservations/${event.id}`} key={event.id}>
-                    <Button
-                      name="event"
-                      key={event.id}
-                      size="3"
-                      variant="soft"
-                      className="flex !justify-between !h-fit !p-2 !px-4 w-full"
-                    >
-                      <div className="flex flex-col justify-between items-start">
-                        <p className="font-semibold">{event.name}</p>
-                        <p>{event.date}</p>
-                      </div>
-                      <div className="flex flex-col items-start gap-1">
-                        <IconButton
-                          size="3"
-                          radius="full"
-                          color="red"
-                          onClick={() => {
-                            handleDelete(event);
-                          }}
-                        >
-                          <CgTrash className="size-6" />
-                        </IconButton>
-                      </div>
-                    </Button>
-                  </Link>
-                )))
-                :
-              (<div style={{ color: 'red', fontSize: '18px', textAlign: 'center' }}>No hay reservas para mostrar</div>)
-}
+            {reservation[0] ? (
+              reservation.map((event) => (
+                <Link to={`/user/reservations/${event.id}`} key={event.id}>
+                  <Button
+                    name="event"
+                    key={event.id}
+                    size="3"
+                    variant="soft"
+                    className="flex !justify-between !h-fit !p-2 !px-4 w-full"
+                  >
+                    <div className="flex flex-col justify-between items-start">
+                      <p className="font-semibold">{event.name}</p>
+                      <p>{event.date}</p>
+                    </div>
+                    <div className="flex flex-col items-start gap-1">
+                      <IconButton
+                        size="3"
+                        radius="full"
+                        color="red"
+                        onClick={() => {
+                          handleDelete(event);
+                        }}
+                      >
+                        <CgTrash className="size-6" />
+                      </IconButton>
+                    </div>
+                  </Button>
+                </Link>
+              ))
+            ) : (
+              <div
+                style={{ color: "red", fontSize: "18px", textAlign: "center" }}
+              >
+                No hay reservas para mostrar
+              </div>
+            )}
           </div>
         </div>
-        <div style={{ flex: '1' }}>
+        <div style={{ flex: "1" }}>
           <Heading as="h1">
-            <Link className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
-              href="./statistics">
+            <Link
+              className="!mb-5 bg-[#E6F6EB] rounded-lg p-6 shadow-sm border-2 border-opacity-20 border-radixgreen hover:shadow-md transition-shadow flex flex-col items-center gap-4"
+              href="./statistics"
+            >
               <IoPodiumOutline className="w-8 h-8" />
-              <h3 className="text-lg font-semibold text-radixgreen">Mi Historial</h3>
+              <h3 className="text-lg font-semibold text-radixgreen">
+                Mi Historial
+              </h3>
             </Link>
           </Heading>
           <div className="flex items-center justify-center">
             <div className="mr-4 mt-2">
-              <EquipmentSelect onChange={(e) => { setEquipment(e.target.value) }} />
+              <EquipmentSelect
+                onChange={(e) => {
+                  setEquipment(e.target.value);
+                }}
+              />
             </div>
             <div className="mt-2">
-              {tipo === 'peso' ? (
-                <Button onClick={() => setTipo('reps')} className="w-full" size="4">
+              {tipo === "peso" ? (
+                <Button
+                  onClick={() => setTipo("reps")}
+                  className="w-full"
+                  size="4"
+                >
                   <Text>Mostrar Repes</Text>
                 </Button>
               ) : (
-                <Button onClick={() => setTipo('peso')} className="w-full" size="4">
+                <Button
+                  onClick={() => setTipo("peso")}
+                  className="w-full"
+                  size="4"
+                >
                   <Text>Mostrar Pesos</Text>
                 </Button>
               )}
             </div>
           </div>
-          <div className='mt-7'>
+          <div className="mt-7">
             {chartData.length > 0 ? (
               <Line
                 options={{
@@ -322,18 +367,24 @@ export default function ClientHomePage() {
                   labels: chartData.map((serie) => serie.date),
                   datasets: [
                     {
-                      label: `Mis ${tipo == 'peso' ? 'pesos' : 'repeticiones'}`,
-                      data: chartData.map((serie) => tipo == 'peso' ? serie.weight : serie.reps),
+                      label: `Mis ${tipo == "peso" ? "pesos" : "repeticiones"}`,
+                      data: chartData.map((serie) =>
+                        tipo == "peso" ? serie.weight : serie.reps,
+                      ),
                       fill: true,
-                      borderColor: 'rgb(48, 164, 108)',
-                      backgroundColor: 'rgba(48, 164, 108, 0.4)',
+                      borderColor: "rgb(48, 164, 108)",
+                      backgroundColor: "rgba(48, 164, 108, 0.4)",
                     },
                   ],
                 }}
-              />)
-              :
-              (<div style={{ color: 'red', fontSize: '18px', textAlign: 'center' }}>No hay datos para mostrar</div>)
-            }
+              />
+            ) : (
+              <div
+                style={{ color: "red", fontSize: "18px", textAlign: "center" }}
+              >
+                No hay datos para mostrar
+              </div>
+            )}
           </div>
         </div>
       </div>

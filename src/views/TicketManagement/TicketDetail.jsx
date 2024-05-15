@@ -158,7 +158,7 @@ const AddTickets = () => {
               )}
             </div>
             <div className="flex flex-col">
-              <strong className="text-radixgreen">Equipo:</strong>{" "}
+              <strong className="text-radixgreen">Máquina:</strong>{" "}
               {editMode ? (
                 <EquipmentSelect
                   name="equipmentId"
@@ -173,7 +173,7 @@ const AddTickets = () => {
               )}
             </div>
             <div className="flex flex-col">
-              <strong className="text-radixgreen">Equipo:</strong>{" "}
+              <strong className="text-radixgreen">Imagen:</strong>{" "}
               {editMode ? (
                 <input
                   type="file"
