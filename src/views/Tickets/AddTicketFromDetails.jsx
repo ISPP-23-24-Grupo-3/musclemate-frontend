@@ -5,6 +5,7 @@ import AuthContext from "../../utils/context/AuthContext";
 import { Button, TextArea, TextField } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form";
 import axios from "axios";
+import { EquipmentSelect } from "../../components/Equipments";
 
 const AddTicketFromDetails = () => {
   const { user } = useContext(AuthContext);
@@ -65,7 +66,7 @@ const AddTicketFromDetails = () => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="label">Asunto:</label>
+            <strong className="text-radixgreen">Asunto:</strong>{" "}
             <TextField.Input
               type="text"
               id="label"
@@ -75,7 +76,7 @@ const AddTicketFromDetails = () => {
             />
           </div>
           <div>
-            <label htmlFor="description">Descripción:</label>
+            <strong className="text-radixgreen">Descripción:</strong>{" "}
             <TextArea
               id="description"
               value={description}
@@ -84,7 +85,7 @@ const AddTicketFromDetails = () => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="image">Imagen:</label>
+            <strong className="text-radixgreen">Imagen:</strong>{" "}
             <input
               type="file"
               id="image"
@@ -94,6 +95,10 @@ const AddTicketFromDetails = () => {
                 setImage(e.target.files[0]);
               }}
             />
+          </div>
+          <div className="flex flex-col">
+            <strong className="text-radixgreen">Equipo:</strong>{" "}
+            <EquipmentSelect defaultValue={equipmentId.toString()} disabled />
           </div>
           {successMessage && (
             <div className="text-green-700">{successMessage}</div>
