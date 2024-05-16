@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { HiUser, HiLockClosed, HiOutlineMail, HiPhone } from "react-icons/hi";
 import { HiHome } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
@@ -6,24 +6,23 @@ import { Button, TextField } from "@radix-ui/themes";
 import { postToApiRegister } from "../../utils/functions/api";
 import { useNavigate, Link } from "react-router-dom";
 import { FormContainer } from "../../components/Form";
-import { Checkbox } from "@radix-ui/themes";
 import { ClipLoader } from "react-spinners";
 
-const ClientRegister = () => {
-  const [isChecked, setIsChecked] = useState(false);
+const RegisterClient = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
-  } = useForm();
+  } = useForm({ mode: "onBlur" });
+
+  console.log(errors);
 
   const onSubmit = async (formData) => {
     setLoading(true);
@@ -40,9 +39,9 @@ const ClientRegister = () => {
 
       const requestBody = {
         name,
-        last_name:lastName,
+        last_name: lastName,
         email,
-        phone_number:phoneNumber,
+        phone_number: phoneNumber,
         address,
         userCustom: {
           username,
@@ -72,7 +71,7 @@ const ClientRegister = () => {
       setError("Hubo un error al crear el propietario");
       console.error("Hubo un error al crear el propietario:", error);
     } finally {
-    setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -97,238 +96,250 @@ const ClientRegister = () => {
 
   const watchPassword = watch("password", "");
 
-  const handlePasswordConfirmationChange = (e) => {
-    const { value } = e.target;
-    setPasswordConfirmation(value);
-  };
-
   return (
-    <div className="flex gap-10 flex-col md:flex-row justify-center items-center">
-      <FormContainer className="">
-        <div className="w-full">
-          <h2 className="mb-3 text-radixgreen font-bold text-4xl text-center">
-            Registro de nuevo propietario
-          </h2>
-          {success && (
-            <div className="bg-green-200 text-green-800 p-3 rounded mb-4">
-              Registro completado
-            </div>
-          )}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-3"
-          >
-            <div className="flex flex-col">
-              <label htmlFor="name" className="mr-3">
-                Nombre
-              </label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiUser className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("name", {
-                    required: messages.req,
-                  })}
-                  name="name"
-                  type="text"
-                />
-              </TextField.Root>
-              {errors.name && (
-                <p className="text-red-500">{errors.name.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="lastname" className="mr-3">
-                Apellidos
-              </label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiUser className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("lastName", {
-                    required: messages.req,
-                  })}
-                  name="lastName"
-                  type="text"
-                />
-              </TextField.Root>
-              {errors.lastName && (
-                <p className="text-red-500">{errors.lastName.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="email">Correo electrónico</label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiOutlineMail className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("email", {
-                    required: messages.req,
-                    pattern: { 
-                      value: /^[a-zA-Z0-9.!#$%&’+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$/,
-                      message: "Debes introducir una dirección de correo electrónico válida", },
-                  })}
-                  name="email"
-                  type="email"
-                />
-              </TextField.Root>
-              {errors.email && (
-                <p className="text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="phoneNumber" className="mr-3">
-                Número de telefono
-              </label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiPhone className="size-6 text-radixgreen mr-3" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("phoneNumber", {
-                    required: messages.req,
-                    pattern: {
-                      value: /^\d{9}$/,
-                      message: "El número de teléfono debe tener 9 dígitos",
-                    },
-                  })}
-                  name="phoneNumber"
-                  type="tel"
-                />
-              </TextField.Root>
-              {errors.phoneNumber && (
-                <p className="text-red-500">{errors.phoneNumber.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="address">Dirección</label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiHome className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("address", {
-                    required: messages.req,
-                  })}
-                  name="address"
-                  type="text"
-                />
-              </TextField.Root>
-              {errors.address && (
-                <p className="text-red-500">{errors.address.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="username">Nombre de usuario</label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiHome className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("username", {
-                    required: messages.req,
-                  })}
-                  name="username"
-                  type="text"
-                />
-              </TextField.Root>
-              {errors.username && (
-                <p className="text-red-500">{errors.username.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="password">Contraseña</label>
-              <TextField.Root>
-                <TextField.Slot>
-                  <HiLockClosed className="size-6 text-radixgreen" />
-                </TextField.Slot>
-                <TextField.Input
-                  {...register("password", {
-                    required: messages.req,
-                    minLength: {
-                      value: 10,
-                      message: "La contraseña debe tener más de 10 caracteres",
-                    },
-                  })}
-                  name="password"
-                  type="password"
-                />
-              </TextField.Root>
-              {errors.password && (
-                <p className="text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-            <label htmlFor="passwordConfirmation" className="mr-3">
-              Confirmar contraseña
-            </label>
-            <TextField.Root>
-              <TextField.Slot>
-                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
-              </TextField.Slot>
-              <TextField.Input
-                {...register("passwordConfirmation", {
-                  required: messages.req,
-                  validate: (value) =>
-                    value === watchPassword || messages.confirmPass,
-                })}
-                name="passwordConfirmation"
-                type="password"
-                onChange={handlePasswordConfirmationChange}
-              />
-            </TextField.Root>
-            {errors.passwordConfirmation && (
-              <p className="text-red-500">{errors.passwordConfirmation.message}</p>
-            )}
-          </div>
-
-            <div className="flex gap-3 items-center">
-            <Checkbox
-              checked={isChecked}
-              onCheckedChange={(e) => setIsChecked(e)}
-            ></Checkbox>
-
-              <p>
-                Acepta los <span className="text-blue-500"><Link to="/terms-conditions">Términos y Condiciones</Link></span>
-              </p>
-            </div>
-
-            {error && <div className="text-red-500">{error}</div>}
-
-            <Button
-              type="submit"
-              size="3"
-              variant="solid"
-              color="green"
-              className="w-full py-3"
-              disabled={!isChecked} // Deshabilita el botón si !isChecked es true
-            >
-              {loading ? <ClipLoader color="#ffffff" /> : 'Registrarse'}
-            </Button>
-
-          </form>
+    <FormContainer className="">
+      <h2 className="mb-3 text-radixgreen font-bold text-4xl text-center">
+        Registro de nuevo propietario
+      </h2>
+      {success && (
+        <div className="bg-green-200 text-green-800 p-3 rounded mb-4">
+          Registro completado
         </div>
-      </FormContainer>
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <div className="flex flex-col">
+          <label htmlFor="name" className="mr-3">
+            Nombre
+          </label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiUser className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("name", {
+                required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "El nombre no puede superar los 100 caracteres",
+                },
+              })}
+              name="name"
+              type="text"
+            />
+          </TextField.Root>
+          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+        </div>
 
-      <div className="w-full md:w-1/2">
-        <img
-          src="https://img.grouponcdn.com/deal/pzR5AeLirhPUNLX4zHZz/zs-2048x1242/v1/c870x524.jpg"
-          alt="Descripción de la imagen"
-          className="mt-4 w-full h-auto"
-        />
-      </div>
-    </div>
+        <div className="flex flex-col">
+          <label htmlFor="lastname" className="mr-3">
+            Apellidos
+          </label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiUser className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("lastName", {
+                required: messages.req,
+                maxLength: {
+                  value: 100,
+                  message: "Los apellidos no puede superar los 100 caracteres",
+                },
+              })}
+              name="lastName"
+              type="text"
+            />
+          </TextField.Root>
+          {errors.lastName && (
+            <p className="text-red-500">{errors.lastName.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="email">Correo electrónico</label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiOutlineMail className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("email", {
+                required: messages.req,
+                pattern: {
+                  value:
+                    /^[a-zA-Z0-9.!#$%&’+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$/,
+                  message:
+                    "Debes introducir una dirección de correo electrónico válida",
+                },
+              })}
+              name="email"
+              type="email"
+            />
+          </TextField.Root>
+          {errors.email && (
+            <p className="text-red-500">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="phoneNumber" className="mr-3">
+            Número de telefono
+          </label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiPhone className="size-6 text-radixgreen mr-3" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("phoneNumber", {
+                required: messages.req,
+                pattern: {
+                  value: /^\d{9}$/,
+                  message: "El número de teléfono debe tener 9 dígitos",
+                },
+              })}
+              name="phoneNumber"
+              type="tel"
+            />
+          </TextField.Root>
+          {errors.phoneNumber && (
+            <p className="text-red-500">{errors.phoneNumber.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="address">Dirección</label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiHome className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("address", {
+                required: messages.req,
+                maxLength: {
+                  value: 255,
+                  message: "La direción no puede superar los 255 caracteres",
+                },
+              })}
+              name="address"
+              type="text"
+            />
+          </TextField.Root>
+          {errors.address && (
+            <p className="text-red-500">{errors.address.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="username">Nombre de usuario</label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiHome className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("username", {
+                required: messages.req,
+                maxLength: {
+                  value: 150,
+                  message:
+                    "El nombre de usuario no puede superar los 150 caracteres",
+                },
+              })}
+              name="username"
+              type="text"
+            />
+          </TextField.Root>
+          {errors.username && (
+            <p className="text-red-500">{errors.username.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="password">Contraseña</label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiLockClosed className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("password", {
+                required: messages.req,
+                minLength: {
+                  value: 10,
+                  message: "La contraseña debe tener más de 10 caracteres",
+                },
+                maxLength: {
+                  value: 128,
+                  message: "La contraseña no puede superar los 128 caracteres",
+                },
+              })}
+              name="password"
+              type="password"
+            />
+          </TextField.Root>
+          {errors.password && (
+            <p className="text-red-500">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="passwordConfirmation" className="mr-3">
+            Confirmar contraseña
+          </label>
+          <TextField.Root>
+            <TextField.Slot>
+              <HiLockClosed className="size-6 text-radixgreen" />
+            </TextField.Slot>
+            <TextField.Input
+              {...register("passwordConfirmation", {
+                required: messages.req,
+                validate: (value) =>
+                  value === watchPassword || messages.confirmPass,
+              })}
+              name="passwordConfirmation"
+              type="password"
+            />
+          </TextField.Root>
+          {errors.passwordConfirmation && (
+            <p className="text-red-500">
+              {errors.passwordConfirmation.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="checkbox"
+            {...register("terms", {
+              required: {
+                value: true,
+                message: "Tienes que aceptar los Términos y Condiciones",
+              },
+            })}
+          />
+          <label htmlFor="terms" className="mr-3">
+            Acepto los{" "}
+            <Link className="text-blue-500" to="/terms-conditions">
+              Términos y Condiciones
+            </Link>
+          </label>
+          {errors.terms && (
+            <p className="text-red-500">{errors.terms.message}</p>
+          )}
+        </div>
+
+        {error && <div className="text-red-500">{error}</div>}
+
+        <Button
+          type="submit"
+          size="3"
+          variant="solid"
+          color="green"
+          className="w-full py-3"
+          disabled={!isValid}
+        >
+          {loading ? <ClipLoader color="#ffffff" /> : "Registrarse"}
+        </Button>
+      </form>
+    </FormContainer>
   );
 };
 
-export default ClientRegister;
+export default RegisterClient;
