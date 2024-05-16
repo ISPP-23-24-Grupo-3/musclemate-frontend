@@ -9,7 +9,7 @@ import { FormContainer } from "../../components/Form";
 import { ClipLoader } from "react-spinners";
 
 const RegisterClient = () => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState({});
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -21,8 +21,6 @@ const RegisterClient = () => {
     formState: { errors, isValid },
     watch,
   } = useForm({ mode: "onBlur" });
-
-  console.log(errors);
 
   const onSubmit = async (formData) => {
     setLoading(true);
@@ -52,24 +50,16 @@ const RegisterClient = () => {
       const response = await postToApiRegister("owners/create/", requestBody);
       const data = await response.json();
       if (response.ok) {
-        setError(null);
+        setError({});
         setSuccess(true);
         setTimeout(() => {
           navigate("/login");
         }, 2000); // Espera 2 segundos antes de redirigir
       } else {
-        if (data.username) {
-          setError("Este nombre de usuario ya existe, prueba con otro");
-        } else if (data.email) {
-          setError("Ya existe un usuario con este email");
-        } else {
-          setError("Hubo un error al crear el propietario");
-        }
-        console.error("Hubo un error al crear el propietario:", data);
+        setError({ ...error, ...data });
       }
-    } catch (error) {
-      setError("Hubo un error al crear el propietario");
-      console.error("Hubo un error al crear el propietario:", error);
+    } catch (err) {
+      setError({ ...error, global: err.message });
     } finally {
       setLoading(false);
     }
@@ -146,8 +136,6 @@ const RegisterClient = () => {
                   message: "Los apellidos no puede superar los 100 caracteres",
                 },
               })}
-              name="lastName"
-              type="text"
             />
           </TextField.Root>
           {errors.lastName && (
@@ -178,6 +166,7 @@ const RegisterClient = () => {
           {errors.email && (
             <p className="text-red-500">{errors.email.message}</p>
           )}
+          {error?.email && <ErrorList errorList={error.email} />}
         </div>
 
         <div className="flex flex-col">
@@ -186,7 +175,7 @@ const RegisterClient = () => {
           </label>
           <TextField.Root>
             <TextField.Slot>
-              <HiPhone className="size-6 text-radixgreen mr-3" />
+              <HiPhone className="size-6 text-radixgreen" />
             </TextField.Slot>
             <TextField.Input
               {...register("phoneNumber", {
@@ -203,6 +192,7 @@ const RegisterClient = () => {
           {errors.phoneNumber && (
             <p className="text-red-500">{errors.phoneNumber.message}</p>
           )}
+          {error?.phone_number && <ErrorList errorList={error.phone_number} />}
         </div>
 
         <div className="flex flex-col">
@@ -250,6 +240,7 @@ const RegisterClient = () => {
           {errors.username && (
             <p className="text-red-500">{errors.username.message}</p>
           )}
+          {error?.username && <ErrorList errorList={error.username} />}
         </div>
 
         <div className="flex flex-col">
@@ -310,7 +301,8 @@ const RegisterClient = () => {
             {...register("terms", {
               required: {
                 value: true,
-                message: "Tienes que aceptar los Términos y Condiciones",
+                message:
+                  "Para poder utilizar MuscleMate tienes que aceptar los Términos y Condiciones",
               },
             })}
           />
@@ -324,8 +316,6 @@ const RegisterClient = () => {
             <p className="text-red-500">{errors.terms.message}</p>
           )}
         </div>
-
-        {error && <div className="text-red-500">{error}</div>}
 
         <Button
           type="submit"
@@ -343,3 +333,13 @@ const RegisterClient = () => {
 };
 
 export default RegisterClient;
+
+function ErrorList({ errorList }) {
+  return (
+    <ul className="text-red-500">
+      {errorList.map((message) => (
+        <li key={message}>{message}</li>
+      ))}
+    </ul>
+  );
+}
