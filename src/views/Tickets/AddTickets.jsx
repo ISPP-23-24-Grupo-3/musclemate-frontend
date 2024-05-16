@@ -155,7 +155,6 @@ const AddTickets = () => {
                 id="image"
                 accept="image/*"
                 onChange={(e) => {
-                  console.log(e.target.files[0]);
                   setImage(e.target.files[0]);
                 }}
               />
