@@ -7,6 +7,7 @@ import { postToApiRegister } from "../../utils/functions/api";
 import { useNavigate, Link } from "react-router-dom";
 import { FormContainer } from "../../components/Form";
 import { ClipLoader } from "react-spinners";
+import { ErrorList } from "../../components/ErrorList";
 
 const RegisterClient = () => {
   const [error, setError] = useState({});
@@ -298,6 +299,7 @@ const RegisterClient = () => {
         <div>
           <input
             type="checkbox"
+            className="w-4 h-4 mr-4 accent-[#30a46c] rounded"
             {...register("terms", {
               required: {
                 value: true,
@@ -333,13 +335,3 @@ const RegisterClient = () => {
 };
 
 export default RegisterClient;
-
-function ErrorList({ errorList }) {
-  return (
-    <ul className="text-red-500">
-      {errorList.map((message) => (
-        <li key={message}>{message}</li>
-      ))}
-    </ul>
-  );
-}
