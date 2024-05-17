@@ -60,7 +60,12 @@ const RegisterClient = () => {
         setError({ ...error, ...data });
       }
     } catch (err) {
-      setError({ ...error, global: err.message });
+      console.error(err);
+      setError({
+        ...error,
+        global:
+          "El proceso de registro. Por favor contacte con el soporte técnico de MuscleMate y le ayudaremos con su incidencia",
+      });
     } finally {
       setLoading(false);
     }
@@ -318,6 +323,8 @@ const RegisterClient = () => {
             <p className="text-red-500">{errors.terms.message}</p>
           )}
         </div>
+
+        {error?.global && <p>{error.global}</p>}
 
         <Button
           type="submit"
