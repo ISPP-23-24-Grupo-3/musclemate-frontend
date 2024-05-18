@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { HiUser, HiLockClosed, HiOutlineMail, HiPhone } from "react-icons/hi";
+import {
+  HiUser,
+  HiLockClosed,
+  HiOutlineMail,
+  HiPhone,
+  HiEye,
+  HiEyeOff,
+} from "react-icons/hi";
 import { HiHome } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button, TextField } from "@radix-ui/themes";
@@ -13,8 +20,18 @@ const RegisterClient = () => {
   const [error, setError] = useState({});
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordCon, setShowPasswordCon] = useState(false);
 
   const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const togglePasswordConVisibility = () => {
+    setShowPasswordCon((showPasswordCon) => !showPasswordCon);
+  };
 
   const {
     register,
@@ -114,6 +131,10 @@ const RegisterClient = () => {
             <TextField.Input
               {...register("name", {
                 required: messages.req,
+                pattern: {
+                  value: /^[a-zA-Z\s]*$/,
+                  message: "El nombre debe contener solo letras, sin acentos",
+                },
                 maxLength: {
                   value: 100,
                   message: "El nombre no puede superar los 100 caracteres",
@@ -137,6 +158,10 @@ const RegisterClient = () => {
             <TextField.Input
               {...register("lastName", {
                 required: messages.req,
+                pattern: {
+                  value: /^[a-zA-Z\s]*$/,
+                  message: "El apellido debe contener solo letras, sin acentos",
+                },
                 maxLength: {
                   value: 100,
                   message: "Los apellidos no puede superar los 100 caracteres",
@@ -259,17 +284,35 @@ const RegisterClient = () => {
               {...register("password", {
                 required: messages.req,
                 minLength: {
-                  value: 10,
-                  message: "La contraseña debe tener más de 10 caracteres",
+                  value: 12,
+                  message: "La contraseña debe tener más de 12 caracteres",
                 },
                 maxLength: {
                   value: 128,
                   message: "La contraseña no puede superar los 128 caracteres",
                 },
+                validate: {
+                  hasNumber: (value) =>
+                    /\d/.test(value) ||
+                    "La contraseña debe contener al menos un número",
+                },
               })}
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
             />
+            <TextField.Slot>
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="ml-3"
+              >
+                {showPassword ? (
+                  <HiEyeOff className="w-6 h-6 text-radixgreen" />
+                ) : (
+                  <HiEye className="w-6 h-6 text-radixgreen" />
+                )}
+              </button>
+            </TextField.Slot>
           </TextField.Root>
           {errors.password && (
             <p className="text-red-500">{errors.password.message}</p>
@@ -291,8 +334,21 @@ const RegisterClient = () => {
                   value === watchPassword || messages.confirmPass,
               })}
               name="passwordConfirmation"
-              type="password"
+              type={showPasswordCon ? "text" : "password"}
             />
+            <TextField.Slot>
+              <button
+                type="button"
+                onClick={togglePasswordConVisibility}
+                className="ml-3"
+              >
+                {showPasswordCon ? (
+                  <HiEyeOff className="w-6 h-6 text-radixgreen" />
+                ) : (
+                  <HiEye className="w-6 h-6 text-radixgreen" />
+                )}
+              </button>
+            </TextField.Slot>
           </TextField.Root>
           {errors.passwordConfirmation && (
             <p className="text-red-500">
