@@ -10,6 +10,7 @@ import { RHFSelect } from "../../components/RHFSelect";
 
 const AddEventsForm = () => {
   const { user } = useContext(AuthContext);
+  const [genError, setGenError] = useState([]);
   const [gyms, setGyms] = useState([]);
   const [gym, setGym] = useState([]);
   const [selectedGym, setSelectedGym] = useState(null);
@@ -45,6 +46,7 @@ const AddEventsForm = () => {
 
   const onSubmit = async (eventInfo) => {
     try {
+      setGenError("");
       const durationHours = Math.floor(eventInfo.duration / 60);
       const durationMinutes = eventInfo.duration % 60;
       const durationSeconds = 0;
@@ -55,23 +57,20 @@ const AddEventsForm = () => {
           ? { ...eventInfo, duration: formattedDuration }
           : { ...eventInfo, duration: formattedDuration, gym: gym?.id };
 
-      const currentDate = new Date().toISOString().split("T")[0];
-      console.log(currentDate);
-      console.log(eventInfo.date);
+      if (eventInfo.attendees > eventInfo.capacity) {
+        setGenError("No es posible apuntar más asistentes que el aforo del evento");
+        throw new Error("No es posible apuntar más asistentes que el aforo del evento");
+      };
 
-      if (eventInfo.date < currentDate) {
-        throw new Error("La fecha debe ser posterior a la fecha actual");
-      } else {
-        const response = await postToApi("events/create/", eventData);
+      const response = await postToApi("events/create/", eventData);
 
-        if (!response.ok) {
-          throw new Error("Error al crear evento");
-        }
-
-        console.log("Evento creado exitosamente");
-        if (user?.rol === "owner") navigate("/owner/events");
-        else if (user?.rol === "gym") navigate("/gym/events");
+      if (!response.ok) {
+        throw new Error("Error al crear evento");
       }
+
+      console.log("Evento creado exitosamente");
+      if (user?.rol === "owner") navigate("/owner/events");
+      else if (user?.rol === "gym") navigate("/gym/events");
     } catch (error) {
       console.error("Hubo un error al crear el evento:", error);
     }
@@ -153,7 +152,7 @@ const AddEventsForm = () => {
               })}
               name="attendees"
               type="number"
-              min="1"
+              min="0"
             />
             {errors.attendees && (
               <p className="text-red-500">{errors.attendees.message}</p>
@@ -239,6 +238,8 @@ const AddEventsForm = () => {
               )}
             </div>
           )}
+
+          {genError && (<p className="text-red-500">{genError}</p>)}
 
           <Button
             type="submit"

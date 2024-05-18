@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import AuthContext from "../../utils/context/AuthContext";
 import {
   HiOutlineUsers,
   HiOutlineTicket,
@@ -17,6 +18,7 @@ import { Checkbox } from "@radix-ui/themes";
 import { RHFSelect } from "../../components/RHFSelect.jsx";
 
 export default function EquipmentDetails() {
+  const { user } = useContext(AuthContext);
   const { eventId } = useParams();
   const [eventDetails, setEventDetails] = useState(null);
   const [isClickable, setIsClickable] = useState(null);
@@ -27,6 +29,8 @@ export default function EquipmentDetails() {
   const [editMode, setEditMode] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const {
     register,
@@ -154,6 +158,10 @@ export default function EquipmentDetails() {
       if (response.ok) {
         // Si la eliminación es exitosa, mostramos el mensaje de éxito
         setDeleteSuccess(true);
+        setTimeout(() => {
+          if (user?.rol === "owner") navigate("/owner/events");
+          else if (user?.rol === "gym") navigate("/gym/events");
+        }, 2000); // Espera 2 segundos antes de redirigir
         return;
       }
       // Si la respuesta no fue exitosa, se ejecutará el código a continuación
