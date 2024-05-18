@@ -12,6 +12,7 @@ const ProfileClient = () => {
   const [isCodeShown, setIsCodeShown] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [clientId, setClientId] = useState(null); // Estado para guardar el ID del cliente
+  const [errors, setErrors] = useState({}); // Estado para guardar los mensajes de error
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -48,14 +49,70 @@ const ProfileClient = () => {
     setEditMode(!editMode);
   };
 
+  const validateInputs = () => {
+    const newErrors = {};
+    const patterns = {
+      mail: /\S+@\S+\.\S+/,
+      phoneNumber: /^\d{9}$/,
+      zipCode: /^\d{5}$/,
+    };
+    const messages = {
+      req: "Este campo es obligatorio",
+      mail: "Debes introducir una dirección correcta",
+      phoneNumber: "Tiene que ser un número de 9 cifras",
+      zipCode: "Tiene que ser un número de 5 cifras",
+    };
+
+    if (!editedUserProfile.name) {
+      newErrors.name = messages.req;
+    }
+    if (!editedUserProfile.last_name) {
+      newErrors.last_name = messages.req;
+    }
+    if (!editedUserProfile.email) {
+      newErrors.email = messages.req;
+    } else if (!patterns.mail.test(editedUserProfile.email)) {
+      newErrors.email = messages.mail;
+    }
+    if (!editedUserProfile.phone_number) {
+      newErrors.phone_number = messages.req;
+    } else if (!patterns.phoneNumber.test(editedUserProfile.phone_number)) {
+      newErrors.phone_number = messages.phoneNumber;
+    }
+    if (!editedUserProfile.address) {
+      newErrors.address = messages.req;
+    }
+    if (!editedUserProfile.city) {
+      newErrors.city = messages.req;
+    }
+    if (!editedUserProfile.zipCode) {
+      newErrors.zipCode = messages.req;
+    } else if (!patterns.zipCode.test(editedUserProfile.zipCode)) {
+      newErrors.zipCode = messages.zipCode;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSaveChanges = async () => {
+    if (!validateInputs()) {
+      return;
+    }
+
     try {
       const response = await putToApi(`clients/update/${clientId}/`, editedUserProfile);
       if (response.ok) {
         setUserProfile(editedUserProfile);
         setEditMode(false);
+        setErrors({});
       } else {
-        console.error("Error updating user:", response.status);
+        const errorData = await response.json();
+        if (errorData.email) {
+          setErrors({ email: "Ya existe un usuario con este email" });
+        } else {
+          console.error("Error updating user:", response.status);
+        }
       }
     } catch (error) {
       console.error("Error updating user:", error);
@@ -102,6 +159,7 @@ const ProfileClient = () => {
                 field="name"
                 onChange={handleInputChange}
                 editedValue={editedUserProfile ? editedUserProfile.name : ""}
+                error={errors.name}
               />
               <UserInfoRow
                 label="Apellidos"
@@ -110,6 +168,7 @@ const ProfileClient = () => {
                 field="last_name"
                 onChange={handleInputChange}
                 editedValue={editedUserProfile ? editedUserProfile.last_name : ""}
+                error={errors.last_name}
               />
               <UserInfoRow
                 label="Fecha de Nacimiento"
@@ -123,6 +182,7 @@ const ProfileClient = () => {
                 field="email"
                 onChange={handleInputChange}
                 editedValue={editedUserProfile ? editedUserProfile.email : ""}
+                error={errors.email}
               />
               <UserInfoRow
                 label="Número de Teléfono"
@@ -131,6 +191,7 @@ const ProfileClient = () => {
                 field="phone_number"
                 onChange={handleInputChange}
                 editedValue={editedUserProfile ? editedUserProfile.phone_number : ""}
+                error={errors.phone_number}
               />
               <UserInfoRow
                 label="Dirección"
@@ -139,6 +200,7 @@ const ProfileClient = () => {
                 field="address"
                 onChange={handleInputChange}
                 editedValue={editedUserProfile ? editedUserProfile.address : ""}
+                error={errors.address}
               />
               <UserInfoRow
                 label="Población"
@@ -147,6 +209,7 @@ const ProfileClient = () => {
                 field="city"
                 onChange={handleInputChange}
                 editedValue={editedUserProfile ? editedUserProfile.city : ""}
+                error={errors.city}
               />
             </div>
             <div className="mt-6">
@@ -179,15 +242,18 @@ const ProfileClient = () => {
   );
 };
 
-const UserInfoRow = ({ label, value, editMode, field, onChange, editedValue, readOnly }) => (
+const UserInfoRow = ({ label, value, editMode, field, onChange, editedValue, error, readOnly }) => (
   <div className="flex flex-col mb-3">
     <span className="text-radixgreen font-bold mb-1">{label}:</span>
     {editMode && !readOnly ? (
-      <TextField.Input
-        type="text"
-        value={editedValue}
-        onChange={(e) => onChange(e, field)}
-      />
+      <>
+        <TextField.Input
+          type="text"
+          value={editedValue}
+          onChange={(e) => onChange(e, field)}
+        />
+        {error && <span className="text-red-500 text-sm">{error}</span>}
+      </>
     ) : (
       <span className="text-black">{value}</span>
     )}
