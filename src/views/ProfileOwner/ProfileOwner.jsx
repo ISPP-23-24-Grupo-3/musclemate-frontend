@@ -6,6 +6,8 @@ import { FormContainer } from "../../components/Form";
 import { RemoveAccount } from "../../components/RemoveAccount";
 import { useForm, Controller } from "react-hook-form";
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const ProfileOwner = () => {
   const { user } = useContext(AuthContext);
   const [ownerProfile, setOwnerProfile] = useState(null);
@@ -32,6 +34,9 @@ const ProfileOwner = () => {
 
   const handleSaveChanges = async (formData) => {
     try {
+
+      console.log(formData)
+      sleep(2000)
       const response = await putToApi(
         `owners/update/${user.username}/`,
         formData,
@@ -70,44 +75,66 @@ const ProfileOwner = () => {
               </Heading>
               <Separator size="4" color="green" />
             </div>
-            <form>
+            <form onSubmit={handleSubmit(handleSaveChanges)}>
               <div className="grid grid-cols-2 gap-x-4">
                 <UserInfoInput
-                  type="text"
                   label="Nombre"
-                  value={ownerProfile ? ownerProfile.name : "Cargando..."}
-                  editMode={editMode}
-                  onChange={(e) => handleInputChange(e, "name")}
+                  name="name"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ required: "Este campo es obligatorio" }}
+                  error={errors.name}
                 />
                 <UserInfoInput
-                  type="text"
                   label="Apellidos"
-                  value={ownerProfile ? ownerProfile.last_name : "Cargando..."}
-                  editMode={editMode}
-                  onChange={(e) => handleInputChange(e, "lastName")}
+                  name="last_name"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ required: "Este campo es obligatorio" }}
+                  error={errors.lastName}
                 />
                 <UserInfoInput
-                  type="text"
                   label="Correo Electrónico"
-                  value={ownerProfile ? ownerProfile.email : "Cargando..."}
-                  editMode={editMode}
-                  onChange={(e) => handleInputChange(e, "email")}
+                  name="email"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ 
+                    required: "Este campo es obligatorio", 
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Correo electrónico inválido"
+                    }
+                  }}
+                  error={errors.email}
                 />
                 <UserInfoInput
-                  type="number"
                   label="Número de Teléfono"
-                  value={
-                    ownerProfile ? ownerProfile.phone_number : "Cargando..."
-                  }
-                  editMode={editMode}
-                  onChange={(e) => handleInputChange(e, "phoneNumber")}
+                  name="phone_number"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ 
+                    required: "Este campo es obligatorio", 
+                    pattern: { 
+                      value: /^[0-9]+$/, 
+                      message: "Ingrese solo números"
+                    }, 
+                    minLength: { value: 9, message: "Mínimo 9 números" }, 
+                    maxLength: { value: 12, message: "Máximo 12 números" } 
+                  }}
+                  error={errors.phoneNumber}
                 />
                 <UserInfoInput
-                  type="text"
                   label="Dirección"
-                  value={ownerProfile ? ownerProfile.address : "Cargando..."}
-                  editMode={editMode}
-                  onChange={(e) => handleInputChange(e, "address")}
+                  name="address"
+                  control={control}
+                  defaultValue=""
+                  disabled={!editMode}
+                  rules={{ required: "Este campo es obligatorio" }}
+                  error={errors.address}
                 />
               </div>
               <div className="mt-4 text-center">
