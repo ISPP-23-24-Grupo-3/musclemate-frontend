@@ -11,8 +11,8 @@ const ProfileClient = () => {
   const [editedUserProfile, setEditedUserProfile] = useState(null);
   const [isCodeShown, setIsCodeShown] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [clientId, setClientId] = useState(null); // Estado para guardar el ID del cliente
-  const [errors, setErrors] = useState({}); // Estado para guardar los mensajes de error
+  const [clientId, setClientId] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -22,7 +22,7 @@ const ProfileClient = () => {
           if (profileResponse.ok) {
             const profileData = await profileResponse.json();
             setUserProfile(profileData);
-            setClientId(profileData.id); // Guardar el ID del cliente
+            setClientId(profileData.id);
           } else {
             console.error("Error fetching user profile:", profileResponse.status);
           }
@@ -55,36 +55,56 @@ const ProfileClient = () => {
       mail: /\S+@\S+\.\S+/,
       phoneNumber: /^\d{9}$/,
       zipCode: /^\d{5}$/,
+      noNumbers: /^[^0-9]*$/,
     };
     const messages = {
       req: "Este campo es obligatorio",
-      mail: "Debes introducir una dirección correcta",
+      mail: "Debes introducir una dirección de correo electrónico correcta",
       phoneNumber: "Tiene que ser un número de 9 cifras",
       zipCode: "Tiene que ser un número de 5 cifras",
+      noNumbers: "Este campo no puede contener números",
     };
 
     if (!editedUserProfile.name) {
       newErrors.name = messages.req;
+    } else if (editedUserProfile.name.length > 100) {
+      newErrors.name = "El nombre no puede superar los 100 caracteres";
+    } else if (!patterns.noNumbers.test(editedUserProfile.name)) {
+      newErrors.name = messages.noNumbers;
     }
+
     if (!editedUserProfile.last_name) {
       newErrors.last_name = messages.req;
+    } else if (editedUserProfile.last_name.length > 100) {
+      newErrors.last_name = "Los apellidos no pueden superar los 100 caracteres";
+    } else if (!patterns.noNumbers.test(editedUserProfile.last_name)) {
+      newErrors.last_name = messages.noNumbers;
     }
+
     if (!editedUserProfile.email) {
       newErrors.email = messages.req;
     } else if (!patterns.mail.test(editedUserProfile.email)) {
       newErrors.email = messages.mail;
     }
+
     if (!editedUserProfile.phone_number) {
       newErrors.phone_number = messages.req;
     } else if (!patterns.phoneNumber.test(editedUserProfile.phone_number)) {
       newErrors.phone_number = messages.phoneNumber;
     }
+
     if (!editedUserProfile.address) {
       newErrors.address = messages.req;
+    } else if (editedUserProfile.address.length > 255) {
+      newErrors.address = "La dirección no puede superar los 255 caracteres";
     }
+
     if (!editedUserProfile.city) {
       newErrors.city = messages.req;
+    } else if (editedUserProfile.city.length > 100) {
+      newErrors.city = "La ciudad no puede superar los 100 caracteres";
     }
+
     if (!editedUserProfile.zipCode) {
       newErrors.zipCode = messages.req;
     } else if (!patterns.zipCode.test(editedUserProfile.zipCode)) {
