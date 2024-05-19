@@ -52,14 +52,14 @@ const ProfileClient = () => {
   const validateInputs = () => {
     const newErrors = {};
     const patterns = {
-      mail: /\S+@\S+\.\S+/,
+      mail: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
       phoneNumber: /^\d{9}$/,
       zipCode: /^\d{5}$/,
       noNumbers: /^[^0-9]*$/,
     };
     const messages = {
       req: "Este campo es obligatorio",
-      mail: "Debes introducir una dirección de correo electrónico correcta",
+      mail: "Debes introducir una dirección de correo electrónico correcta y sin acentos",
       phoneNumber: "Tiene que ser un número de 9 cifras",
       zipCode: "Tiene que ser un número de 5 cifras",
       noNumbers: "Este campo no puede contener números",
