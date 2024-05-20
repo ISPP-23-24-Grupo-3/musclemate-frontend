@@ -54,6 +54,26 @@ export default function MachineList() {
         });
     }
   }, [machines]);
+  const translateMuscularGroup = (group) => {
+    switch (group) {
+      case "arms":
+        return "Brazos";
+      case "legs":
+        return "Piernas";
+      case "core":
+        return "Core";
+      case "chest":
+        return "Pecho";
+      case "back":
+        return "Espalda";
+      case "shoulders":
+        return "Hombros";
+      case "other":
+        return "Otros";
+      default:
+        return group;
+    }
+  };
 
   function actualRate(ratings, length) {
     var value = 0;
@@ -170,7 +190,7 @@ export default function MachineList() {
                     onClick={() => removeFilter(f)}
                   >
                     <IoIosClose className="size-4" />
-                    {f}
+                    {translateMuscularGroup(f)}
                   </Button>
                 ))}
               </div>
