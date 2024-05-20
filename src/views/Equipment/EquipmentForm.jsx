@@ -6,9 +6,10 @@ import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
 import { GymSelect } from "../../components/Gyms";
-import { RHFSelect } from "../../components/RHFSelect";
+import { RHFMultiSelect } from "../../components/RHFMultiSelect";
 import axios from "axios";
 import { EquipmentImage } from "../../components/Images";
+
 
 const GymMachineForm = () => {
   const navigate = useNavigate();
@@ -29,16 +30,44 @@ const GymMachineForm = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
+
+  const translateMuscularGroup = (group) => {
+    switch (group) {
+      case "arms":
+        return "Brazos";
+      case "legs":
+        return "Piernas";
+      case "core":
+        return "Core";
+      case "chest":
+        return "Pecho";
+      case "back":
+        return "Espalda";
+      case "shoulders":
+        return "Hombros";
+      case "other":
+        return "Otros";
+      default:
+        return group;
+    }
+  };
 
   const onSubmit = async (machineInfo) => {
     if (user?.rol === "gym") machineInfo.gym = gym.id;
     try {
       const formData = new FormData();
-      Object.keys(machineInfo).forEach((key) => {
-        formData.append(key, machineInfo[key]);
-      });
+      
+      formData.append("name", machineInfo.name);
+      formData.append("brand", machineInfo.brand);
+      formData.append("serial_number", machineInfo.serial_number);
+      formData.append("description", machineInfo.description);
+      const muscularGroupArray = machineInfo.muscular_group;
+      muscularGroupArray.forEach(item => formData.append("muscular_group", item));
+      formData.append("gym", machineInfo.gym);
       formData.set("image", machineInfo.image[0]);
+      console.log(formData);
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/equipments/create/`,
         formData,
@@ -65,10 +94,12 @@ const GymMachineForm = () => {
     req: "Este campo es obligatorio",
     name: "El nombre de la máquina debe tener más de 5 caracteres",
     brand: "La marca debe tener más de 3 caracteres",
-    reference: "El número de referencia debe ser único por gimnasio",
+    serialNumber: "El número de serie debe ser único por gimnasio",
     description: "La descripción debe tener más de 10 caracteres",
     muscularGroup: "El grupo muscular debe ser especificado",
   };
+
+  const selectedMuscularGroups = watch("muscular_group", []);
 
   return (
     <div className="max-w-xl mx-auto">
@@ -97,6 +128,16 @@ const GymMachineForm = () => {
           Agregar máquina de gimnasio
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+          {user?.rol === "owner" && (
+            <div className="flex flex-col">
+              <label htmlFor="gym">Gimnasio</label>
+              <GymSelect {...register("gym", { required: messages.req })} />
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col">
             <label htmlFor="name" className="mr-3">
               Nombre de la máquina
@@ -133,14 +174,14 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="serial_number" className="mr-3">
-              Número de referencia
+              Número de serie
             </label>
             <TextField.Input
               {...register("serial_number", {
                 required: messages.req,
                 pattern: {
                   value: /^[0-9]+$/,
-                  message: "El número de referencia debe ser numérico",
+                  message: "El número de serie debe ser numérico",
                 },
               })}
               name="serial_number"
@@ -156,7 +197,7 @@ const GymMachineForm = () => {
               Imagen
             </label>
             <input
-              {...register("image")}
+              {...register("image", {required: messages.req})}
               type="file"
               onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
             />
@@ -194,30 +235,54 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="muscular_group">Grupo muscular</label>
-            <RHFSelect
-              placeholder="Selecciona un grupo muscular"
+            <RHFMultiSelect
+              placeholder="Selecciona grupo muscular"
               {...register("muscular_group", { required: messages.req })}
             >
-              <Select.Item value="arms">Brazos</Select.Item>
-              <Select.Item value="legs">Piernas</Select.Item>
-              <Select.Item value="core">Abdominales</Select.Item>
-              <Select.Item value="chest">Pecho</Select.Item>
-              <Select.Item value="back">Espalda</Select.Item>
-              <Select.Item value="shoulders">Hombros</Select.Item>
-              <Select.Item value="other">Otros</Select.Item>
-            </RHFSelect>
+              <div>
+                <input type="checkbox" value="arms" {...register("muscular_group")} />
+                <label>Brazos</label>
+              </div>
+              <div>
+                <input type="checkbox" value="legs" {...register("muscular_group")} />
+                <label>Piernas</label>
+              </div>
+              <div>
+                <input type="checkbox" value="core" {...register("muscular_group")} />
+                <label>Abdominales</label>
+              </div>
+              <div>
+                <input type="checkbox" value="chest" {...register("muscular_group")} />
+                <label>Pecho</label>
+              </div>
+              <div>
+                <input type="checkbox" value="back" {...register("muscular_group")} />
+                <label>Espalda</label>
+              </div>
+              <div>
+                <input type="checkbox" value="shoulders" {...register("muscular_group")} />
+                <label>Hombros</label>
+              </div>
+              <div>
+                <input type="checkbox" value="other" {...register("muscular_group")} />
+                <label>Otros</label>
+              </div>
+            </RHFMultiSelect>
             {errors.muscular_group && (
               <p className="text-red-500">{errors.muscular_group.message}</p>
             )}
           </div>
 
-          {user?.rol === "owner" && (
-            <div className="flex flex-col ">
-              <label htmlFor="gym">Gimnasio</label>
-              <GymSelect {...register("gym", { required: messages.req })} />
-              {errors.gym && (
-                <p className="text-red-500">{errors.gym.message}</p>
-              )}
+          {selectedMuscularGroups.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {selectedMuscularGroups.map((group) => (
+                <span
+                  key={group}
+                  className="px-2 py-1 bg-gray-200 rounded-md text-sm"
+                >
+                  {translateMuscularGroup(group)}
+                </span>
+              ))}
             </div>
           )}
 

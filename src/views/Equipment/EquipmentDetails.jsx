@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   getFromApi,
   putToApi,
@@ -15,7 +16,7 @@ import {
   TextFieldInput,
 } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form.jsx";
-
+import { RHFMultiSelect } from "../../components/RHFMultiSelect";
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 import { Checkbox } from "@radix-ui/themes";
@@ -46,6 +47,16 @@ export default function EquipmentDetails() {
   const [updatedDetails, setUpdatedDetails] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
 
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
+  const selectedMuscularGroups = watch("muscular_group", []);
+
+  
   // Opciones de grupo muscular
   const muscularGroupOptions = [
     { value: "arms", label: "Brazos" },
@@ -87,6 +98,7 @@ export default function EquipmentDetails() {
       })
       .then((data) => {
         setMachineDetails(data);
+        console.log(data.muscular_group);
         // Cambio aquí para obtener el nombre del gimnasio
         if (data.gym) {
           const gymId = data.gym;
@@ -284,27 +296,37 @@ export default function EquipmentDetails() {
   const handleSaveChanges = async () => {
     try {
       const formData = new FormData();
-      Object.keys(updatedDetails).forEach((key) => {
-        formData.append(key, updatedDetails[key]);
-      });
+  
+      formData.append("name", updatedDetails.name);
+      const muscularGroupArray = updatedDetails.muscular_group;
+      muscularGroupArray.forEach(item => formData.append("muscular_group", item));
+      formData.append("description", updatedDetails.description);
+      formData.append("brand", updatedDetails.brand);
+      formData.append("serial_number", updatedDetails.serial_number);
+
+      // Sólo agregar la imagen si se ha seleccionado una nueva
+      if (updatedDetails.image && updatedDetails.image !== machineDetails.image) {
+        formData.append("image", updatedDetails.image);
+      }
 
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/equipments/update/${equipmentId}/`,
-        updatedDetails,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${JSON.parse(localStorage.getItem("authTokens"))?.access}`,
           },
-        },
+        }
       );
-
+  
       setMachineDetails(response.data);
       setEditMode(false);
     } catch (error) {
       setError("Error al guardar los cambios.");
     }
   };
+  
 
   const handleDelete = async () => {
     try {
@@ -312,6 +334,10 @@ export default function EquipmentDetails() {
       if (response.ok) {
         // Si la eliminación es exitosa, mostramos el mensaje de éxito
         setDeleteSuccess(true);
+        setTimeout(() => {
+          navigate("/owner/equipments/");
+        }, 2000); // Espera 2 segundos antes de redirigir
+
         return;
       }
       // Si la respuesta no fue exitosa, se ejecutará el código a continuación
@@ -335,7 +361,10 @@ export default function EquipmentDetails() {
   return (
     <div className="max-w-xl mx-auto">
       {deleteSuccess && (
-        <FormContainer role="alert">
+        <div
+        className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+        role="alert"
+        >
           <strong className="font-bold">Éxito!</strong>
           <span className="block sm:inline">
             {" "}
@@ -355,7 +384,7 @@ export default function EquipmentDetails() {
               <path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z" />
             </svg>
           </span>
-        </FormContainer>
+        </div>
       )}
       <FormContainer>
         <Heading size="7" className="text-radixgreen !mb-3 text-center">
@@ -408,7 +437,8 @@ export default function EquipmentDetails() {
           <div className={`flex ${editMode ? "flex-col" : "gap-1"}`}>
             <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
             {editMode ? (
-              <RHFSelect
+              <>
+              <RHFMultiSelect
                 name="muscular_group"
                 defaultValue={updatedDetails.muscular_group}
                 onChange={(e) =>
@@ -420,11 +450,29 @@ export default function EquipmentDetails() {
                     {option.label}
                   </Select.Item>
                 ))}
-              </RHFSelect>
+              </RHFMultiSelect>
+               <div className="flex flex-wrap gap-2 mt-4">
+                  {updatedDetails.muscular_group.map((group) => (
+                    <span
+                      key={group}
+                      className="px-2 py-1 bg-gray-200 rounded-md text-sm"
+                    >
+                      {translateMuscularGroup(group)}
+                    </span>
+                  ))}
+                </div>
+              </>
             ) : (
-              <span>
-                {translateMuscularGroup(machineDetails.muscular_group)}
-              </span>
+              
+              machineDetails.muscular_group.map((option, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 bg-radixgreen rounded-md text-sm text-white"
+                >
+                  {translateMuscularGroup(option)}
+                </span>
+              ))
+
             )}
           </div>
           <div>

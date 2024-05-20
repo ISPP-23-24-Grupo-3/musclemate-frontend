@@ -1,11 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import { HiUser, HiLockClosed, HiOutlineMail, HiPhone } from "react-icons/hi";
 import {
-  HiBuildingOffice2,
-  HiHome,
-  HiMiniCake,
-  HiMiniIdentification,
-} from "react-icons/hi2";
+  HiUser,
+  HiLockClosed,
+  HiOutlineMail,
+  HiPhone,
+  HiEyeOff,
+  HiEye,
+} from "react-icons/hi";
+import { HiBuildingOffice2, HiHome, HiMiniCake } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { Button, Select, TextField, TextFieldSlot } from "@radix-ui/themes";
 import { getFromApi, postToApi } from "../../utils/functions/api";
@@ -26,7 +28,17 @@ const UserRegister = () => {
   const [errorMessageMail, setErrorMessageMail] = useState("");
   const [errorMessageDate, setErrorMessageDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [showPasswordCon, setShowPasswordCon] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const togglePasswordConVisibility = () => {
+    setShowPasswordCon((showPasswordCon) => !showPasswordCon);
+  };
 
   const handleEmailChange = () => {
     setErrorMessageMail(null); // Limpiar el mensaje de error del email
@@ -64,9 +76,9 @@ const UserRegister = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
-  } = useForm();
+  } = useForm({ mode: "onBlur" });
 
   const onSubmit = async (formData) => {
     setLoading(true);
@@ -85,11 +97,28 @@ const UserRegister = () => {
         password,
       } = formData;
 
+      console.log(birth);
+      const lowDate = new Date("1920-01-01");
       const birthDate = new Date(birth);
-      const currentDate = new Date();
-      if (birthDate > currentDate) {
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+      if (birthDate > today) {
         setErrorMessageDate("La fecha de nacimiento no puede ser futura");
         return;
+      } else if (age < 12) {
+        setErrorMessageDate("Debes tener al menos 12 años para registrarte.");
+        return;
+      } else if (birthDate < lowDate) {
+        setErrorMessageDate(
+          "La fecha de nacimiento no puede ser anterior a 1920 "
+        );
       } else {
         // Si la fecha de nacimiento es válida, limpiar el mensaje de error
         setErrorMessageDate(null);
@@ -97,11 +126,11 @@ const UserRegister = () => {
 
       const requestBody = {
         name,
-        last_name:lastName,
+        last_name: lastName,
         email,
         birth,
         gender,
-        phone_number:phoneNumber,
+        phone_number: phoneNumber,
         address,
         city,
         zipCode,
@@ -111,24 +140,32 @@ const UserRegister = () => {
         },
         gym: user?.rol === "owner" ? formData.gym : gym.id,
       };
-
-      const response = await postToApi("clients/create/", requestBody);
-      if (!response.ok) {
-        const data = await response.json();
-        if (data.username) {
-          setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
-        } else if (data.email) {
-          setErrorMessageMail("Ya existe un usuario con este email");
-        } else {
-          setError("Hubo un error al crear el propietario");
+      if (
+        error === null &&
+        errorMessageMail === null &&
+        errorMessageDate === null &&
+        errorMessageUser === null
+      ) {
+        const response = await postToApi("clients/create/", requestBody);
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.username) {
+            setErrorMessageUser(
+              "Este nombre de usuario ya existe, prueba con otro"
+            );
+          } else if (data.email) {
+            setErrorMessageMail("Ya existe un usuario con este email");
+          } else {
+            setError("Hubo un error al crear el propietario");
+          }
+          return;
         }
-        return;
+        setError(null);
+        setErrorMessageUser(null);
+        setErrorMessageMail(null);
+        if (user?.rol === "owner") navigate("/owner/users");
+        else if (user?.rol === "gym") navigate("/gym/users");
       }
-      setError(null);
-      setErrorMessageUser(null);
-      setErrorMessageMail(null);
-      if (user?.rol === "owner") navigate("/owner/users");
-      else if (user?.rol === "gym") navigate("/gym/users");
     } catch (error) {
       console.error("Hubo un error al crear el usuario:", error);
     } finally {
@@ -142,7 +179,7 @@ const UserRegister = () => {
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
     phoneNumber: "Tiene que ser un número de 9 cifras",
-    zipCode: "Tiene que ser un númeroo de 5 cifras",
+    zipCode: "Tiene que ser un número de 5 cifras",
     confirmPass: "Las contraseñas no coinciden",
   };
 
@@ -175,6 +212,10 @@ const UserRegister = () => {
               <TextField.Input
                 {...register("name", {
                   required: messages.req,
+                  pattern: {
+                    value: /^[a-zA-Z\sáéíóúÁÉÍÓÚ]*$/,
+                    message: "El nombre debe contener solo letras",
+                  },
                   maxLength: {
                     value: 100,
                     message: "El nombre no puede superar los 100 caracteres",
@@ -194,6 +235,10 @@ const UserRegister = () => {
             <TextField.Root
               {...register("lastName", {
                 required: messages.req,
+                pattern: {
+                  value: /^[a-zA-Z\sáéíóúÁÉÍÓÚ]*$/,
+                  message: "El apellido debe contener solo letras",
+                },
                 maxLength: {
                   value: 100,
                   message: "Los apellidos no puede superar los 100 caracteres",
@@ -318,7 +363,7 @@ const UserRegister = () => {
             <label htmlFor="city">Ciudad</label>
             <TextField.Root>
               <TextField.Slot>
-                <HiBuildingOffice2 className="size-6 text-radixgreen mr-3" />
+                <HiBuildingOffice2 className="size-6 text-radixgreen" />
               </TextField.Slot>
               <TextField.Input
                 {...register("city", {
@@ -341,7 +386,7 @@ const UserRegister = () => {
             <label htmlFor="zipCode">Código Postal</label>
             <TextField.Root>
               <TextField.Slot>
-                <HiBuildingOffice2 className="size-6 text-radixgreen mr-3" />
+                <HiBuildingOffice2 className="size-6 text-radixgreen" />
               </TextField.Slot>
               <TextField.Input
                 {...register("zipCode", {
@@ -366,7 +411,7 @@ const UserRegister = () => {
             </label>
             <TextField.Root>
               <TextField.Slot>
-                <HiHome className="size-6 text-radixgreen mr-3" />
+                <HiHome className="size-6 text-radixgreen" />
               </TextField.Slot>
               <TextField.Input
                 {...register("username", {
@@ -396,7 +441,7 @@ const UserRegister = () => {
             </label>
             <TextField.Root>
               <TextField.Slot>
-                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
+                <HiLockClosed className="size-6 text-radixgreen" />
               </TextField.Slot>
               <TextField.Input
                 {...register("password", {
@@ -410,10 +455,28 @@ const UserRegister = () => {
                     message:
                       "La contraseña no puede superar los 128 caracteres",
                   },
+                  validate: {
+                    hasNumber: (value) =>
+                      /\d/.test(value) ||
+                      "La contraseña debe contener al menos un número",
+                  },
                 })}
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
               />
+              <TextField.Slot>
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="ml-3"
+                >
+                  {showPassword ? (
+                    <HiEyeOff className="w-6 h-6 text-radixgreen" />
+                  ) : (
+                    <HiEye className="w-6 h-6 text-radixgreen" />
+                  )}
+                </button>
+              </TextField.Slot>
             </TextField.Root>
             {errors.password && (
               <p className="text-red-500">{errors.password.message}</p>
@@ -426,7 +489,7 @@ const UserRegister = () => {
             </label>
             <TextField.Root>
               <TextField.Slot>
-                <HiLockClosed className="w-6 h-6 text-radixgreen mr-3" />
+                <HiLockClosed className="size-6 text-radixgreen" />
               </TextField.Slot>
               <TextField.Input
                 {...register("passwordConfirmation", {
@@ -435,12 +498,27 @@ const UserRegister = () => {
                     value === watchPassword || messages.confirmPass,
                 })}
                 name="passwordConfirmation"
-                type="password"
+                type={showPasswordCon ? "text" : "password"}
                 onChange={handlePasswordConfirmationChange}
               />
+              <TextField.Slot>
+                <button
+                  type="button"
+                  onClick={togglePasswordConVisibility}
+                  className="ml-3"
+                >
+                  {showPasswordCon ? (
+                    <HiEyeOff className="w-6 h-6 text-radixgreen" />
+                  ) : (
+                    <HiEye className="w-6 h-6 text-radixgreen" />
+                  )}
+                </button>
+              </TextField.Slot>
             </TextField.Root>
             {errors.passwordConfirmation && (
-              <p className="text-red-500">{errors.passwordConfirmation.message}</p>
+              <p className="text-red-500">
+                {errors.passwordConfirmation.message}
+              </p>
             )}
           </div>
 
@@ -463,8 +541,9 @@ const UserRegister = () => {
             variant="solid"
             color="green"
             className="w-full py-3"
+            disabled={!isValid}
           >
-            {loading ? <ClipLoader color="#ffffff" /> : 'Registrar'}
+            {loading ? <ClipLoader color="#ffffff" /> : "Registrar"}
           </Button>
         </form>
       </FormContainer>
