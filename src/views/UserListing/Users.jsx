@@ -21,7 +21,9 @@ const Users = () => {
     const result = users
       .filter(
         (user) =>
-          user.name.toLowerCase().includes(search.toLowerCase())
+          user.name.toLowerCase().includes(search.toLowerCase()) ||
+          user.last_name.toLowerCase().includes(search.toLowerCase())
+
       )
       .filter((user) =>
         filters != 0
@@ -140,7 +142,7 @@ const Users = () => {
                 >
                   <div className="flex flex-col">
                     <p className="font-semibold">
-                      {users.name} {users.lastName}
+                      {users.name} {users.last_name}
                     </p>
                   </div>
                   <div className="flex flex-col items-start gap-1">

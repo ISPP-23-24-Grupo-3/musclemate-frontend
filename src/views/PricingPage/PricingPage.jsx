@@ -21,7 +21,7 @@ function PricingPage() {
     <div className="px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <div className="text-center text-[#333]">
-          <Heading size="8" className="text-radixgreen !mt-8 !mb-3 text-center">Planes de subscripción</Heading>
+          <Heading size="8" className="text-radixgreen !mt-8 !mb-3 text-center">Planes de suscripción</Heading>
           <div className="flex justify-center items-center">
             {loading && <MoonLoader color="#30A46C" loading={loading}  speedMultiplier={0.5}/>}
           </div>
