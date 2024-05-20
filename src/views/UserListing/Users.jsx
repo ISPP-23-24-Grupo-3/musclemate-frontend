@@ -16,6 +16,18 @@ const Users = () => {
   const [search, setSearch] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [open, setOpen] = useState(false);
+  const [gyms, setGyms] = useState([]);
+  const [selectedGym, setSelectedGym] = useState("");
+
+  useEffect(() => {
+    async function fetchGyms() {
+      const response = await getFromApi("gyms/");
+      const data = await response.json();
+      setGyms(data);
+    }
+    fetchGyms();
+  }, []);
+
 
   useEffect(() => {
     const result = users
@@ -29,10 +41,13 @@ const Users = () => {
         filters != 0
           ? filters.some((f) => (user.register ? "Activa" : "Caducada") === f)
           : true
+      )
+      .filter((user) =>
+        selectedGym ? user.gym === selectedGym : true
       );
-  
+
     setFilteredUsers(result);
-  }, [users, search, filters]);
+  }, [users, search, filters, selectedGym,gyms]);
 
   const addFilter = (filter) => setFilters([filter, ...filters]);
   const removeFilter = (filter) =>
@@ -50,7 +65,7 @@ const Users = () => {
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [selectedGym,gyms]);
 
   return (
     <>
@@ -98,7 +113,7 @@ const Users = () => {
             </PopoverAnchor>
 
             <Popover.Content>
-              <div className="flex"></div>
+              <div className="flex">
               <span className="text-lg font-bold">Filtrar por Matrícula</span>
               <div className="flex gap-3">
                 {MATRICULA.map((m) => (
@@ -115,6 +130,30 @@ const Users = () => {
                   </Toggle.Root>
                 ))}
               </div>
+              <div className="flex">
+              <span className="text-lg font-bold mt-4">Filtrar por Gimnasio</span>
+              <div className="flex gap-3">
+                    {gyms.map((gym) => (
+                      <Toggle.Root
+                        key={gym.id}
+                        pressed={selectedGym === gym.id}
+                        className={`capitalize transition-colors bg-radixgreen/10 text-radixgreen ${
+                          selectedGym === gym.id
+                            ? "data-state-on:bg-radixgreen data-state-on:text-white"
+                            : ""
+                        } 
+                          py-1 px-2 border border-radixgreen rounded-full`}
+                        onPressedChange={(p) => {
+                          p ? setSelectedGym(gym.id) : setSelectedGym(null);
+                          setOpen(false);
+                        }}
+                      >
+                        {gym.name}
+                      </Toggle.Root>
+                    ))}
+                  </div>
+              </div>
+            </div>
             </Popover.Content>
           </Popover.Root>
         </div>
