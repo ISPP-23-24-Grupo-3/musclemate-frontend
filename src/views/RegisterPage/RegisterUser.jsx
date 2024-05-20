@@ -88,15 +88,23 @@ const UserRegister = () => {
       console.log(birth);
       const lowDate = new Date("1920-01-01");
       const birthDate = new Date(birth);
-      const currentDate = new Date();
-      console.log(birthDate);
-      console.log(birthDate > currentDate);
-      if (birthDate > currentDate) {
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (birthDate > today) {
         setErrorMessageDate("La fecha de nacimiento no puede ser futura");
         return;
-      } else if (birthDate < lowDate){
+      } 
+      else if (age < 12) {
+        setErrorMessageDate("Debes tener al menos 12 años para registrarte.");
+        return;
+      }
+      else if (birthDate < lowDate){
         setErrorMessageDate("La fecha de nacimiento no puede ser anterior a 1920 ");
-      } else {
+      else {
         // Si la fecha de nacimiento es válida, limpiar el mensaje de error
         setErrorMessageDate(null);
       }
