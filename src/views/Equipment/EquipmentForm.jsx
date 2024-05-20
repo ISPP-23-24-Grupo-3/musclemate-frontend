@@ -65,7 +65,7 @@ const GymMachineForm = () => {
     req: "Este campo es obligatorio",
     name: "El nombre de la máquina debe tener más de 5 caracteres",
     brand: "La marca debe tener más de 3 caracteres",
-    reference: "El número de referencia debe ser único por gimnasio",
+    serialNumber: "El número de serie debe ser único por gimnasio",
     description: "La descripción debe tener más de 10 caracteres",
     muscularGroup: "El grupo muscular debe ser especificado",
   };
@@ -97,6 +97,16 @@ const GymMachineForm = () => {
           Agregar máquina de gimnasio
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+          {user?.rol === "owner" && (
+            <div className="flex flex-col">
+              <label htmlFor="gym">Gimnasio</label>
+              <GymSelect {...register("gym", { required: messages.req })} />
+              {errors.gym && (
+                <p className="text-red-500">{errors.gym.message}</p>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col">
             <label htmlFor="name" className="mr-3">
               Nombre de la máquina
@@ -133,14 +143,14 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="serial_number" className="mr-3">
-              Número de referencia
+              Número de serie
             </label>
             <TextField.Input
               {...register("serial_number", {
                 required: messages.req,
                 pattern: {
                   value: /^[0-9]+$/,
-                  message: "El número de referencia debe ser numérico",
+                  message: "El número de serie debe ser numérico",
                 },
               })}
               name="serial_number"
@@ -210,16 +220,6 @@ const GymMachineForm = () => {
               <p className="text-red-500">{errors.muscular_group.message}</p>
             )}
           </div>
-
-          {user?.rol === "owner" && (
-            <div className="flex flex-col ">
-              <label htmlFor="gym">Gimnasio</label>
-              <GymSelect {...register("gym", { required: messages.req })} />
-              {errors.gym && (
-                <p className="text-red-500">{errors.gym.message}</p>
-              )}
-            </div>
-          )}
 
           <Button
             type="submit"

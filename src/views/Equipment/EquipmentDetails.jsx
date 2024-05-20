@@ -281,30 +281,53 @@ export default function EquipmentDetails() {
     setEditMode(!editMode);
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUpdatedDetails((prevDetails) => ({
+        ...prevDetails,
+        image: file,
+      }));
+      setUpdateImage(URL.createObjectURL(file));
+    } else {
+      // Mantener la imagen actual
+      setUpdatedDetails((prevDetails) => ({
+        ...prevDetails,
+        image: machineDetails.image, // Asumiendo que `machineDetails.image` contiene la URL de la imagen actual
+      }));
+      setUpdateImage(null); // Limpiar la URL de la imagen
+    }
+  };
+  
+  
+
   const handleSaveChanges = async () => {
     try {
       const formData = new FormData();
       Object.keys(updatedDetails).forEach((key) => {
+        if (key === "image" && !updatedDetails.image) return; // Omitir si no hay una nueva imagen seleccionada
         formData.append(key, updatedDetails[key]);
       });
-
+  
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/equipments/update/${equipmentId}/`,
-        updatedDetails,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${JSON.parse(localStorage.getItem("authTokens"))?.access}`,
           },
-        },
+        }
       );
-
+  
       setMachineDetails(response.data);
       setEditMode(false);
     } catch (error) {
       setError("Error al guardar los cambios.");
     }
   };
+  
+  
 
   const handleDelete = async () => {
     try {
@@ -335,7 +358,10 @@ export default function EquipmentDetails() {
   return (
     <div className="max-w-xl mx-auto">
       {deleteSuccess && (
-        <FormContainer role="alert">
+        <div
+        className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+        role="alert"
+        >
           <strong className="font-bold">Éxito!</strong>
           <span className="block sm:inline">
             {" "}
@@ -355,7 +381,7 @@ export default function EquipmentDetails() {
               <path d="M14.354 5.354a2 2 0 00-2.828 0L10 7.172 7.172 5.354a2 2 0 10-2.828 2.828L7.172 10l-2.828 2.828a2 2 0 102.828 2.828L10 12.828l2.828 2.828a2 2 0 102.828-2.828L12.828 10l2.828-2.828a2 2 0 000-2.828z" />
             </svg>
           </span>
-        </FormContainer>
+        </div>
       )}
       <FormContainer>
         <Heading size="7" className="text-radixgreen !mb-3 text-center">
@@ -448,19 +474,13 @@ export default function EquipmentDetails() {
                   type="file"
                   id="image"
                   accept="image/*"
-                  onChange={(e) => {
-                    setUpdatedDetails((d) => {
-                      const obj = { ...d, image: e.target.files[0] };
-                      setUpdateImage(URL.createObjectURL(e.target.files[0]));
-                      return obj;
-                    });
-                  }}
+                  onChange={handleImageChange}
                 />
-                {(updateImage && (
+                {updateImage ? (
                   <span className="size-36 rounded-xl border-2 border-radixgreen overflow-hidden">
                     <img src={updateImage} />
                   </span>
-                )) || (
+                ) : (
                   <EquipmentImage
                     equipment={machineDetails}
                     className="size-36 rounded-xl border-2 border-radixgreen"
