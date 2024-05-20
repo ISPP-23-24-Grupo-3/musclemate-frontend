@@ -281,34 +281,21 @@ export default function EquipmentDetails() {
     setEditMode(!editMode);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUpdatedDetails((prevDetails) => ({
-        ...prevDetails,
-        image: file,
-      }));
-      setUpdateImage(URL.createObjectURL(file));
-    } else {
-      // Mantener la imagen actual
-      setUpdatedDetails((prevDetails) => ({
-        ...prevDetails,
-        image: machineDetails.image, // Asumiendo que `machineDetails.image` contiene la URL de la imagen actual
-      }));
-      setUpdateImage(null); // Limpiar la URL de la imagen
-    }
-  };
-  
-  
-
   const handleSaveChanges = async () => {
     try {
       const formData = new FormData();
-      Object.keys(updatedDetails).forEach((key) => {
-        if (key === "image" && !updatedDetails.image) return; // Omitir si no hay una nueva imagen seleccionada
-        formData.append(key, updatedDetails[key]);
-      });
   
+      formData.append("name", updatedDetails.name);
+      formData.append("muscular_group", updatedDetails.muscular_group);
+      formData.append("description", updatedDetails.description);
+      formData.append("brand", updatedDetails.brand);
+      formData.append("serial_number", updatedDetails.serial_number);
+
+      // Sólo agregar la imagen si se ha seleccionado una nueva
+      if (updatedDetails.image && updatedDetails.image !== machineDetails.image) {
+        formData.append("image", updatedDetails.image);
+      }
+
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/equipments/update/${equipmentId}/`,
         formData,
@@ -326,7 +313,6 @@ export default function EquipmentDetails() {
       setError("Error al guardar los cambios.");
     }
   };
-  
   
 
   const handleDelete = async () => {
@@ -474,13 +460,19 @@ export default function EquipmentDetails() {
                   type="file"
                   id="image"
                   accept="image/*"
-                  onChange={handleImageChange}
+                  onChange={(e) => {
+                    setUpdatedDetails((d) => {
+                      const obj = { ...d, image: e.target.files[0] };
+                      setUpdateImage(URL.createObjectURL(e.target.files[0]));
+                      return obj;
+                    });
+                  }}
                 />
-                {updateImage ? (
+                {(updateImage && (
                   <span className="size-36 rounded-xl border-2 border-radixgreen overflow-hidden">
                     <img src={updateImage} />
                   </span>
-                ) : (
+                )) || (
                   <EquipmentImage
                     equipment={machineDetails}
                     className="size-36 rounded-xl border-2 border-radixgreen"

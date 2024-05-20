@@ -6,9 +6,10 @@ import { getFromApi, postToApi } from "../../utils/functions/api";
 import { useNavigate } from "react-router";
 import { FormContainer } from "../../components/Form";
 import { GymSelect } from "../../components/Gyms";
-import { RHFSelect } from "../../components/RHFSelect";
+import { RHFMultiSelect } from "../../components/RHFMultiSelect";
 import axios from "axios";
 import { EquipmentImage } from "../../components/Images";
+
 
 const GymMachineForm = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const GymMachineForm = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
 
   const onSubmit = async (machineInfo) => {
@@ -69,6 +71,8 @@ const GymMachineForm = () => {
     description: "La descripción debe tener más de 10 caracteres",
     muscularGroup: "El grupo muscular debe ser especificado",
   };
+
+  const selectedMuscularGroups = watch("muscular_group", []);
 
   return (
     <div className="max-w-xl mx-auto">
@@ -204,22 +208,56 @@ const GymMachineForm = () => {
 
           <div className="flex flex-col">
             <label htmlFor="muscular_group">Grupo muscular</label>
-            <RHFSelect
-              placeholder="Selecciona un grupo muscular"
+            <RHFMultiSelect
+              placeholder="Selecciona grupo muscular"
               {...register("muscular_group", { required: messages.req })}
             >
-              <Select.Item value="arms">Brazos</Select.Item>
-              <Select.Item value="legs">Piernas</Select.Item>
-              <Select.Item value="core">Abdominales</Select.Item>
-              <Select.Item value="chest">Pecho</Select.Item>
-              <Select.Item value="back">Espalda</Select.Item>
-              <Select.Item value="shoulders">Hombros</Select.Item>
-              <Select.Item value="other">Otros</Select.Item>
-            </RHFSelect>
+              <div>
+                <input type="checkbox" value="arms" {...register("muscular_group")} />
+                <label>Brazos</label>
+              </div>
+              <div>
+                <input type="checkbox" value="legs" {...register("muscular_group")} />
+                <label>Piernas</label>
+              </div>
+              <div>
+                <input type="checkbox" value="core" {...register("muscular_group")} />
+                <label>Abdominales</label>
+              </div>
+              <div>
+                <input type="checkbox" value="chest" {...register("muscular_group")} />
+                <label>Pecho</label>
+              </div>
+              <div>
+                <input type="checkbox" value="back" {...register("muscular_group")} />
+                <label>Espalda</label>
+              </div>
+              <div>
+                <input type="checkbox" value="shoulders" {...register("muscular_group")} />
+                <label>Hombros</label>
+              </div>
+              <div>
+                <input type="checkbox" value="other" {...register("muscular_group")} />
+                <label>Otros</label>
+              </div>
+            </RHFMultiSelect>
             {errors.muscular_group && (
               <p className="text-red-500">{errors.muscular_group.message}</p>
             )}
           </div>
+
+          {selectedMuscularGroups.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {selectedMuscularGroups.map((group) => (
+                <span
+                  key={group}
+                  className="px-2 py-1 bg-gray-200 rounded-md text-sm"
+                >
+                  {group}
+                </span>
+              ))}
+            </div>
+          )}
 
           <Button
             type="submit"
