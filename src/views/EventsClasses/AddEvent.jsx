@@ -87,7 +87,7 @@ const AddEventsForm = () => {
     <div className="flex justify-center items-center min-h-screen">
       <FormContainer className="md:w-1/2">
         <h2 className="mb-6 text-radixgreen font-bold text-4xl text-center">
-          Crear evento
+          Añadir evento
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <div>
