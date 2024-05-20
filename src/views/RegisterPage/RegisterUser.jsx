@@ -104,7 +104,7 @@ const UserRegister = () => {
       }
       else if (birthDate < lowDate){
         setErrorMessageDate("La fecha de nacimiento no puede ser anterior a 1920 ");
-      else {
+       } else {
         // Si la fecha de nacimiento es válida, limpiar el mensaje de error
         setErrorMessageDate(null);
       }
