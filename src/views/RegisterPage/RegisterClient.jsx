@@ -132,8 +132,8 @@ const RegisterClient = () => {
               {...register("name", {
                 required: messages.req,
                 pattern: {
-                  value: /^[a-zA-Z\s]*$/,
-                  message: "El nombre debe contener solo letras, sin acentos",
+                  value: /^[a-zA-Z\sáéíóúÁÉÍÓÚ]*$/,
+                  message: "El nombre debe contener solo letras",
                 },
                 maxLength: {
                   value: 100,
@@ -159,8 +159,8 @@ const RegisterClient = () => {
               {...register("lastName", {
                 required: messages.req,
                 pattern: {
-                  value: /^[a-zA-Z\s]*$/,
-                  message: "El apellido debe contener solo letras, sin acentos",
+                  value: /^[a-zA-Z\sáéíóúÁÉÍÓÚ]*$/,
+                  message: "El apellido debe contener solo letras",
                 },
                 maxLength: {
                   value: 100,
