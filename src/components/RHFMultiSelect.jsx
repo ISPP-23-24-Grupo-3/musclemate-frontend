@@ -41,6 +41,7 @@ export const RHFMultiSelect = forwardRef(
       
         // Actualizamos el estado con la nueva lista de opciones seleccionadas
         setSelectedOptions(newSelectedOptions);
+        console.log(newSelectedOptions);
       
         // Enviamos la lista de opciones seleccionadas al controlador de cambio
         onChange({ target: { name, value: newSelectedOptions } });

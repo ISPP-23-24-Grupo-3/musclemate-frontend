@@ -298,8 +298,7 @@ export default function EquipmentDetails() {
       const formData = new FormData();
   
       formData.append("name", updatedDetails.name);
-      const muscularGroupArray = updatedDetails.muscular_group;
-      muscularGroupArray.forEach(item => formData.append("muscular_group", item));
+      formData.append("muscular_group", updatedDetails.muscular_group);
       formData.append("description", updatedDetails.description);
       formData.append("brand", updatedDetails.brand);
       formData.append("serial_number", updatedDetails.serial_number);
@@ -440,7 +439,7 @@ export default function EquipmentDetails() {
               <>
               <RHFMultiSelect
                 name="muscular_group"
-                defaultValue={updatedDetails.muscular_group}
+                defaultValue={Array.isArray(updatedDetails.muscular_group) ? updatedDetails.muscular_group : updatedDetails.muscular_group.split(',')}
                 onChange={(e) =>
                   handleInputChangeMuscular(e.target.value, "muscular_group")
                 }
@@ -451,20 +450,10 @@ export default function EquipmentDetails() {
                   </Select.Item>
                 ))}
               </RHFMultiSelect>
-               <div className="flex flex-wrap gap-2 mt-4">
-                  {updatedDetails.muscular_group.map((group) => (
-                    <span
-                      key={group}
-                      className="px-2 py-1 bg-gray-200 rounded-md text-sm"
-                    >
-                      {translateMuscularGroup(group)}
-                    </span>
-                  ))}
-                </div>
               </>
             ) : (
               
-              machineDetails.muscular_group.map((option, index) => (
+              machineDetails.muscular_group.split(',').map((option, index) => (
                 <span
                   key={index}
                   className="px-2 py-1 bg-radixgreen rounded-md text-sm text-white"
@@ -472,7 +461,6 @@ export default function EquipmentDetails() {
                   {translateMuscularGroup(option)}
                 </span>
               ))
-
             )}
           </div>
           <div>
