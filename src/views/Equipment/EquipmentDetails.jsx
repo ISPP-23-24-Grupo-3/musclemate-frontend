@@ -98,6 +98,7 @@ export default function EquipmentDetails() {
       })
       .then((data) => {
         setMachineDetails(data);
+        console.log(data.muscular_group);
         // Cambio aquí para obtener el nombre del gimnasio
         if (data.gym) {
           const gymId = data.gym;
@@ -297,7 +298,8 @@ export default function EquipmentDetails() {
       const formData = new FormData();
   
       formData.append("name", updatedDetails.name);
-      formData.append("muscular_group", updatedDetails.muscular_group);
+      const muscularGroupArray = updatedDetails.muscular_group;
+      muscularGroupArray.forEach(item => formData.append("muscular_group", item));
       formData.append("description", updatedDetails.description);
       formData.append("brand", updatedDetails.brand);
       formData.append("serial_number", updatedDetails.serial_number);
@@ -449,23 +451,28 @@ export default function EquipmentDetails() {
                   </Select.Item>
                 ))}
               </RHFMultiSelect>
-               {selectedMuscularGroups.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {selectedMuscularGroups.map((group) => (
+               <div className="flex flex-wrap gap-2 mt-4">
+                  {updatedDetails.muscular_group.map((group) => (
                     <span
                       key={group}
                       className="px-2 py-1 bg-gray-200 rounded-md text-sm"
                     >
-                      {group}
+                      {translateMuscularGroup(group)}
                     </span>
                   ))}
                 </div>
-              )}
               </>
             ) : (
-              <span>
-                {translateMuscularGroup(machineDetails.muscular_group)}
-              </span>
+              
+              machineDetails.muscular_group.map((option, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 bg-radixgreen rounded-md text-sm text-white"
+                >
+                  {translateMuscularGroup(option)}
+                </span>
+              ))
+
             )}
           </div>
           <div>

@@ -33,6 +33,27 @@ const GymMachineForm = () => {
     watch,
   } = useForm();
 
+  const translateMuscularGroup = (group) => {
+    switch (group) {
+      case "arms":
+        return "Brazos";
+      case "legs":
+        return "Piernas";
+      case "core":
+        return "Core";
+      case "chest":
+        return "Pecho";
+      case "back":
+        return "Espalda";
+      case "shoulders":
+        return "Hombros";
+      case "other":
+        return "Otros";
+      default:
+        return group;
+    }
+  };
+
   const onSubmit = async (machineInfo) => {
     if (user?.rol === "gym") machineInfo.gym = gym.id;
     try {
@@ -259,7 +280,7 @@ const GymMachineForm = () => {
                   key={group}
                   className="px-2 py-1 bg-gray-200 rounded-md text-sm"
                 >
-                  {group}
+                  {translateMuscularGroup(group)}
                 </span>
               ))}
             </div>
