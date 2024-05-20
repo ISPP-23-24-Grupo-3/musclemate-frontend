@@ -317,11 +317,11 @@ export default function EquipmentDetails() {
       // Si la respuesta no fue exitosa, se ejecutará el código a continuación
     } catch (error) {
       // Si hay un error durante la solicitud, se ejecutará el código a continuación
-      setError("Error al eliminar el equipo.");
+      setError("Error al eliminar la máquina.");
       return;
     }
     // Si la ejecución llega a este punto, significa que hubo un problema durante la eliminación
-    setError("Error al eliminar el equipo."); // Muestra un mensaje de error genérico
+    setError("Error al eliminar la máquina."); // Muestra un mensaje de error genérico
   };
 
   if (!machineDetails) {
@@ -339,7 +339,7 @@ export default function EquipmentDetails() {
           <strong className="font-bold">Éxito!</strong>
           <span className="block sm:inline">
             {" "}
-            El equipo ha sido eliminado correctamente.
+            La máquina ha sido eliminada correctamente.
           </span>
           <span
             className="absolute top-0 bottom-0 right-0 px-4 py-3"

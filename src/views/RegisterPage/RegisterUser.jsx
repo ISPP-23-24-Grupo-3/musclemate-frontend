@@ -85,6 +85,8 @@ const UserRegister = () => {
         password,
       } = formData;
 
+      console.log(birth);
+      const lowDate = new Date("1920-01-01");
       const birthDate = new Date(birth);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -100,6 +102,8 @@ const UserRegister = () => {
         setErrorMessageDate("Debes tener al menos 12 años para registrarte.");
         return;
       }
+      else if (birthDate < lowDate){
+        setErrorMessageDate("La fecha de nacimiento no puede ser anterior a 1920 ");
       else {
         // Si la fecha de nacimiento es válida, limpiar el mensaje de error
         setErrorMessageDate(null);
@@ -121,24 +125,25 @@ const UserRegister = () => {
         },
         gym: user?.rol === "owner" ? formData.gym : gym.id,
       };
-
-      const response = await postToApi("clients/create/", requestBody);
-      if (!response.ok) {
-        const data = await response.json();
-        if (data.username) {
-          setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
-        } else if (data.email) {
-          setErrorMessageMail("Ya existe un usuario con este email");
-        } else {
-          setError("Hubo un error al crear el propietario");
+      if (error === null && errorMessageMail === null && errorMessageDate === null && errorMessageUser === null){
+        const response = await postToApi("clients/create/", requestBody);
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.username) {
+            setErrorMessageUser("Este nombre de usuario ya existe, prueba con otro");
+          } else if (data.email) {
+            setErrorMessageMail("Ya existe un usuario con este email");
+          } else {
+            setError("Hubo un error al crear el propietario");
+          }
+          return;
         }
-        return;
+        setError(null);
+        setErrorMessageUser(null);
+        setErrorMessageMail(null);
+        if (user?.rol === "owner") navigate("/owner/users");
+        else if (user?.rol === "gym") navigate("/gym/users");
       }
-      setError(null);
-      setErrorMessageUser(null);
-      setErrorMessageMail(null);
-      if (user?.rol === "owner") navigate("/owner/users");
-      else if (user?.rol === "gym") navigate("/gym/users");
     } catch (error) {
       console.error("Hubo un error al crear el usuario:", error);
     } finally {
@@ -152,7 +157,7 @@ const UserRegister = () => {
     mail: "Debes introducir una dirección correcta",
     password: "La contraseña tiene que ser mayor a 10 caracteres",
     phoneNumber: "Tiene que ser un número de 9 cifras",
-    zipCode: "Tiene que ser un númeroo de 5 cifras",
+    zipCode: "Tiene que ser un número de 5 cifras",
     confirmPass: "Las contraseñas no coinciden",
   };
 

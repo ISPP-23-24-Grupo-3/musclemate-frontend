@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getFromApi, deleteFromApi } from "../../utils/functions/api";
 import { Button, Heading } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form";
@@ -9,6 +9,8 @@ export default function GymDetails() {
   const [gymDetails, setGymDetails] = useState(null);
   const [error, setError] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getFromApi(`gyms/detail/${gymId}/`)
@@ -33,6 +35,9 @@ export default function GymDetails() {
       if (response.ok) {
         // Si la eliminación es exitosa, redirige al usuario a la lista de gimnasios
         setDeleteSuccess(true);
+        setTimeout(() => {
+          navigate("/owner/my-gyms");
+        }, 2000); // Espera 2 segundos antes de redirigir
         return;
       }
       // Si la respuesta no fue exitosa, se ejecutará el código a continuación
