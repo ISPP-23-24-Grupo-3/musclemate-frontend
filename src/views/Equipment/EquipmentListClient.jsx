@@ -251,7 +251,7 @@ export default function MachineList() {
                       p ? addFilter(m) : removeFilter(m)
                     }
                   >
-                    {m}
+                    {translateMuscularGroup(m)}
                   </Toggle.Root>
                 ))}
               </div>
