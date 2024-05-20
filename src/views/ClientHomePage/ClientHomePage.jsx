@@ -52,7 +52,6 @@ export default function ClientHomePage() {
   const [chartData, setChartData] = useState([]);
   const [routines, setRoutines] = useState([]);
   const [reservation, setReservations] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [error, setError] = useState(null);
 
