@@ -74,7 +74,7 @@ const Header = () => {
                 <HeaderLink to="/owner/events">Eventos</HeaderLink>
                 ) : null}
               <HeaderLink to="/owner/pricing">Planes</HeaderLink>
-              <HeaderLink to="/owner/subscriptions">Subscripciones</HeaderLink>
+              <HeaderLink to="/owner/subscriptions">Suscripciones</HeaderLink>
             </>
           ) : user?.rol === "client" ? (
             <>

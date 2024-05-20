@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/themes";
 import { getFromApi, putToApi } from "../../utils/functions/api";
 import { FormContainer } from "../../components/Form";
+import { useForm } from "react-hook-form";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -18,6 +19,7 @@ const Profile = () => {
   const [isCodeShown, setIsCodeShown] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editedUser, setEditedUser] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     console.log(userId);
@@ -50,14 +52,48 @@ const Profile = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await putToApi(`clients/update/${userId}/`, editedUser);
-      if (response.ok) {
-        setUser(editedUser);
-        setEditMode(false);
-      } else {
-        console.error("Error updating user:", response.status);
+      const {
+        name,
+        lastName,
+        email,
+        birth,
+        gender,
+        phoneNumber,
+        address,
+        city,
+        zipCode,
+        username,
+        password,
+      } = editedUser;
+
+      const birthDate = new Date(birth);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (birthDate > today) {
+        setError(true)
+        return;
+      } 
+      else if (age < 12) {
+        setError(true)
+        return;
+      }
+      else {
+        setError(false)
+        const response = await putToApi(`clients/update/${userId}/`, editedUser);
+        if (response.ok) {
+          setUser(editedUser);
+          setEditMode(false);
+        } else {
+          setError(true)
+          console.error("Error updating user:", response.status);
+        }
       }
     } catch (error) {
+      setError(true)
       console.error("Error updating user:", error);
     }
   };
@@ -79,6 +115,24 @@ const Profile = () => {
     } catch (error) {
       console.error("Error toggling registration:", error);
     }
+  };
+
+  const{register,formState: { errors }} = useForm();
+
+  const messages = {
+    req: "Este campo es obligatorio",
+    name: "El nombre de usuario tiene que ser mayor a 8 caracteres",
+    mail: "Debes introducir una dirección correcta",
+    password: "La contraseña tiene que ser mayor a 10 caracteres",
+    phoneNumber: "Tiene que ser un número de 9 cifras",
+    zipCode: "Tiene que ser un númeroo de 5 cifras",
+    confirmPass: "Las contraseñas no coinciden",
+  };
+
+  const patterns = {
+    mail: /\S+@\S+\.\S+/,
+    phoneNumber: /^\d{9}$/,
+    zipCode: /^\d{5}$/,
   };
 
   return (
@@ -123,11 +177,22 @@ const Profile = () => {
               {editMode ? (
                 <>
                   <TextField.Input
+                  {...register("name", {
+                    required: messages.req,
+                    maxLength: {
+                      value: 100,
+                      message: "El nombre no puede superar los 100 caracteres",
+                    },
+                  })}
                     type="text"
+                    name="name"
                     value={editedUser ? editedUser.name : ""}
                     onChange={(e) => handleInputChange(e, "name")}
                     placeholder="Nombre"
                   />
+                  {errors.name && (
+                    <p className="text-red-500">{errors.name.message}</p>
+                  )}
                   <label
                     htmlFor="lastName"
                     className="text-radixgreen font-bold"
@@ -224,6 +289,9 @@ const Profile = () => {
                 </Callout.Text>
               </Callout.Root>
             </div>
+            {error && (
+              <p className="text-red-500">Hubo un problema al actualizar el usuario por favor revise todos los campos</p>
+            )}
             <div className="flex flex-col gap-3">
               {editMode ? (
                 <div className="flex justify-between flex-wrap gap-3">
