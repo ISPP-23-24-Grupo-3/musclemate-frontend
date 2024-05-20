@@ -96,6 +96,27 @@ export default function MachineList() {
       machineRatings.find((item) => item.id === a.id)?.ratings,
   };
 
+  const translateMuscularGroup = (group) => {
+    switch (group) {
+      case "arms":
+        return "Brazos";
+      case "legs":
+        return "Piernas";
+      case "core":
+        return "Core";
+      case "chest":
+        return "Pecho";
+      case "back":
+        return "Espalda";
+      case "shoulders":
+        return "Hombros";
+      case "other":
+        return "Otros";
+      default:
+        return group;
+    }
+  };
+
   const addFilter = (filter) => set_filters([filter, ...filters]);
   const removeFilter = (filter) =>
     set_filters(filters.filter((f) => f !== filter));
@@ -215,7 +236,7 @@ export default function MachineList() {
                     onClick={() => removeFilter(f)}
                   >
                     <IoIosClose className="size-4" />
-                    {f}
+                    {translateMuscularGroup(f)}
                   </Button>
                 ))}
               </div>
@@ -287,7 +308,7 @@ export default function MachineList() {
                       p ? addFilter(m) : removeFilter(m)
                     }
                   >
-                    {m}
+                    {translateMuscularGroup(m)}
                   </Toggle.Root>
                 ))}
               </div>
@@ -392,4 +413,3 @@ export default function MachineList() {
     </>
   );
 }
-
