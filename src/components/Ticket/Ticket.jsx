@@ -49,6 +49,7 @@ export const Ticket = ({ ticket, onStatusChange, onResponseChange, onResponseSub
         setStatus("Cerrado");
         setTicketColor("red");
     } // Actualizar el estado local al estado del ticket
+    console.log(ticket.response)
   }, [ticket.status]);
 
 
@@ -107,7 +108,7 @@ export const Ticket = ({ ticket, onStatusChange, onResponseChange, onResponseSub
         <Card>
           <Text size="4">{ticket.description}</Text>
         </Card>
-        {ticket.response ? (
+        {(ticket.response!=null && ticket.response!="null") ? (
           <div>
             <strong className="text-radixgreen">Respuesta:</strong>{" "}
             <Card>
