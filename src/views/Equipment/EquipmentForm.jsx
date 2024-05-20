@@ -37,10 +37,16 @@ const GymMachineForm = () => {
     if (user?.rol === "gym") machineInfo.gym = gym.id;
     try {
       const formData = new FormData();
-      Object.keys(machineInfo).forEach((key) => {
-        formData.append(key, machineInfo[key]);
-      });
+      
+      formData.append("name", machineInfo.name);
+      formData.append("brand", machineInfo.brand);
+      formData.append("serial_number", machineInfo.serial_number);
+      formData.append("description", machineInfo.description);
+      const muscularGroupArray = machineInfo.muscular_group;
+      muscularGroupArray.forEach(item => formData.append("muscular_group", item));
+      formData.append("gym", machineInfo.gym);
       formData.set("image", machineInfo.image[0]);
+      console.log(formData);
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/equipments/create/`,
         formData,
@@ -170,7 +176,7 @@ const GymMachineForm = () => {
               Imagen
             </label>
             <input
-              {...register("image")}
+              {...register("image", {required: messages.req})}
               type="file"
               onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
             />

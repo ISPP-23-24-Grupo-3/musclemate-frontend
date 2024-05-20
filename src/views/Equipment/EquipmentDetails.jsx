@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   getFromApi,
   putToApi,
@@ -15,7 +16,7 @@ import {
   TextFieldInput,
 } from "@radix-ui/themes";
 import { FormContainer } from "../../components/Form.jsx";
-
+import { RHFMultiSelect } from "../../components/RHFMultiSelect";
 import Rating from "../../components/Rating";
 import { HiTicket } from "react-icons/hi";
 import { Checkbox } from "@radix-ui/themes";
@@ -46,6 +47,16 @@ export default function EquipmentDetails() {
   const [updatedDetails, setUpdatedDetails] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
 
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
+  const selectedMuscularGroups = watch("muscular_group", []);
+
+  
   // Opciones de grupo muscular
   const muscularGroupOptions = [
     { value: "arms", label: "Brazos" },
@@ -321,6 +332,10 @@ export default function EquipmentDetails() {
       if (response.ok) {
         // Si la eliminación es exitosa, mostramos el mensaje de éxito
         setDeleteSuccess(true);
+        setTimeout(() => {
+          navigate("/owner/equipments/");
+        }, 2000); // Espera 2 segundos antes de redirigir
+
         return;
       }
       // Si la respuesta no fue exitosa, se ejecutará el código a continuación
@@ -420,7 +435,8 @@ export default function EquipmentDetails() {
           <div className={`flex ${editMode ? "flex-col" : "gap-1"}`}>
             <strong className="text-radixgreen">Grupo Muscular:</strong>{" "}
             {editMode ? (
-              <RHFSelect
+              <>
+              <RHFMultiSelect
                 name="muscular_group"
                 defaultValue={updatedDetails.muscular_group}
                 onChange={(e) =>
@@ -432,7 +448,20 @@ export default function EquipmentDetails() {
                     {option.label}
                   </Select.Item>
                 ))}
-              </RHFSelect>
+              </RHFMultiSelect>
+               {selectedMuscularGroups.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {selectedMuscularGroups.map((group) => (
+                    <span
+                      key={group}
+                      className="px-2 py-1 bg-gray-200 rounded-md text-sm"
+                    >
+                      {group}
+                    </span>
+                  ))}
+                </div>
+              )}
+              </>
             ) : (
               <span>
                 {translateMuscularGroup(machineDetails.muscular_group)}
