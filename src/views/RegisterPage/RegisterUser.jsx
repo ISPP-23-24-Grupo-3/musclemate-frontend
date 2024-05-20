@@ -78,7 +78,7 @@ const UserRegister = () => {
     handleSubmit,
     formState: { errors, isValid },
     watch,
-  } = useForm();
+  } = useForm({ mode: "onBlur" });
 
   const onSubmit = async (formData) => {
     setLoading(true);
@@ -454,6 +454,11 @@ const UserRegister = () => {
                     value: 128,
                     message:
                       "La contraseña no puede superar los 128 caracteres",
+                  },
+                  validate: {
+                    hasNumber: (value) =>
+                      /\d/.test(value) ||
+                      "La contraseña debe contener al menos un número",
                   },
                 })}
                 name="password"
