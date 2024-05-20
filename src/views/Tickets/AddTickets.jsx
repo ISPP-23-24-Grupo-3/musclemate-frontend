@@ -1,11 +1,15 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Importa useNavigate desde react-router-dom
-import { postToApi, getFromApi, postFormToApi } from "../../utils/functions/api";
+import {
+  postToApi,
+  getFromApi,
+  postFormToApi,
+} from "../../utils/functions/api";
 import AuthContext from "../../utils/context/AuthContext";
 import { FormContainer } from "../../components/Form";
 import { Button, Select, TextArea, TextField } from "@radix-ui/themes";
-import { EquipmentSelect } from "../../components/Equipments"
-import axios from 'axios';
+import { EquipmentSelect } from "../../components/Equipments";
+import axios from "axios";
 
 import { FaFileImage } from "react-icons/fa";
 
@@ -43,14 +47,18 @@ const AddTickets = () => {
       formData.append("equipment", equipmentId);
       formData.append("client", user.id);
       formData.append("status", false);
-      formData.append('image', image);
+      formData.append("image", image);
 
-      const response = await axios.post(`${BASE_URL}/tickets/create/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
+      const response = await axios.post(
+        `${BASE_URL}/tickets/create/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem("authTokens"))?.access}`,
+          },
         },
-      });
+      );
       console.log(response);
       if (response.status == 201) {
         setSuccessMessage("Incidencia creada exitosamente");
@@ -106,12 +114,14 @@ const AddTickets = () => {
         </h2>
         {gymPlan === "free" ? (
           <div className="text-red-700">
-            La subscripción "{gymPlan}" de tu gimnasio no incluye esta funcionalidad. ¡Contacta con tu gimnasio para adquirir funcionalidades como esta!
+            La subscripción "{gymPlan}" de tu gimnasio no incluye esta
+            funcionalidad. ¡Contacta con tu gimnasio para adquirir
+            funcionalidades como esta!
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-            <strong className="text-radixgreen">Asunto:</strong>{" "}
+              <strong className="text-radixgreen">Asunto:</strong>{" "}
               <TextField.Input
                 type="text"
                 id="label"
@@ -121,7 +131,7 @@ const AddTickets = () => {
               />
             </div>
             <div>
-            <strong className="text-radixgreen">Descripción:</strong>{" "}
+              <strong className="text-radixgreen">Descripción:</strong>{" "}
               <TextArea
                 id="description"
                 value={description}
@@ -130,7 +140,7 @@ const AddTickets = () => {
               />
             </div>
             <div className="flex flex-col">
-            <strong className="text-radixgreen">Equipo:</strong>{" "}
+              <strong className="text-radixgreen">Máquina:</strong>{" "}
               <EquipmentSelect
                 id="equipmentId"
                 onChange={(eq) => setEquipmentId(eq.target.value)}
@@ -139,14 +149,14 @@ const AddTickets = () => {
               />
             </div>
             <div>
-            <strong className="text-radixgreen">Imagen:</strong>{" "}
+              <strong className="text-radixgreen">Imagen:</strong>{" "}
               <input
                 type="file"
                 id="image"
                 accept="image/*"
                 onChange={(e) => {
-                  console.log(e.target.files[0])
-                  setImage(e.target.files[0])}}
+                  setImage(e.target.files[0]);
+                }}
               />
             </div>
             {successMessage && (

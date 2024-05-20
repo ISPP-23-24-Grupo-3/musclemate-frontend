@@ -32,7 +32,7 @@ function Gym({
 }) {
   const { user } = useContext(AuthContext);
 
-  async function handleClick() {
+  async function handleCancel() {
     const owner = await getFromApi(`owners/detail/${user.username}/`);
     const { customer_id } = await owner.json();
     const customer = await stripe.customers.retrieve(customer_id, {
@@ -43,25 +43,140 @@ function Gym({
       setError("No tienes suscripciones activas.");
       return;
     }
-    const subcription_quantity = customer.subscriptions.data[0].quantity;
-    if (subcription_quantity === 1) {
-      await stripe.subscriptions.cancel(customer.subscriptions.data[0].id);
-      console.log("Subscription deleted successfully");
+    if (subscription_plan === "premium") {
+      const premium_subscription = customer.subscriptions.data.find(
+        (subscription) => subscription.items.data[0].price.id === "price_1Ow67AHg56faYu5eTccV66kL"
+      );
+      const premium_subscription_quantity = premium_subscription.quantity;
+      const premium_subscription_id = premium_subscription.id;
+      const premium_item_id = premium_subscription.items.data[0].id;
+      if (premium_subscription_quantity === 1) {
+        await stripe.subscriptions.cancel(premium_subscription_id);
+      } else {
+        await stripe.subscriptions.update(premium_subscription_id, {
+          items: [
+            {
+              id: premium_item_id,
+              quantity: premium_subscription_quantity - 1,
+            },
+          ],
+        });
+      }
     } else {
-      const item_id = customer.subscriptions.data[0].items.data[0].id;
-      await stripe.subscriptions.update(customer.subscriptions.data[0].id, {
-        items: [
-          {
-            id: item_id,
-            quantity: subcription_quantity - 1,
-          },
-        ],
-      });
-      console.log("Subscription updated successfully");
+      const standard_subscription = customer.subscriptions.data.find(
+        (subscription) => subscription.items.data[0].price.id === "price_1Ow69FHg56faYu5eI3UjOlqS"
+      );
+      const standard_subscription_quantity = standard_subscription.quantity;
+      const standard_subscription_id = standard_subscription.id;
+      const standard_item_id = standard_subscription.items.data[0].id;
+      if (standard_subscription_quantity === 1) {
+        await stripe.subscriptions.cancel(standard_subscription_id);
+      } else {
+        await stripe.subscriptions.update(standard_subscription_id, {
+          items: [
+            {
+              id: standard_item_id,
+              quantity: standard_subscription_quantity - 1,
+            },
+          ],
+        });
+      }
     }
     await putToApi(`gyms/update/${id}/`, { subscription_plan: "free" });
     notSubscribedGyms(id);
   }
+
+  async function handleUpgrade() {
+    const owner = await getFromApi(`owners/detail/${user.username}/`);
+    const { customer_id } = await owner.json();
+    const customer = await stripe.customers.retrieve(customer_id, {
+      expand: ["subscriptions"],
+    });
+    console.log(customer.subscriptions);
+    if (customer.subscriptions.data.length === 0) {
+      setError("No tienes suscripciones activas.");
+      return;
+    }
+    console.log(customer.subscriptions);
+    const standard_subscription = customer.subscriptions.data.find(
+      (subscription) => subscription.items.data[0].price.id === "price_1Ow69FHg56faYu5eI3UjOlqS"
+    );
+    console.log(standard_subscription);
+    const premium_subscription = customer.subscriptions.data.find(
+      (subscription) => subscription.items.data[0].price.id === "price_1Ow67AHg56faYu5eTccV66kL"
+    );
+    if (!standard_subscription) {
+      setError("No tienes una suscripción estándar.");
+      return;
+    }
+    const standard_subscription_quantity = standard_subscription.quantity;
+    const standard_subscription_id = standard_subscription.id;
+    const standard_item_id = standard_subscription.items.data[0].id;
+
+    if (premium_subscription) {
+      const premium_subscription_quantity = premium_subscription.quantity;
+      const premium_subscription_id = premium_subscription.id;
+      const premium_item_id = premium_subscription.items.data[0].id;
+      await stripe.subscriptions.update(premium_subscription_id, {
+        items: [
+          {
+            id: premium_item_id,
+            quantity: premium_subscription_quantity + 1,
+          },
+        ],
+      });
+      if (standard_subscription_quantity === 1) {
+        await stripe.subscriptions.cancel(standard_subscription_id);
+      } else {
+        await stripe.subscriptions.update(standard_subscription_id, {
+          items: [
+            {
+              id: standard_item_id,
+              quantity: standard_subscription_quantity - 1,
+            },
+          ],
+        });
+      }
+      await putToApi(`gyms/update/${id}/`, { subscription_plan: "premium" });
+      window.location.reload();
+      return;
+    }
+
+    if (standard_subscription_quantity === 1) {
+      await stripe.subscriptions.update(standard_subscription_id, {
+        items: [
+          {
+            id: standard_item_id,
+            price: "price_1Ow67AHg56faYu5eTccV66kL",
+          },
+        ],
+      });
+    }
+    if (standard_subscription_quantity > 1) {
+      await stripe.subscriptions.update(standard_subscription_id, {
+        items: [
+          {
+            id: standard_item_id,
+            quantity: standard_subscription_quantity - 1,
+          },
+        ],
+      });
+      await stripe.subscriptions.create({
+        customer: customer_id,
+        items: [
+          {
+            price: "price_1Ow67AHg56faYu5eTccV66kL",
+            quantity: 1,
+          },
+        ],
+      });
+    }
+    await putToApi(`gyms/update/${id}/`, { subscription_plan: "premium" });
+    window.location.reload();
+    return;
+
+  }
+
 
   return (
     <div className="border border-radixgreen rounded-lg w-full">
@@ -92,28 +207,40 @@ function Gym({
           <div className="flex justify-center items-center mt-5">
 
             {subscription_plan ? (
-              <Button color="red" onClick={() => handleClick(id)}>
-                Cancelar suscripción
-              </Button>
+              <>
+                <Button color="red" onClick={() => handleCancel(id, subscription_plan)}>
+                  Cancelar suscripción
+                </Button>
+                {subscription_plan === "standard" ? (
+                  <Button color="green" onClick={() => handleUpgrade(id)}>
+                    Mejorar suscripción
+                  </Button>
+                ) : null}
+              </>
             ) : (
               <Checkbox.Root
-              className="w-6 h-6 border border-black rounded-sm flex items-center justify-center"
-              onCheckedChange={() =>
-                handleCheck(id, location_subscription_plan)
-              }
-            >
-              <Checkbox.Indicator className="bg-radixgreen w-full h-full flex justify-center items-center">
-                <CheckIcon color="white" />
-              </Checkbox.Indicator>
-            </Checkbox.Root>
+                className="w-6 h-6 border border-black rounded-sm flex items-center justify-center"
+                onCheckedChange={() =>
+                  handleCheck(id, location_subscription_plan)
+                }
+              >
+                <Checkbox.Indicator className="bg-radixgreen w-full h-full flex justify-center items-center">
+                  <CheckIcon color="white" />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
             )}
             
           </div>
         ) : (
-          <div className="flex justify-center items-center mt-5">
-            <Button color="red" onClick={() => handleClick(id)}>
+          <div className="flex justify-center items-center mt-5 gap-5">
+            <Button color="red" onClick={() => handleCancel(id, subscription_plan)}>
               Cancelar suscripción
             </Button>
+            {subscription_plan === "standard" ? (
+                  <Button color="green" onClick={() => handleUpgrade(id)}>
+                    Mejorar suscripción
+                  </Button>
+                ) : null}
           </div>
         )}
       </div>
