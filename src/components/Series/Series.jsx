@@ -354,7 +354,7 @@ export const Series = (workoutID) => {
                                     color={`${errors[`reps${serie.id}`] ? "red" : "green"}`}
                                     defaultValue={serie.reps}
                                     {...register(`reps${serie.id}`, {
-                                      validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                                      validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser mayor que 0",
                                     })}
                                   />
                                   </div>   
@@ -368,7 +368,7 @@ export const Series = (workoutID) => {
                                     placeholder='En Kg'
                                     defaultValue={serie.weight}
                                     {...register(`peso${serie.id}`, {
-                                      validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                                      validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser mayor que 0",
                                     })}
                                   />
                                 </div>
@@ -382,7 +382,7 @@ export const Series = (workoutID) => {
                                     placeholder='En segundos'
                                     onChange={(e) =>{ setDuration(e.target.value)}}
                                     {...register(`durationn${serie.id}`, {
-                                      validate: value => value === "" || (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                                      validate: value => value === "" || (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser mayor que 0",
                                     })}
                                   />
                                 </div>
@@ -390,7 +390,7 @@ export const Series = (workoutID) => {
                             </div>
                             <span className={`${errors[`reps${serie.id}`] || errors[`peso${serie.id}`]
                             || errors[`durationn${serie.id}`] ? "text-red-500" : "hidden"} block mb-2`}>
-                              Todos los campos deben ser 0 o números enteros positivos
+                              Todos los campos deben ser mayores que 0
                             </span>
                             <Button>Aceptar</Button>
                           </div>
@@ -461,7 +461,7 @@ export const Series = (workoutID) => {
                 <div className="flex flex-col items-center">
                   <Text>Repeticiones: </Text>
                   <TextField.Input {...register("reps", {
-                    validate: value => (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                    validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser mayor que 0",
                   })}></TextField.Input>
                 </div>
               </div>
@@ -471,7 +471,7 @@ export const Series = (workoutID) => {
                   <TextField.Input 
                   placeholder='En Kg'   
                   {...register("peso", {
-                    validate: value => (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                    validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser mayor que 0",
                   })} ></TextField.Input>
                 </div>
               </div>
@@ -481,13 +481,13 @@ export const Series = (workoutID) => {
                   <TextField.Input 
                   placeholder='En segundos'
                   {...register("duration", {
-                    validate: value => (value >= 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
+                    validate: value => (value > 0 && Number.isInteger(Number(value))) || "El valor debe ser 0 o un número entero positivo",
                   })} ></TextField.Input>
                 </div>
               </div>
             </div>
             <span className={`font-bold ${errors.peso || errors.duration || errors.reps? "text-red-500" : "hidden"} block mb-2`}>
-              Todos los campos deben ser 0 o números enteros positivos
+              Todos los campos deben ser mayores que 0
             </span>
           </div>
           <div className='flex justify-center mt-3'>
