@@ -63,8 +63,7 @@ const GymMachineForm = () => {
       formData.append("brand", machineInfo.brand);
       formData.append("serial_number", machineInfo.serial_number);
       formData.append("description", machineInfo.description);
-      const muscularGroupArray = machineInfo.muscular_group;
-      muscularGroupArray.forEach(item => formData.append("muscular_group", item));
+      formData.append("muscular_group", machineInfo.muscular_group);
       formData.append("gym", machineInfo.gym);
       formData.set("image", machineInfo.image[0]);
       console.log(formData);
